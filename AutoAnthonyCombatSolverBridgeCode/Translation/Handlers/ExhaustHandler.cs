@@ -38,7 +38,10 @@ public sealed class ExhaustHandler : IOperationHandler
             var hand = context.Mirror.OwnerState.Hand.Cards.ToList();
             var selected = context.Mirror.Rng.CombatCardSelection.NextItem(hand);
             if (selected is not null)
+            {
                 context.Mirror.Simulator.Exhaust(selected);
+                context.Resolution?.ExhaustedByCard.Add(selected);
+            }
             return;
         }
         var handCards = context.Mirror.OwnerState.Hand.Cards.ToList();
@@ -48,6 +51,7 @@ public sealed class ExhaustHandler : IOperationHandler
         foreach (var target in targets)
         {
             context.Mirror.Simulator.Exhaust(target);
+            context.Resolution?.ExhaustedByCard.Add(target);
             if (context.Mirror.Simulator.HasPendingChoice)
                 return;
         }

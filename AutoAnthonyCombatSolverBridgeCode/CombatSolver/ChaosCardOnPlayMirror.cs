@@ -72,6 +72,15 @@ internal static class ChaosCardOnPlayMirror
             if (operation.Scope == OperationScope.ConditionalTrigger)
             {
                 var conditionSpec = TryEffectiveSpec(card, index);
+                // Batch AQ：ForEach 触发器（immediate）——对本卡已消耗的每张卡执行收益
+                // （复刻源码 L180-182 ExecuteForEach；ExhaustedByCard 由 ExhaustHandler 记录）
+                if (conditionSpec?.Opcode == "trigger"
+                    && conditionSpec.Trigger is { Kind: "for_each_exhausted_card" or "for_each_exhausted_non_attack"
+                        or "for_each_exhausted_status", Lifetime: "immediate" })
+                {
+                    ExecuteForEach(card, index, context, resolution);
+                    continue;
+                }
                 if (conditionSpec?.Condition is { } condition
                     && ConditionEvaluator.IsSupportedCondition(condition.Kind))
                 {
@@ -93,6 +102,12 @@ internal static class ChaosCardOnPlayMirror
                 // 只门控普通条件（AbilityTrigger/持久触发器仍跳过——武装为 Power）
                 if (gate.Scope == OperationScope.ConditionalTrigger)
                 {
+                    // Batch AQ：ForEach 触发器的收益已由 ForEach 循环执行——主循环跳过
+                    var gateSpec = TryEffectiveSpec(card, gateIndex);
+                    if (gateSpec?.Opcode == "trigger"
+                        && gateSpec.Trigger is { Kind: "for_each_exhausted_card" or "for_each_exhausted_non_attack"
+                            or "for_each_exhausted_status" })
+                        continue;
                     if (!conditionResults.TryGetValue(gateIndex, out var gateResult) || !gateResult)
                         continue;    // 条件 false → 跳过 payoff
                 }
@@ -221,6 +236,16 @@ internal static class ChaosCardOnPlayMirror
                     return null;    // 放行（执行循环中评估并门控 payoff）
                 return Describe(card, index, $"条件 kind={condition.Kind} 不在支持矩阵");
             }
+            // Batch AQ：ForEach 触发器（immediate——打出时对已消耗的卡执行收益）
+            if (operation.Scope == OperationScope.ConditionalTrigger
+                && triggerSpec.Opcode == "trigger"
+                && triggerSpec.Trigger is { Kind: "for_each_exhausted_card" or "for_each_exhausted_non_attack"
+                    or "for_each_exhausted_status" })
+            {
+                if (triggerSpec.Trigger.Lifetime != "immediate")
+                    return Describe(card, index, $"ForEach 触发器 lifetime={triggerSpec.Trigger.Lifetime} 不在支持矩阵");
+                return ValidateForEachPayload(card, index);
+            }
             var triggerReason = ChaosTriggerPolicy.ValidateTrigger(operation, triggerSpec);
             return triggerReason is null ? null : Describe(card, index, triggerReason);
         }
@@ -251,8 +276,13 @@ internal static class ChaosCardOnPlayMirror
                 && triggerSpec.Opcode == "condition"
                 && triggerSpec.Condition is { } condition
                 && AutoAnthonyCombatSolverBridge.Translation.ConditionEvaluator.IsSupportedCondition(condition.Kind);
+            // Batch AQ：ForEach 触发器的 payoff——由 ForEach 循环执行，走正常 handler 校验
+            var forEachTrigger = trigger.Scope == OperationScope.ConditionalTrigger
+                && triggerSpec.Opcode == "trigger"
+                && triggerSpec.Trigger is { Kind: "for_each_exhausted_card" or "for_each_exhausted_non_attack"
+                    or "for_each_exhausted_status" };
             // 即时条件只门控执行，不能绕过后面的 handler 支持检查。
-            if (!immediateCondition)
+            if (!immediateCondition && !forEachTrigger)
             {
                 if (ChaosTriggerPolicy.ValidateTrigger(trigger, triggerSpec) is not null)
                     return Describe(card, index, "收益引用了未适配触发器");
@@ -261,6 +291,8 @@ internal static class ChaosCardOnPlayMirror
                 var payloadReason = ChaosTriggerPolicy.ValidatePayload(payloadSpec);
                 if (payloadReason is not null) return Describe(card, index, payloadReason);
             }
+            if (forEachTrigger && operation.CardTargetSlot is not null)
+                return Describe(card, index, "ForEach 收益引用迭代卡槽位（CardTargetSlot）尚未支持");
         }
 
         if (operation.CardTargetSlot is not null)
@@ -309,6 +341,77 @@ internal static class ChaosCardOnPlayMirror
 
         return null;
     }
+
+    /// <summary>Batch AQ：ForEach 触发器的收益校验（复刻源码 ExecuteForEach 的消费面）。</summary>
+    private static string? ValidateForEachPayload(ChaosCardModel card, int triggerIndex)
+    {
+        var operations = card.Generated.Operations;
+        var hasPayload = false;
+        for (var index = triggerIndex + 1; index < operations.Count; index++)
+        {
+            var effect = operations[index];
+            if (!effect.Parameters.TryGetValue("triggerIndex", out var linked) || linked != triggerIndex) continue;
+            hasPayload = true;
+            if (effect.Scope is OperationScope.Modifier or OperationScope.AbilityTrigger
+                or OperationScope.ConditionalTrigger or OperationScope.AbilityRule)
+                return Describe(card, index, "ForEach 收益是触发器/修饰符（嵌套不支持）");
+            if (effect.CardTargetSlot is not null)
+                return Describe(card, index, "ForEach 收益引用迭代卡槽位（CardTargetSlot）尚未支持");
+            var spec = TryEffectiveSpec(card, index);
+            if (spec is null) return Describe(card, index, "ForEach 收益缺少 spec");
+            var handler = OperationHandlerRegistry.Instance.TryGet(OperationKey.FromSpec(spec));
+            if (handler is null) return Describe(card, index, $"ForEach 收益 {spec.Opcode}/{spec.Variant} 无 handler");
+            var reason = handler.ValidateSupport(new OperationShape(index, effect.Scope, spec));
+            if (reason is not null) return Describe(card, index, reason);
+            var shapeReason = ValidateSpecShape(card, index, spec);
+            if (shapeReason is not null) return shapeReason;
+        }
+        if (!hasPayload) return Describe(card, triggerIndex, "ForEach 触发器没有收益操作");
+        return null;
+    }
+
+    /// <summary>Batch AQ：ForEach 触发器执行（复刻源码 L383-401 ExecuteForEach）。</summary>
+    private static void ExecuteForEach(ChaosCardModel card, int triggerIndex,
+        CardOnPlayMirrorContext context, OperationResolutionState resolution)
+    {
+        var triggerKind = TryEffectiveSpec(card, triggerIndex)?.Trigger?.Kind;
+        // 源码 L387-388：state.ExhaustedByCard 按触发器 kind 过滤类型
+        var items = resolution.ExhaustedByCard
+            .Where(candidate => ExhaustedCardMatchesTrigger(triggerKind, candidate.Preview.Type))
+            .ToList();
+        var operations = card.Generated.Operations;
+        foreach (var _ in items)
+        {
+            for (var index = triggerIndex + 1; index < operations.Count; index++)
+            {
+                var effect = operations[index];
+                if (!effect.Parameters.TryGetValue("triggerIndex", out var linked) || linked != triggerIndex) continue;
+                var spec = ChaosOperationExecutor.EffectiveRuntimeSpec(card, index);
+                var handler = OperationHandlerRegistry.Instance.TryGet(OperationKey.FromSpec(spec))
+                    ?? throw PredictionUnsupportedException.ForContent(
+                        Describe(card, index, $"ForEach 收益 {spec.Opcode}/{spec.Variant} 无 handler（校验层遗漏）"),
+                        typeof(ChaosCardModel));
+                // 复刻 ExecuteWithResolvedTarget 的显式随机目标解析（与主循环一致）
+                Creature? resolvedRandomTarget = null;
+                if (spec.Flags.Contains("random_enemy_reference"))
+                    resolvedRandomTarget = context.Rng.CombatTargets.NextItem(context.CombatState.HittableEnemies);
+                handler.Execute(new OperationExecutionContext(context, card,
+                    new OperationShape(index, effect.Scope, spec), resolvedRandomTarget, Resolution: resolution));
+                if (context.Simulator.HasPendingChoice)
+                    throw PredictionUnsupportedException.ForContent(
+                        Describe(card, index, "ForEach 收益产生选择，尚未接入整卡执行续接"),
+                        typeof(ChaosCardModel));
+            }
+        }
+    }
+
+    /// <summary>源码 L403-408：按触发器 kind 过滤消耗卡的类型。</summary>
+    private static bool ExhaustedCardMatchesTrigger(string? triggerKind, CardType cardType) => triggerKind switch
+    {
+        "for_each_exhausted_non_attack" => cardType != CardType.Attack,
+        "for_each_exhausted_status" => cardType == CardType.Status,
+        _ => true
+    };
 
     /// <summary>解析执行视角 spec；旧存档无 spec 时返回 null（由调用方转成不支持原因）。</summary>
     private static OperationRuntimeSpec? TryEffectiveSpec(ChaosCardModel card, int index)
