@@ -17,14 +17,25 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 
 ---
 
-## 当前状态：v0.0.4（观察模式）
+## 当前状态：v0.0.4（观察模式）——里程碑①–④已全部实机验证
 
 | 里程碑 | 内容 | 状态 |
 |---|---|---|
-| ① | 空模板 Mod 能编译并被游戏加载 | ✅ 代码就绪，待你启动游戏验证 |
-| ② | 同时引用 AutoAnthony.dll + CombatSolver.dll | ✅ 编译期引用 + Publicizer 已配置 |
-| ③ | 识别 `ChaosCardModel`（AutoAnthony 生成牌） | ✅ `RuntimeSpecDumpPatch` 已实现 |
-| ④ | 把生成卡的全部 `OperationRuntimeSpec` 打进日志 | ✅ 结构化转储已实现 |
+| ① | 空模板 Mod 能编译并被游戏加载 | ✅ 实机验证（游戏日志：DLL 加载 + 初始化器调用） |
+| ② | 同时引用 AutoAnthony.dll + CombatSolver.dll | ✅ 实机验证（守卫全绿：版本/MVID/SHA256 与锁定值一致） |
+| ③ | 识别 `ChaosCardModel`（AutoAnthony 生成牌） | ✅ 实机验证（战斗开始即逐卡识别） |
+| ④ | 把生成卡的全部 `OperationRuntimeSpec` 打进日志 | ✅ 实机验证（12 卡 / 24 操作 / 24 spec 全转储，零缺失零不一致） |
+
+实测样例（spec-dump.log）：
+
+```
+CHAOS_CARD id=CARD.CHAOS_CARD000 title="岿然防御" type=Skill cost=1 ... operations=2 specs_present=2 persisted_specs=2
+  op[0] template="N:B" scope=NonTargeted spec=present
+    spec schema=1 opcode=gain_block variant=immediate target=self zones=none->none filter=any flags=[block_reference,...] values=[block=4 src=fixed off=0 up] condition=- trigger=-
+```
+
+实测覆盖的 opcode：`deal_damage` / `apply_power` / `gain_block` / `template_independent_action` /
+`trigger` / `upgrade_card` / `exhaust_card` / `modify_block` / `modify_hits`。
 
 0.0.4 **不向 CombatSolver 注册任何镜像**（fail-closed：部分适配比完全不适配更危险）。
 进入战斗后桥只做两件事：识别生成牌、转储 RuntimeSpec。CombatSolver 对 AutoAnthony 内容
