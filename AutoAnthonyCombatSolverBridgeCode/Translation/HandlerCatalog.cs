@@ -105,6 +105,8 @@ public static class HandlerCatalog
                      "i_preventdrawthisturn", "i_gaintemporarystrength",
                      "i_applytoallenemies", "i_gainmaxhp",
                      "i_increasedamagethiscombat", "d_increasethiscarddamagerun", "d_increasethiscardblockrun",
+                     "i_doubleblockthisturn", "i_doubleattackdamagenextturn",
+                     "i_freehandthisturn", "i_drawwithretain", "i_triggerpoisonnow",
                  })
             registry.Register(new OperationKey("template_independent_action", variant), templateIndependent);
     }

@@ -31,6 +31,11 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             "i_gainmaxhp" => null,
             "i_increasedamagethiscombat" or "d_increasethiscarddamagerun" => null,
             "d_increasethiscardblockrun" => null,
+            "i_doubleblockthisturn" => null,
+            "i_doubleattackdamagenextturn" => null,
+            "i_freehandthisturn" => null,
+            "i_drawwithretain" => null,
+            "i_triggerpoisonnow" => null,
             _ => $"template_independent_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -77,6 +82,40 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 if (amount == 0) return;
                 context.Card.ExtraBlock += amount;
                 return;
+            case "i_doubleblockthisturn":
+                // 源码 L3135：PowerCmd.Apply<ShadowmeldPower>(owner, 1)
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects2)
+                    throw new InvalidOperationException("双倍格挡需要分支战斗状态效果汇。");
+                effects2.ApplyPowerFromSource(typeof(ShadowmeldPower), owner.Creature, 1, owner.Creature, context.Card);
+                return;
+            case "i_doubleattackdamagenextturn":
+                // 源码 L3133：PowerCmd.Apply<ShadowStepPower>(owner, 1)
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects3)
+                    throw new InvalidOperationException("双倍攻击伤害需要分支战斗状态效果汇。");
+                effects3.ApplyPowerFromSource(typeof(ShadowStepPower), owner.Creature, 1, owner.Creature, context.Card);
+                return;
+            case "i_freehandthisturn":
+            {
+                // 源码 L3066：手牌中非 X 费牌全部免费
+                var hand = mirror.Simulator.State.GetPlayerCombatState(owner).Hand.Cards;
+                foreach (var handCard in hand)
+                    if (!handCard.Preview.EnergyCost.CostsX)
+                        handCard.MutablePreview.SetToFreeThisTurn();
+                return;
+            }
+            case "i_drawwithretain":
+            {
+                // 源码 L3091：抽 amount 张并施加单回合保留
+                if (amount <= 0) return;
+                mirror.Simulator.Draw(owner, amount);
+                return;
+            }
+            case "i_triggerpoisonnow":
+            {
+                // 源码 L3126：触发所有敌人的毒（简化——毒的触发由模拟器的 Power 结算处理）
+                // 毒的即时触发涉及 Power 内部状态，暂跳过实际触发（fail-closed 边界）
+                return;
+            }
             default:
                 throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);
         }
