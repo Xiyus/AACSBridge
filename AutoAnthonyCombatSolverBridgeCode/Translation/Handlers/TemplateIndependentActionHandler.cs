@@ -28,6 +28,12 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
         // modify_cost/set_zero：本卡费用设为 0
         if (spec.Opcode == "modify_cost" && spec.Variant == "set_zero")
             return null;
+        // upgrade_card/referenced：升级引用卡（简化——升级本卡）
+        if (spec.Opcode == "upgrade_card" && spec.Variant == "referenced")
+            return null;
+        // end_turn/after_card_resolution：结算后结束回合
+        if (spec.Opcode == "end_turn" && spec.Variant == "after_card_resolution")
+            return null;
         return spec.Variant switch
         {
             "i_preventdrawthisturn" => null,
@@ -76,6 +82,20 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
         if (context.Shape.Spec.Opcode == "modify_cost")
         {
             context.Card.SetToFreeThisCombat();
+            return;
+        }
+
+        // upgrade_card/referenced：升级引用卡（简化——升级本卡）
+        if (context.Shape.Spec.Opcode == "upgrade_card")
+        {
+            if (context.Card.IsUpgradable)
+                global::CombatSolver.Engine.Common.PredictionUtils.UpgradeCard(context.Card);
+            return;
+        }
+
+        // end_turn/after_card_resolution：结算后结束回合（no-op——回合结束由求解器管理）
+        if (context.Shape.Spec.Opcode == "end_turn")
+        {
             return;
         }
 

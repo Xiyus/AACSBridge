@@ -147,5 +147,8 @@ public static class HandlerCatalog
 
         // 0.9.x：modify_cost/set_zero（4 条——本卡费用设为 0）
         registry.Register(new OperationKey("modify_cost", "set_zero"), templateIndependent);
+        // 0.9.x：upgrade_card/referenced + end_turn/after_card_resolution
+        registry.Register(new OperationKey("upgrade_card", "referenced"), templateIndependent);
+        registry.Register(new OperationKey("end_turn", "after_card_resolution"), templateIndependent);
     }
 }
