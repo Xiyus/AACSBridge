@@ -26,6 +26,9 @@ internal static class DamageModifierResolver
             or "ncr_repeatpervoidplayedcombat"
             or "r_damageupwhendrawn",
         "modify_hits" => spec.Variant == "flat_extra",
+        "modify_damage" => spec.Variant is
+            "vulnerable_scaled" or "strike_count_scaled" or "current_block",
+        "modify_orb_slots" => spec.Variant == "loss",
         _ => false,
     };
 

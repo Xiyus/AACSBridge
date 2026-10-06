@@ -36,6 +36,7 @@ public sealed class PowerHandler : IOperationHandler
         ["dexterity_gain_this_turn"] = (typeof(AnticipatePower), 1),
         ["doom"] = (typeof(DoomPower), 1),
         ["focus_loss"] = (typeof(FocusPower), -1),
+        ["focus_loss_this_turn"] = (typeof(FocusPower), -1),
         ["thorns"] = (typeof(ThornsPower), 1),
         ["intangible"] = (typeof(IntangiblePower), 1),
         ["plating"] = (typeof(PlatingPower), 1),

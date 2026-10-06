@@ -33,7 +33,7 @@ public static class HandlerCatalog
                      "vulnerable_double", "retain_hand_this_turn", "strength", "strength_per_target_vulnerable",
                      "dexterity_gain", "dexterity_loss", "dexterity_gain_this_turn", "doom", "focus_loss",
                      "thorns", "intangible", "blur", "plating", "strength_this_turn", "vigor",
-                     "poison",
+                     "poison", "focus_loss_this_turn",
                  })
             registry.Register(new OperationKey("apply_power", variant), power);
 
