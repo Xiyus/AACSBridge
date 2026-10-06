@@ -100,6 +100,12 @@ internal static class ChaosCardChoiceMirror
                         .ToList();
                     return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Draw, 1, drawAttacks);
                 }
+                case ("template_self_action", "r_movediscardcardtodrawtop", "none", "none"):
+                {
+                    // 源码 L1514-1520：从弃牌堆选 1 张放到抽牌堆顶
+                    var discard = owner.DiscardPile.Cards;
+                    return NativeSpec(PlanChoiceEffect.MoveToDrawTop, PileType.Discard, 1, discard);
+                }
             }
         }
 
@@ -125,6 +131,7 @@ internal static class ChaosCardChoiceMirror
             ("move_card", "selected", "discard", "draw") => true,
             ("template_independent_action", "cl_moveselectedattackdrawtohand", "none", "none") => true,
             ("template_independent_action", "cl_moveselectedskilldrawtohand", "none", "none") => true,
+            ("template_self_action", "r_movediscardcardtodrawtop", "none", "none") => true,
             _ => false,
         };
 

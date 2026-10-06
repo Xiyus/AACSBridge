@@ -29,6 +29,7 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
             "t_poison" => null,
             "t_xstrengthloss" => null,
             "t_xweak" => null,
+            "ncr_applydoom" => null,
             _ => $"template_target_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -70,6 +71,14 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
                     context.Card, context.Shape.OperationIndex, "amount",
                     context.Card.ResolveEffectEnergyXValue());
                 effects.ApplyPowerFromSource(typeof(WeakPower), target, x, owner.Creature, context.Card);
+                return;
+            }
+            case "ncr_applydoom":
+            {
+                // 源码 L1832-1835：PowerCmd.Apply<DoomPower>(target, amount)（简单路径——
+                // DoomPerDoomThreshold 修饰符由校验层排除）
+                var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
+                effects.ApplyPowerFromSource(typeof(DoomPower), target, amount, owner.Creature, context.Card);
                 return;
             }
             default:

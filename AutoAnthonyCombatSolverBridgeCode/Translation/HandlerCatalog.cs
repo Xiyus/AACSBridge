@@ -66,12 +66,14 @@ public static class HandlerCatalog
                      "d_gainfocus", "d_gaintemporaryfocus", "d_gainorbslots", "n_createshiv",
                      "r_forge", "n_allpoison", "d_evokerightmostorb", "d_loseorbslots",
                      "d_nextturnenergy", "d_losefocus", "d_gainstrength", "d_gaindexterity",
+                     "d_triggerrightmostorbpassive", "ncr_applydoomall", "ncr_applyselfdoom",
+                     "ncr_applyweakall", "ncr_applyvulnerableall", "r_enemieslosestrengththisturn",
                  })
             registry.Register(new OperationKey("template_self_action", variant), templateSelf);
 
-        // 0.8.x：template_target_action 目标模板（毒/X 力量损失/X 虚弱，7 条）
+        // 0.8.x：template_target_action 目标模板（毒/X 力量损失/X 虚弱/末日，11 条）
         var templateTarget = new Handlers.TemplateTargetActionHandler();
-        foreach (var variant in new[] { "t_poison", "t_xstrengthloss", "t_xweak" })
+        foreach (var variant in new[] { "t_poison", "t_xstrengthloss", "t_xweak", "ncr_applydoom" })
             registry.Register(new OperationKey("template_target_action", variant), templateTarget);
 
         // 0.8.x：template_independent_action 简单独立模板（禁抽/临时力量/全体易伤/最大生命，5 条）

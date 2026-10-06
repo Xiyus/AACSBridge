@@ -48,6 +48,12 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "d_losefocus" => null,
             "d_gainstrength" => null,
             "d_gaindexterity" => null,
+            "d_triggerrightmostorbpassive" => null,
+            "ncr_applydoomall" => null,
+            "ncr_applyselfdoom" => null,
+            "ncr_applyweakall" => null,
+            "ncr_applyvulnerableall" => null,
+            "r_enemieslosestrengththisturn" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -182,6 +188,57 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects5)
                     throw new InvalidOperationException("敏捷需要分支战斗状态效果汇。");
                 effects5.ApplyPowerFromSource(typeof(DexterityPower), owner.Creature, count, owner.Creature, context.Card);
+                return;
+            case "d_triggerrightmostorbpassive":
+            {
+                // 源码 L2179-2182：最右球被动 × count 次
+                if (count == 0) return;
+                var orbQueue = mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue;
+                if (orbQueue.Orbs.Count == 0) return;
+                var rightmost = orbQueue.Orbs.FirstOrDefault();
+                if (rightmost is null) return;
+                for (var i = 0; i < count; i++)
+                    mirror.Simulator.OrbPassive(rightmost);
+                return;
+            }
+            case "ncr_applydoomall":
+                // 源码 L1775-1776：PowerCmd.Apply<DoomPower>(HittableEnemies, amount)
+                if (count == 0) return;
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects6)
+                    throw new InvalidOperationException("末日需要分支战斗状态效果汇。");
+                foreach (var enemy in mirror.CombatState.HittableEnemies)
+                    effects6.ApplyPowerFromSource(typeof(DoomPower), enemy, count, owner.Creature, context.Card);
+                return;
+            case "ncr_applyselfdoom":
+                // 源码 L1778-1779：PowerCmd.Apply<DoomPower>(owner, amount)
+                if (count == 0) return;
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects7)
+                    throw new InvalidOperationException("自身末日需要分支战斗状态效果汇。");
+                effects7.ApplyPowerFromSource(typeof(DoomPower), owner.Creature, count, owner.Creature, context.Card);
+                return;
+            case "ncr_applyweakall":
+                // 源码 L1781-1782：PowerCmd.Apply<WeakPower>(HittableEnemies, amount)
+                if (count == 0) return;
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects8)
+                    throw new InvalidOperationException("全体虚弱需要分支战斗状态效果汇。");
+                foreach (var enemy in mirror.CombatState.HittableEnemies)
+                    effects8.ApplyPowerFromSource(typeof(WeakPower), enemy, count, owner.Creature, context.Card);
+                return;
+            case "ncr_applyvulnerableall":
+                // 源码 L1784-1785：PowerCmd.Apply<VulnerablePower>(HittableEnemies, amount)
+                if (count == 0) return;
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects9)
+                    throw new InvalidOperationException("全体易伤需要分支战斗状态效果汇。");
+                foreach (var enemy in mirror.CombatState.HittableEnemies)
+                    effects9.ApplyPowerFromSource(typeof(VulnerablePower), enemy, count, owner.Creature, context.Card);
+                return;
+            case "r_enemieslosestrengththisturn":
+                // 源码 L1521-1522：PowerCmd.Apply<PiercingWailPower>(HittableEnemies, amount)
+                if (count == 0) return;
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects10)
+                    throw new InvalidOperationException("全体力量损失需要分支战斗状态效果汇。");
+                foreach (var enemy in mirror.CombatState.HittableEnemies)
+                    effects10.ApplyPowerFromSource(typeof(PiercingWailPower), enemy, count, owner.Creature, context.Card);
                 return;
             default:
                 throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);
