@@ -59,9 +59,9 @@ public static class CombatSolverRegistrar
 
         var cs = report.CombatSolver;
         BridgeLog.Info($"CombatSolver 适配面核验：缺失类型 {cs.MissingTypes.Count} 个、缺失成员 {cs.MissingMembers.Count} 个。");
-        BridgeLog.Info("0.2.0 生效范围：deal_damage(selected/all) + gain_block/draw_cards/gain_energy/lose_hp/heal(immediate) + " +
-                       "apply_power(20 个 variant) + Power 卡 Unpowered 伤害 + M:base/strength_scaled 格挡修饰符，全部 fixed 值形状。" +
-                       "支持矩阵外的卡（X 费、其余修饰符、触发器、选牌、随机引用等）打出时整场搜索中止（fail-closed），绝不给出错误预测。");
+        BridgeLog.Info("0.3.0 生效范围：即时牌 + apply_power(20 variant) + Power 卡伤害 + strength_scaled 修饰符 + " +
+                       "牌堆移动（exhaust_card/discard_card 的 all、create_copy/this_card、draw_and_discard/nonzero_cost）。" +
+                       "矩阵外的卡（X 费、选牌、随机、触发器等）保守排除（模拟中不可打），绝不给出错误预测。");
     }
 
     // --- 具体卡类型枚举 -------------------------------------------------------------------------

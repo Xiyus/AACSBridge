@@ -27,7 +27,7 @@ public static class BridgeBootstrap
 
         CombatSolverRegistrar.Initialize(report);
 
-        BridgeLog.Info("0.2.0 生效：即时牌 + apply_power（20 个 Debuff/增益变体）+ Power 卡伤害 + strength_scaled 格挡修饰符可被精确预测。" +
-                       "支持矩阵外的卡打出时整场搜索中止（fail-closed）。进入战斗后留意 CHAOS_CARD 转储行与 CombatSolver 的搜索行为。");
+        BridgeLog.Info("0.3.0 生效：即时牌 + apply_power + 牌堆移动（消耗整手/弃置整手/复制自身/抽后弃非零费）可被精确预测。" +
+                       "矩阵外的卡保守排除（模拟中不可打）。进入战斗后留意 CHAOS_CARD 转储行与 CombatSolver 的搜索行为。");
     }
 }

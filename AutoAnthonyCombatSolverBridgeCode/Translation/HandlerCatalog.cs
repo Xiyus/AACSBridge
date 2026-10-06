@@ -34,5 +34,11 @@ public static class HandlerCatalog
                      "thorns", "intangible", "blur", "plating", "strength_this_turn", "vigor",
                  })
             registry.Register(new OperationKey("apply_power", variant), power);
+
+        // 0.3.0：牌堆移动（确定性形状——选牌/RNG 形状仍由校验层拒绝）
+        registry.Register(new OperationKey("exhaust_card", "all"), new Handlers.ExhaustHandler());
+        registry.Register(new OperationKey("discard_card", "all"), new Handlers.DiscardHandler());
+        registry.Register(new OperationKey("create_copy", "this_card"), new Handlers.CreateCopyHandler());
+        registry.Register(new OperationKey("draw_and_discard", "nonzero_cost"), new Handlers.DrawAndDiscardHandler());
     }
 }

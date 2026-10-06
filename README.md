@@ -17,7 +17,7 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 
 ---
 
-## 当前状态：v0.2.0（Power/Debuff 翻译生效）——里程碑①–④已实机验证
+## 当前状态：v0.3.0（牌堆移动翻译生效）——里程碑①–④已实机验证
 
 | 里程碑 | 内容 | 状态 |
 |---|---|---|
@@ -25,6 +25,7 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 | 0.1.0 | Damage/Block/Draw/Energy 翻译 + 镜像注册 | ✅ 实机验证（镜像调用/fail-closed 全链路实证） |
 | 0.2.0 | apply_power(20 variant) + Power 卡伤害 + strength_scaled 修饰符 | ✅ 实机验证（**严格 diff 零差异**，见下） |
 | 0.2.0+ | 保守可打性模式（矩阵外卡模拟中不可打） | ✅ 实机验证（搜索从必然失败变为完整完成） |
+| 0.3.0 | 牌堆移动：exhaust/discard(all) + create_copy + draw_and_discard | ✅ 编译通过，待实机验证 |
 
 ### 0.2.0 实机验证记录（2026-10-06）
 
@@ -57,6 +58,10 @@ CHAOS_CARD id=CARD.CHAOS_CARD000 title="岿然防御" type=Skill cost=1 ... oper
 | `lose_hp` | (immediate, self) / (immediate, selected_enemy)，fixed 值 | 8 + 2 |
 | `heal` | (immediate, self)，fixed 值 | 1 |
 | `apply_power` | 20 个 variant（0.2.0）：vulnerable/weak/strength_loss(_this_turn)/strength_gain（selected_enemy+all_enemies）、vulnerable_double、strength/dexterity_gain(_loss/_this_turn)/doom/focus_loss/thorns/intangible/blur/plating/strength_this_turn/vigor/strength_loss(_this_turn)/retain_hand_this_turn/strength_per_target_vulnerable（self） | 76 |
+| `exhaust_card` | (all, all_cards, hand→none)，filter=any/non_attack | 3 |
+| `discard_card` | (all, all_cards, hand→none)，filter=any | 2 |
+| `create_copy` | (this_card, self_card, none→discard)——Anger 式克隆进弃牌堆 | 2 |
+| `draw_and_discard` | (nonzero_cost, self)——Scrape 式抽后弃非零费 | 1 |
 
 **卡级生效条件**：卡上全部操作都在矩阵内，且不触发以下任一排除项（fail-closed，逐项对应后续里程碑）：
 
@@ -214,8 +219,9 @@ dotnet build -c Debug
 |---|---|
 | 0.0.1–0.0.4 | ✅ 模板 / 双 DLL 引用 / 守卫 / ChaosCard 识别 / RuntimeSpec 转储（全部实机验证） |
 | 0.1.0 | ✅ Damage / Block / Draw / Energy(+lose_hp/heal) handler + 逐具体类镜像注册 + fail-closed 校验（实机验证） |
-| 0.2.0 | ✅ apply_power 20 variant + Power 卡 Unpowered 伤害 + strength_scaled 格挡修饰符 |
-| 0.2.x | 其余伤害修饰符（vulnerable_scaled / strike_count_scaled / current_block 等 DamageAndHits 数学） |
+| 0.2.0 | ✅ apply_power 20 variant + Power 卡 Unpowered 伤害 + strength_scaled 格挡修饰符（**严格 diff 零差异**实机验证） |
+| 0.2.0+ | ✅ 保守可打性模式（矩阵外卡模拟中不可打，搜索可完成） |
+| 0.3.0 | ✅ 牌堆移动：exhaust_card/discard_card(all) + create_copy(this_card) + draw_and_discard(nonzero_cost) |
 | 0.3.0 | 牌堆移动（Discard / Exhaust / Create / Shuffle） |
 | 0.4.0 | Target 展开 / X 费 / 模拟 RNG（随机目标引用、事件目标、历史计数、阈值翻倍） |
 | 0.5.0 | Player Choice（选牌分支） |
