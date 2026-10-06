@@ -122,6 +122,7 @@ public static class HandlerCatalog
                      "cl_exhaustuptohandcards", "d_increasethiscardcost",
                      // 代理模板（简单 Power/球操作）
                      "i_proxyatomic_foregoneconclusion", "i_proxyatomic_multicast", "i_proxyatomic_tempest",
+                     "i_proxyatomic_whitenoise",
                  })
             registry.Register(new OperationKey("template_independent_action", variant), templateIndependent);
     }

@@ -51,6 +51,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             "i_proxyatomic_foregoneconclusion" => null,
             "i_proxyatomic_multicast" => null,
             "i_proxyatomic_tempest" => null,
+            "i_proxyatomic_whitenoise" => null,
             _ => $"template_independent_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -239,6 +240,24 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                     mirror.Simulator.OrbChannel(owner, orb);
                     if (mirror.Simulator.HasPendingChoice)
                         throw new InvalidOperationException("Tempest 引导出现选择，尚未接入执行续接。");
+                }
+                return;
+            }
+            case "i_proxyatomic_whitenoise":
+            {
+                // 源码 L2456-2470：随机 Power 牌免费入手（分支 RNG 生成）
+                var generated = global::CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions
+                    .GetDistinctUnlockedCharacterCardsForCombat(
+                        mirror.Simulator, owner, 1, mirror.Rng.CombatCardGeneration,
+                        mirror.CardMultiplayerConstraint,
+                        candidate => ChaosOperationExecutor.CanBeRandomlyGeneratedInCombat(candidate)
+                            && candidate.Type == MegaCrit.Sts2.Core.Entities.Cards.CardType.Power);
+                var list = generated.ToList();
+                if (list.Count > 0)
+                {
+                    list[0].MutablePreview.SetToFreeThisTurn();
+                    mirror.Simulator.AddGeneratedCardsToCombat(list,
+                        MegaCrit.Sts2.Core.Entities.Cards.PileType.Hand, owner);
                 }
                 return;
             }
