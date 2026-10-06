@@ -282,8 +282,13 @@ internal static class ChaosCompositePowerMirror
         {
             if (listener is ChaosCompositePower) continue;
             var method = listener.GetType().GetMethod(nameof(AbstractModel.AfterSideTurnStart));
-            if (method?.DeclaringType != typeof(AbstractModel))
-                throw Unsupported($"AfterSideTurnStart 顺序冲突：{listener.GetType().FullName}；当前 Solver 无有序第三方入口");
+            if (method?.DeclaringType == typeof(AbstractModel)) continue;
+            // 游戏原生模型（MegaCrit.*）由 CombatSolver 自己的镜像处理——不是顺序冲突
+            var listenerAssembly = listener.GetType().Assembly.GetName().Name ?? "";
+            if (listenerAssembly.StartsWith("MegaCrit", StringComparison.Ordinal)) continue;
+            // AutoAnthony 自身的模型也由桥处理
+            if (listenerAssembly.StartsWith("AutoAnthony", StringComparison.Ordinal)) continue;
+            throw Unsupported($"AfterSideTurnStart 顺序冲突：{listener.GetType().FullName}；当前 Solver 无有序第三方入口");
         }
     }
 
