@@ -159,16 +159,24 @@ internal static class ChaosCardOnPlayMirror
 
         if (operation.Scope is OperationScope.Modifier)
         {
-            // 0.2.0 唯一放行的修饰符：M:base/strength_scaled（由 BlockHandler 消费其数学，
-            // 执行循环中与其他 Modifier 一样被跳过——与源码 Play 的跳过规则一致）
-            if (operation.Template != "M:base")
-                return Describe(card, index, $"Modifier 操作（{operation.Template}）的修饰符数学未建模");
-            var modifierSpec = TryEffectiveSpec(card, index);
-            if (modifierSpec is null)
+            // 0.2.0 放行：M:base/strength_scaled（BlockHandler 消费）
+            // 0.9.0 放行：DamageModifierResolver 支持的伤害/命中修饰符（DamageHandler 消费）
+            if (operation.Template == "M:base")
+            {
+                var modifierSpec = TryEffectiveSpec(card, index);
+                if (modifierSpec is null)
+                    return Describe(card, index, "修饰符无法解析执行视角 spec");
+                if (modifierSpec.Opcode != "modify_block" || modifierSpec.Variant != "strength_scaled")
+                    return Describe(card, index, $"修饰符（{modifierSpec.Opcode}/{modifierSpec.Variant}）的数学未建模");
+                return ValidateSpecShape(card, index, modifierSpec);
+            }
+            // 0.9.0：伤害/命中修饰符（由 DamageModifierResolver 在 DamageHandler 内结算）
+            var dmgModSpec = TryEffectiveSpec(card, index);
+            if (dmgModSpec is null)
                 return Describe(card, index, "修饰符无法解析执行视角 spec");
-            if (modifierSpec.Opcode != "modify_block" || modifierSpec.Variant != "strength_scaled")
-                return Describe(card, index, $"修饰符（{modifierSpec.Opcode}/{modifierSpec.Variant}）的数学未建模");
-            return ValidateSpecShape(card, index, modifierSpec);
+            if (AutoAnthonyCombatSolverBridge.Translation.DamageModifierResolver.IsSupportedModifier(dmgModSpec))
+                return ValidateSpecShape(card, index, dmgModSpec);
+            return Describe(card, index, $"Modifier 操作（{operation.Template}）的修饰符数学未建模");
         }
 
         if (operation.Scope is OperationScope.AbilityTrigger or OperationScope.ConditionalTrigger)

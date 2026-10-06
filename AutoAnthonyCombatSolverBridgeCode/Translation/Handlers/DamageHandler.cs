@@ -45,9 +45,10 @@ public sealed class DamageHandler : IOperationHandler
         var amount = context.ExecutableAmount;
         var damage = context.RuntimeValue("damage", amount);
         var hits = Math.Max(0, context.RuntimeValue("hits", 1));
-        // DamageAndHits 的无伤害修饰符路径（校验层只放行 M:base/strength_scaled 格挡修饰符）：
-        // damage = baseDamage + ExtraDamage；hits 下限 0。
-        var finalDamage = damage + card.ExtraDamage;
+        // 0.9.0：修饰符解析（DamageModifierResolver 复刻 DamageAndHits 数学）
+        // ——含 ExtraDamage 叠加、前缀缩放 baseHits、动态总命中替换、附加命中叠加
+        var (finalDamage, resolvedHits) = DamageModifierResolver.Resolve(context, damage, hits);
+        hits = resolvedHits;
         if (hits == 0)
             return;    // 源码语义：零 hits = 成功 no-op，不是失败
 

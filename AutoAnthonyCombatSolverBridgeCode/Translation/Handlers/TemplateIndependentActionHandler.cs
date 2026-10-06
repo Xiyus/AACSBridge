@@ -29,6 +29,8 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             "i_gaintemporarystrength" => null,
             "i_applytoallenemies" => null,
             "i_gainmaxhp" => null,
+            "i_increasedamagethiscombat" or "d_increasethiscarddamagerun" => null,
+            "d_increasethiscardblockrun" => null,
             _ => $"template_independent_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -62,6 +64,18 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 // 镜像：模拟器的 GainMaxHp（与 CreatureCmd 语义一致——治疗实际增量）
                 if (amount == 0) return;
                 mirror.Simulator.GainMaxHp(owner.Creature, amount);
+                return;
+            case "i_increasedamagethiscombat":
+            case "d_increasethiscarddamagerun":
+                // 源码 L3245/L3571-3578：card.ExtraDamage += amount
+                // 镜像：MutablePreview 的 ExtraDamage（分支 COW——每次打出递增，与实际一致）
+                if (amount == 0) return;
+                context.Card.ExtraDamage += amount;
+                return;
+            case "d_increasethiscardblockrun":
+                // 源码 L3581-3587：card.ExtraBlock += amount
+                if (amount == 0) return;
+                context.Card.ExtraBlock += amount;
                 return;
             default:
                 throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);
