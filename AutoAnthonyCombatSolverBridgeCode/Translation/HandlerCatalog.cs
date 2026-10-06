@@ -85,6 +85,9 @@ public static class HandlerCatalog
                      // 更多球激发/简单变体
                      "d_evokeleftmostorb", "d_evokealltwice", "n_createinkshiv",
                      "n_blockequalallpoison", "d_exhaustallstatuses", "d_shuffleallunexhaustedintodraw",
+                     // 卡牌创建/生成/返回
+                     "r_putkingsswordinhand", "d_addrandompowertohand",
+                     "cl_addrandomattacktohand", "d_returnzerocostdiscardtohand",
                  })
             registry.Register(new OperationKey("template_self_action", variant), templateSelf);
 

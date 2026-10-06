@@ -104,6 +104,11 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "n_blockequalallpoison" => null,
             "d_exhaustallstatuses" => null,
             "d_shuffleallunexhaustedintodraw" => null,
+            // 卡牌创建/生成/返回
+            "r_putkingsswordinhand" => null,
+            "d_addrandompowertohand" => null,
+            "cl_addrandomattacktohand" => null,
+            "d_returnzerocostdiscardtohand" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -500,6 +505,44 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 foreach (var handCard in hand)
                     mirror.Simulator.Discard(handCard);
                 mirror.Simulator.Shuffle(owner);
+                return;
+            }
+            case "r_putkingsswordinhand":
+            {
+                // 源码 L1611：将君王之刃放入手牌（有匹配卡时）
+                mirror.Simulator.CreateAndAddGeneratedCardsToCombat<SovereignBlade>(
+                    owner, PileType.Hand, 1, owner);
+                return;
+            }
+            case "d_addrandompowertohand":
+            {
+                // 源码 L2166-2176：随机 Power 牌入手（分支 RNG 生成）
+                if (count == 0) return;
+                var generated = global::CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions
+                    .GetDistinctUnlockedCharacterCardsForCombat(
+                        mirror.Simulator, owner, count, mirror.Rng.CombatCardGeneration,
+                        mirror.CardMultiplayerConstraint,
+                        candidate => ChaosOperationExecutor.CanBeRandomlyGeneratedInCombat(candidate)
+                            && candidate.Type == CardType.Power);
+                mirror.Simulator.AddGeneratedCardsToCombat(generated.ToList(), PileType.Hand, owner);
+                return;
+            }
+            case "cl_addrandomattacktohand":
+            {
+                // 源码 L1283-1293：随机攻击牌入手（分支 RNG 生成）
+                if (count == 0) return;
+                var generated = global::CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions
+                    .GetDistinctUnlockedCharacterCardsForCombat(
+                        mirror.Simulator, owner, count, mirror.Rng.CombatCardGeneration,
+                        mirror.CardMultiplayerConstraint,
+                        candidate => ChaosOperationExecutor.CanBeRandomlyGeneratedInCombat(candidate)
+                            && candidate.Type == CardType.Attack);
+                mirror.Simulator.AddGeneratedCardsToCombat(generated.ToList(), PileType.Hand, owner);
+                return;
+            }
+            case "d_returnzerocostdiscardtohand":
+            {
+                // 源码 L2152-2158：从弃牌堆返回零费牌到手（选择型——走选牌机制）
                 return;
             }
             default:
