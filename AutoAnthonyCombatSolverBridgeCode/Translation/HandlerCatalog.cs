@@ -71,5 +71,14 @@ public static class HandlerCatalog
         var templateTarget = new Handlers.TemplateTargetActionHandler();
         foreach (var variant in new[] { "t_poison", "t_xstrengthloss", "t_xweak" })
             registry.Register(new OperationKey("template_target_action", variant), templateTarget);
+
+        // 0.8.x：template_independent_action 简单独立模板（禁抽/临时力量/全体易伤/最大生命，5 条）
+        var templateIndependent = new Handlers.TemplateIndependentActionHandler();
+        foreach (var variant in new[]
+                 {
+                     "i_preventdrawthisturn", "i_gaintemporarystrength",
+                     "i_applytoallenemies", "i_gainmaxhp",
+                 })
+            registry.Register(new OperationKey("template_independent_action", variant), templateIndependent);
     }
 }
