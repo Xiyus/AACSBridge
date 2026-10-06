@@ -135,7 +135,11 @@ internal static class ChaosCompositePowerMirror
     {
         if (power.ProfileId.Length != 0)
             throw Unsupported("外部角色 Profile 的复合 Power 尚未适配");
-        var predicted = PredictedCard.Create(ChaosCardRegistry.Canonical(power.Character, power.Slot), power.Owner.Player!);
+        // 模拟分支中的克隆 Creature 可能没有 Player 引用（例如根捕获时来自非玩家侧的
+        // Power 克隆）——fail-closed 而不是 NullReference 崩溃
+        if (power.Owner?.Player is null)
+            throw Unsupported("复合 Power 的 Owner Creature 缺少 Player 引用（模拟克隆边界）");
+        var predicted = PredictedCard.Create(ChaosCardRegistry.Canonical(power.Character, power.Slot), power.Owner.Player);
         var card = (ChaosCardModel)predicted.MutablePreview;
         if (power.SourceTinkeredDefinitionPayload.Length > 0)
             card.ApplyCapturedDefinition(CardTinkeringApi.DeserializeCard(power.SourceTinkeredDefinitionPayload));
