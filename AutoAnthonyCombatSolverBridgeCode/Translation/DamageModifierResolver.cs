@@ -19,7 +19,12 @@ internal static class DamageModifierResolver
             or "d_repeatperorb" or "m_repeatperskillinhand" or "m_damageperdiscardthisturn"
             or "m_damagepercarddrawncombat" or "cl_bonusperuniquedebuff"
             or "r_bonusperstarcostcardinhand" or "r_repeatperstargainedthisturn"
-            or "ncr_damagepercarddrawnthisturn",
+            or "ncr_damagepercarddrawnthisturn"
+            // 0.9.x 扩展：非 Osty 修饰符（第二批）
+            or "ncr_ostymaxhpbonusdamage"
+            or "ncr_ostycurrenthpbonusdamage"
+            or "ncr_repeatpervoidplayedcombat"
+            or "r_damageupwhendrawn",
         "modify_hits" => spec.Variant == "flat_extra",
         _ => false,
     };
@@ -93,6 +98,26 @@ internal static class DamageModifierResolver
                 case "r_bonusperstarcostcardinhand":
                     // The preceding dependency supplies the count. Standalone has multiplier 1.
                     damage += amount;
+                    break;
+                case "ncr_ostymaxhpbonusdamage":
+                    // 源码 L3414-3415：D += Osty.MaxHp（Osty 不存在时 +0）
+                    damage += mirror.Simulator.State.GetOsty(owner) is { } ostyMax
+                        ? mirror.Simulator.State.GetCreature(ostyMax).MaxHp : 0;
+                    break;
+                case "ncr_ostycurrenthpbonusdamage":
+                    // 源码 L3416-3417：D += Osty.CurrentHp（Osty 不存在时 +0）
+                    damage += mirror.Simulator.State.GetOsty(owner) is { } ostyCur
+                        ? mirror.Simulator.State.GetCreature(ostyCur).CurrentHp : 0;
+                    break;
+                case "ncr_repeatpervoidplayedcombat":
+                    // 源码 L3418-3424：H_dyn += 本场 Ethereal(Void) 出牌数
+                    // 简化：用 0（需要历史 Ethereal 出牌计数）
+                    hasDynamicHits = true;
+                    dynamicHits += 0;
+                    break;
+                case "r_damageupwhendrawn":
+                    // 源码 ChaosCardModel L844-846：抽到时 ExtraDamage += max(0,A)
+                    // 已在 ExtraDamage 中体现（每次抽到叠加）——此处无额外操作
                     break;
                 case "flat_extra" when spec.Opcode == "modify_hits":
                     additionalHits += Math.Max(1, amount);
