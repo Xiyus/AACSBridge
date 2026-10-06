@@ -1,0 +1,15 @@
+{
+  "id": "AutoAnthonyCombatSolverBridge",
+  "name": "AutoAnthony × CombatSolver 兼容桥",
+  "author": "Xiyus",
+  "description": "让 CombatSolver 能够预测 AutoAnthony 生成卡牌的兼容层。当前为观察构建（0.0.4）：识别生成牌并转储其结构化 OperationRuntimeSpec；镜像注册将在 0.1.0 提供。",
+  "version": "0.0.4",
+  "min_game_version": "0.111.0",
+  "has_pck": false,
+  "has_dll": true,
+  "dependencies": [
+    { "id": "AutoAnthony", "min_version": "0.3.137" },
+    { "id": "CombatSolver", "min_version": "0.50.0" }
+  ],
+  "affects_gameplay": false
+}

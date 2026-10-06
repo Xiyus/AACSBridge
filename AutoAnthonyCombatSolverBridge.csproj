@@ -1,0 +1,116 @@
+<Project Sdk="Godot.NET.Sdk/4.5.1" InitialTargets="CheckDependencyPaths;CheckLocalDependencies">
+    <Import Project=".\Sts2PathDiscovery.props"/>
+    <Import Project=".\LocalDependencies.props" Condition="Exists('.\LocalDependencies.props')"/>
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>true</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <!-- 是否 publicize *游戏*程序集：关闭。桥只使用 sts2 的公共 API。
+             CombatSolver 的 publicize 在下面单独配置（其适配 API 是 internal）。 -->
+        <Publicize>false</Publicize>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+        <AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
+        <PathMap>$(AppOutputBase)=.\</PathMap>
+        <GodotDisabledSourceGenerators>GodotPluginsInitializer</GodotDisabledSourceGenerators>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <!-- 屏蔽架构不匹配警告：Mod 理想情况下按全平台（MSIL）构建，
+             而本地 StS2 是特定平台版本。 -->
+        <NoWarn>$(NoWarn);MSB3270</NoWarn>
+    </PropertyGroup>
+
+    <!-- 游戏程序集（由运行中的游戏提供；绝不复制进本 Mod）。 -->
+    <ItemGroup Condition="Exists('$(Sts2DataDir)')">
+        <Reference Include="0Harmony">
+            <HintPath>$(Sts2DataDir)/0Harmony.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="sts2">
+            <HintPath>$(Sts2DataDir)/sts2.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+
+    <!-- 桥所适配的两个 Mod。Private=false：桥只*引用*它们；
+         把它们的 DLL 打进本 Mod 会造成程序集重复并破坏加载。 -->
+    <ItemGroup>
+        <Reference Include="AutoAnthony">
+            <HintPath>$(AutoAnthonyDllDir)/AutoAnthony.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="CombatSolver">
+            <HintPath>$(CombatSolverDllDir)/CombatSolver.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+
+    <!-- 仅编译期的 CombatSolver internal 适配 API publicize
+         （镜像注册表、AdaptedCardOnPlayMirrors、KnownPreRootSubscriberTypeNames 等）。
+         游戏运行时仍加载原版 CombatSolver.dll；这里只放宽编译期可见性——CombatSolver 自己的
+         第三方文档就是如此要求外部适配程序集接入这些入口的。 -->
+    <ItemGroup>
+        <PackageReference Include="Krafs.Publicizer" Version="2.3.0" PrivateAssets="All"/>
+        <Publicize Include="CombatSolver" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Alchyr.Sts2.ModAnalyzers 是内容 Mod 工具（本地化/卡池规则）；桥不含任何内容，
+             因此省略——与 CombatSolver 自己的 csproj 一致。 -->
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="AutoAnthonyCombatSolverBridge/**" />
+        <Compile Remove="materials/**" />
+        <Compile Remove="shaders/**" />
+        <Compile Remove="images/**" />
+        <EmbeddedResource Remove="AutoAnthonyCombatSolverBridge/**" />
+        <EmbeddedResource Remove="materials/**" />
+        <EmbeddedResource Remove="shaders/**" />
+        <EmbeddedResource Remove="images/**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Condition="Exists('Directory.Build.props')" Include="Directory.Build.props"/>
+        <None Include=".gitignore" />
+        <None Include="AutoAnthonyCombatSolverBridge.json" />
+        <None Include="project.godot"/>
+        <None Include="AutoAnthonyCombatSolverBridge/**" />
+    </ItemGroup>
+
+    <Target Name="CheckDependencyPaths" >
+        <Error
+                Text=" 未在路径 '$(Sts2DataDir)' 找到 Slay the Spire 2 游戏数据目录"
+                Condition="'$(Sts2DataDir)' == '' or !Exists('$(Sts2DataDir)')" />
+    </Target>
+
+    <Target Name="CheckLocalDependencies">
+        <Error
+                Text=" 未在 '$(AutoAnthonyDllDir)' 找到 AutoAnthony.dll。请复制 LocalDependencies.props.example 为 LocalDependencies.props，并指向你已安装的 AutoAnthony Mod 目录（见 README）。"
+                Condition="'$(AutoAnthonyDllDir)' == '' or !Exists('$(AutoAnthonyDllDir)/AutoAnthony.dll')" />
+        <Error
+                Text=" 未在 '$(CombatSolverDllDir)' 找到 CombatSolver.dll。请复制 LocalDependencies.props.example 为 LocalDependencies.props，并指向你已安装的 CombatSolver Mod 目录（见 README）。"
+                Condition="'$(CombatSolverDllDir)' == '' or !Exists('$(CombatSolverDllDir)/CombatSolver.dll')" />
+    </Target>
+
+    <Target Name="CopyToModsFolderOnBuild" AfterTargets="PostBuildEvent">
+        <Message Text="正在复制 .dll .pdb 和 .json 到游戏 mods 目录。" Importance="high" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
+        <Copy SourceFiles="$(AssemblyName).json" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
+        <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
+    </Target>
+
+    <Target Name="NeedGodotForPublish" BeforeTargets="Publish">
+        <Error Text=" Publish 前必须配置 Godot 路径；在 '$(GodotPath)' 未找到 Godot。请检查 Directory.Build.props。"
+               Condition="'$(GodotPath)' == '' or !Exists('$(GodotPath)')"/>
+    </Target>
+
+    <Target Name="GodotPublish" AfterTargets="Publish" Condition="'$(GodotPath)' != '' and Exists('$(GodotPath)') and '$(IsInnerGodotExport)' != 'true'">
+        <Message Text="正在导出 Godot .pck 到 mods 目录" Importance="high"/>
+        <Exec Command="&quot;$(GodotPath)&quot; --headless --export-pack &quot;BasicExport&quot; &quot;$(ModsPath)$(MSBuildProjectName)/$(MSBuildProjectName).pck&quot;"
+              EnvironmentVariables="IsInnerGodotExport=true;MSBUILDDISABLENODEREUSE=1"
+              ContinueOnError="WarnAndContinue"/>
+    </Target>
+</Project>
