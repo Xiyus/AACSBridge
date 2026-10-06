@@ -30,7 +30,8 @@ public static class BridgeBootstrap
 
         CombatSolverRegistrar.Initialize(report);
 
-        BridgeLog.Info("1.0.0 生效：64 个翻译键覆盖 63% 目录形状——即时牌/apply_power/牌堆移动/X 费/随机目标/选牌/触发器/随机生成/球引导/锻造/毒全部可精确预测。" +
-                       "矩阵外的卡保守排除（模拟中不可打）。进入战斗后留意 CHAOS_CARD 转储行与 CombatSolver 的搜索行为。");
+        BridgeLog.Info("1.1.0 生效：122 翻译键覆盖 72% 目录形状——含修饰符数学（DamageAndHits）、条件门控（ConditionMatches）、" +
+                       "球引导/锻造/毒/状态牌/代理 Power/选牌/触发器/随机生成全部可精确预测。" +
+                       "矩阵外的卡保守排除（模拟中不可打）。");
     }
 }
