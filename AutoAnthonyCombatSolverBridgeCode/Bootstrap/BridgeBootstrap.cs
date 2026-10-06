@@ -30,8 +30,7 @@ public static class BridgeBootstrap
 
         CombatSolverRegistrar.Initialize(report);
 
-        BridgeLog.Info("0.7.0 生效：随机生成（create_card 四变体，分支 RNG + 递归镜像）加入支持矩阵；" +
-                       "受限触发器 + ChaosCompositePower + 即时牌/apply_power/牌堆移动/X 费/随机目标/玩家选牌全部可精确预测。" +
+        BridgeLog.Info("1.0.0 生效：64 个翻译键覆盖 63% 目录形状——即时牌/apply_power/牌堆移动/X 费/随机目标/选牌/触发器/随机生成/球引导/锻造/毒全部可精确预测。" +
                        "矩阵外的卡保守排除（模拟中不可打）。进入战斗后留意 CHAOS_CARD 转储行与 CombatSolver 的搜索行为。");
     }
 }
