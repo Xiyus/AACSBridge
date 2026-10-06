@@ -229,6 +229,8 @@ internal static class ChaosCardOnPlayMirror
         {
             var triggerSpec = TryEffectiveSpec(card, index);
             if (triggerSpec is null) return Describe(card, index, "触发器缺少结构化 spec");
+            if (ChaosCardExhaustMirror.IsTrigger(operation))
+                return ChaosCardExhaustMirror.Validate(card, index);
             // 0.9.0：条件操作（opcode=condition）走 ConditionEvaluator 校验
             if (triggerSpec.Opcode == "condition" && triggerSpec.Condition is { } condition)
             {
@@ -284,7 +286,8 @@ internal static class ChaosCardOnPlayMirror
             // 即时条件只门控执行，不能绕过后面的 handler 支持检查。
             if (!immediateCondition && !forEachTrigger)
             {
-                if (ChaosTriggerPolicy.ValidateTrigger(trigger, triggerSpec) is not null)
+                if (!ChaosCardExhaustMirror.IsTrigger(trigger)
+                    && ChaosTriggerPolicy.ValidateTrigger(trigger, triggerSpec) is not null)
                     return Describe(card, index, "收益引用了未适配触发器");
                 var payloadSpec = TryEffectiveSpec(card, index);
                 if (payloadSpec is null) return Describe(card, index, "触发收益缺少 spec");

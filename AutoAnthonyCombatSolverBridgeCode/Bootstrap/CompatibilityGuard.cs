@@ -149,7 +149,8 @@ public static class CompatibilityGuard
         {
             ("CombatSolver.PersistentPowerSupport", "TriggerAfterSideTurnStart", "System.Boolean", 5),
             ("CombatSolver.EndTurnPowerSupport", "TriggerRegular", "System.Boolean", 5),
-            ("CombatSolver.ContinuationStamp", "AppendPowers", "System.Void", 3)
+            ("CombatSolver.ContinuationStamp", "AppendPowers", "System.Void", 3),
+            ("CombatSolver.Engine.InCombat.Mirrors.HookMirrors", "AfterCardExhausted", "System.Void", 3)
         };
         foreach (var (typeName, name, returns, count) in seams)
         {

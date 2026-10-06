@@ -17,9 +17,9 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 
 ---
 
-## 当前开发状态（2026-10-07，Batch AR）
+## 当前开发状态（2026-10-07，Batch AS）
 
-当前源码已超过历史 1.0.0：**212 个注册键，117 项离线检查通过**。本机已安装 DLL 枚举到
+当前源码已超过历史 1.0.0：**212 个注册键，128 项离线检查通过**。本机已安装 DLL 枚举到
 467 个目录原子，331 个通过单操作校验；这是单操作准入统计，**不是整卡覆盖率或实机等价率**，
 不能与历史 587/931 直接比较。逐条结果及二进制 hash 见 [目录审计](docs/catalog-audit.json)，
 本轮结论与剩余工作见 [验收与后续清单](docs/acceptance-and-backlog.md)。
@@ -30,6 +30,25 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 整卡执行遇到 pending choice 而没有续接时硬失败，不再继续执行后续操作。
 
 **本轮新增行为尚未进行实机严格 diff，不据此宣布发布验收完成。** 以下为上一批和历史记录。
+
+### Batch AS：实机费用差异修复与本卡消耗事件
+
+2026-10-07 对 `014a6a5` 的实机日志核对：4 个 ROUTE_REPLAY、18 条 ROUTE_ACTION，
+SEARCH_FAILURE 为 0，4 次 `firstScalarDifference` 均为 null。但发现一条完整续接状态差异：
+`CHAOS_NECROBINDER_CARD007`（捕捉郁）在生物死亡后真实费用降至 0，预测仍为 1。
+因此本场只记为逐动作标量回放一致，不能宣布完整状态严格 diff 通过。
+原日志路径、SHA256 和差异文本保存于 [实机证据](docs/live-evidence-2026-10-07.json)。
+高费用触发器只出现在目录转储，未证明本场实际触发；死灵法师火焰 VFX 空引用堆栈未指向桥。
+
+| 行为 | 派发 | 支持边界 |
+|---|---|---|
+| 生物死亡后本卡降费 | 逐具体 Chaos 卡登记 `AfterDeath`；战斗牌堆中的分支卡按原版 `OperationAmount` 求和并 `AddThisCombat` | 排除阻止移除；每项至少 1；即使 OnPlay 不支持也镜像被动降费 |
+| `self_exhausted/immediate` | Solver 全局 `AfterCardExhausted` 完成后派发本卡收益 | `ConditionalTrigger` + `thisCard`；fixed 自身格挡/能量/治疗、全体/随机伤害 |
+
+本卡消耗事件覆盖统一消耗入口，按顺序执行 `triggerIndex` 链接收益；不在 OnPlay 执行，
+不与消耗堆回合事件混淆。无收益、嵌套触发/修饰符、事件卡槽、动态收益及选择续接均拒绝。
+128 项离线检查通过，包括事件身份/收益准入与拒绝、死亡 hook 登记、阻止移除过滤及实际 Harmony 接缝。
+费用修复和新消耗事件均待新一轮实机严格 diff 验证；单操作目录准入仍为 331/467。
 
 ### Batch AR：高费用出牌触发器
 

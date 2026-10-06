@@ -113,6 +113,26 @@ void Run()
     { Parameters = new Dictionary<string, int> { ["triggerIndex"] = 0 } };
     Check(validateOperation.Invoke(null, [TestChaosCard.Create([conditionOp, supportedPayoff]), 1, supportedPayoff]) is null,
         "supported conditional payoff still accepted");
+    var selfExhaust = Op(Spec("trigger", "event", "self", new("self_exhausted", "immediate")),
+        "C:after", OperationScope.ConditionalTrigger) with { CardTargetSlot = "thisCard" };
+    var exhaustMirror = assembly.GetType("AutoAnthonyCombatSolverBridge.CombatSolver.ChaosCardExhaustMirror")!;
+    var isSelf = exhaustMirror.GetMethod("IsTrigger", BindingFlags.NonPublic | BindingFlags.Static)!;
+    Check((bool)isSelf.Invoke(null, [selfExhaust])!, "self-exhaust event identity admitted");
+    Check(!(bool)isSelf.Invoke(null, [selfExhaust with { CardTargetSlot = null }])!, "self-exhaust requires thisCard slot");
+    Check(!(bool)isSelf.Invoke(null, [selfExhaust with { RuntimeSpec = selfExhaust.RuntimeSpec! with
+        { Trigger = new("turn_end_if_self_in_exhaust", "immediate") } }])!, "exhaust-pile turn event is not self-exhaust");
+    Check(validateOperation.Invoke(null, [TestChaosCard.Create([selfExhaust, supportedPayoff]), 0, selfExhaust]) is null,
+        "self-exhaust accepts bounded linked payoff");
+    Check(validateOperation.Invoke(null, [TestChaosCard.Create([selfExhaust, supportedPayoff]), 1, supportedPayoff]) is null,
+        "self-exhaust linked payoff accepted by card validation");
+    Check(validateOperation.Invoke(null, [TestChaosCard.Create([selfExhaust]), 0, selfExhaust]) is not null,
+        "self-exhaust without payoff rejected");
+    var drawPayoff = supportedPayoff with { RuntimeSpec = Spec("draw_cards", "immediate", "self") };
+    Check(validateOperation.Invoke(null, [TestChaosCard.Create([selfExhaust, drawPayoff]), 0, selfExhaust]) is not null,
+        "self-exhaust recursive draw payoff rejected");
+    var badLifetime = selfExhaust with { RuntimeSpec = selfExhaust.RuntimeSpec! with { Trigger = new("self_exhausted", "combat") } };
+    Check(validateOperation.Invoke(null, [TestChaosCard.Create([badLifetime, supportedPayoff]), 0, badLifetime]) is not null,
+        "self-exhaust combat lifetime rejected");
 
     var evaluator = assembly.GetType("AutoAnthonyCombatSolverBridge.Translation.ConditionEvaluator")!;
     var evaluate = evaluator.GetMethod("Evaluate", BindingFlags.NonPublic | BindingFlags.Static)!;
@@ -313,6 +333,20 @@ void Run()
         .GetField("Registry", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
     Check((bool)beforeRegistry.GetType().GetMethod("HasRegisteredHandler")!.Invoke(beforeRegistry, [power])!,
         "BeforeCardPlayed installs an executable handler instead of an ignored override");
+    var registrar = assembly.GetType("AutoAnthonyCombatSolverBridge.CombatSolver.CombatSolverRegistrar")!;
+    var concreteCard = aa.GetTypes().First(type => !type.IsAbstract && typeof(ChaosCardModel).IsAssignableFrom(type));
+    registrar.GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
+        .Single(method => method.Name == "RegisterMirrorsForType").Invoke(null, [concreteCard]);
+    var deathRegistry = solver.GetType("CombatSolver.Engine.InCombat.Mirrors.Hooks.Death.AfterDeathMirrors")!
+        .GetField("Registry", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+    var cardReceiver = System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(concreteCard);
+    Check((bool)deathRegistry.GetType().GetMethod("HasRegisteredHandler")!.Invoke(deathRegistry, [cardReceiver])!,
+        "concrete Chaos card has actual AfterDeath cost handler");
+    var deathContextType = solver.GetType("CombatSolver.Engine.InCombat.Mirrors.Hooks.Death.AfterDeathMirrorContext")!;
+    var deathContext = System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(deathContextType);
+    deathContextType.GetProperty("WasRemovalPrevented")!.SetValue(deathContext, true);
+    registrar.GetMethod("AfterDeath", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, [cardReceiver, deathContext]);
+    Check(true, "prevented removal does not touch card or branch state");
     var hidden = solver.GetType("CombatSolver.PowerHiddenStateMirrors")!;
     var slots = (System.Collections.IDictionary)hidden.GetField("Registry", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
     Check(slots.Contains(typeof(ChaosCompositePower)), "hidden state registry installed");
@@ -322,6 +356,9 @@ void Run()
     try
     {
         harmony.PatchAll(assembly);
+        Check(HarmonyLib.Harmony.GetAllPatchedMethods().Any(method =>
+            method.DeclaringType?.FullName == "CombatSolver.Engine.InCombat.Mirrors.HookMirrors" && method.Name == "AfterCardExhausted"),
+            "self-exhaust seam patches solver global event");
         Check(HarmonyLib.Harmony.GetAllPatchedMethods().Any(method =>
             method.DeclaringType?.FullName == "CombatSolver.ContinuationStamp" && method.Name == "AppendPowers"),
             "continuation seam patches actual method");

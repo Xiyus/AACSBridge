@@ -3,6 +3,9 @@ using AutoAnthony;
 using CombatSolver;
 using CombatSolver.Engine.InCombat.Mirrors.Cards;
 using CombatSolver.Engine.InCombat.Mirrors.Cards.OnPlay;
+using CombatSolver.Engine.InCombat.Mirrors.Hooks.Death;
+using CombatSolver.Engine.InCombat.Simulation;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
 using AutoAnthonyCombatSolverBridge.Bootstrap;
 using AutoAnthonyCombatSolverBridge.Diagnostics;
@@ -116,6 +119,8 @@ public static class CombatSolverRegistrar
     {
         CardOnPlayMirrors.Registry.Register<TCard>(ChaosCardOnPlayMirror.Execute);
         CardIsPlayableMirrors.Registry.Register<TCard>(ChaosCardIsPlayableMirror.Evaluate);
+        // Passive card hooks apply even when OnPlay is outside the support matrix.
+        AfterDeathMirrors.Registry.Register<TCard>(AfterDeath);
         // 0.5.0：玩家选牌登记（spec 按卡实例的操作动态构造；无选择型操作返回 null = 没有选择）
         CardChoiceMirrors.Register<TCard>(ChaosCardChoiceMirror.BuildSpec, ChaosCardChoiceMirror.Apply);
     }
@@ -128,4 +133,16 @@ public static class CombatSolverRegistrar
 
     private static void RegisterMirrorsForType(Type type)
         => RegisterMirrorsForMethod.MakeGenericMethod(type).Invoke(null, null);
+
+    internal static void AfterDeath(ChaosCardModel card, AfterDeathMirrorContext context)
+    {
+        if (context.WasRemovalPrevented) return;
+        var predicted = context.State.FindCard(card);
+        if (predicted?.GetPile(context.State)?.Type.IsCombatPile() != true) return;
+        var preview = (ChaosCardModel)predicted.MutablePreview;
+        var reduction = preview.Generated.Operations.Select((operation, index) => (operation, index))
+            .Where(item => item.operation.Template == "NCR:CostDownWhenCreatureDies")
+            .Sum(item => Math.Max(1, preview.OperationAmount(item.index)));
+        if (reduction > 0) preview.EnergyCost.AddThisCombat(-reduction);
+    }
 }

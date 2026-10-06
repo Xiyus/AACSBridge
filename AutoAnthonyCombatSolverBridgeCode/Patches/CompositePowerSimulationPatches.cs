@@ -3,6 +3,7 @@ using System.Text;
 using AutoAnthony;
 using CombatSolver;
 using CombatSolver.Engine.InCombat.Simulation;
+using CombatSolver.Engine.Common;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -10,6 +11,13 @@ using MegaCrit.Sts2.Core.Models;
 using AutoAnthonyCombatSolverBridge.CombatSolver;
 
 namespace AutoAnthonyCombatSolverBridge.Patches;
+
+[HarmonyPatch(typeof(global::CombatSolver.Engine.InCombat.Mirrors.HookMirrors), "AfterCardExhausted")]
+internal static class ChaosCardSelfExhaustPatch
+{
+    private static void Postfix(CombatPredictionSimulator simulator, PredictedCard card)
+        => ChaosCardExhaustMirror.Execute(simulator, card);
+}
 
 [HarmonyPatch(typeof(CombatPredictionSimulator), nameof(CombatPredictionSimulator.ManualPlay))]
 internal static class CompositePowerManualBoundaryPatch
