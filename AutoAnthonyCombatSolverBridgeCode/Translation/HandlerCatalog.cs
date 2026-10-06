@@ -142,5 +142,8 @@ public static class HandlerCatalog
                      "d_setthiscardcostzero", "d_increaseallclaws",
                  })
             registry.Register(new OperationKey("template_independent_action", variant), templateIndependent);
+
+        // 0.9.x：modify_cost/set_zero（4 条——本卡费用设为 0）
+        registry.Register(new OperationKey("modify_cost", "set_zero"), templateIndependent);
     }
 }

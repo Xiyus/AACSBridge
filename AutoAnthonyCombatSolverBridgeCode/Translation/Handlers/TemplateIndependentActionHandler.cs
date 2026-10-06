@@ -25,6 +25,9 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
     public string? ValidateSupport(OperationShape shape)
     {
         var spec = shape.Spec;
+        // modify_cost/set_zero：本卡费用设为 0
+        if (spec.Opcode == "modify_cost" && spec.Variant == "set_zero")
+            return null;
         return spec.Variant switch
         {
             "i_preventdrawthisturn" => null,
@@ -68,6 +71,14 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
         var mirror = context.Mirror;
         var owner = context.Card.Owner;
         var amount = context.ExecutableAmount;
+
+        // modify_cost/set_zero：本卡费用设为 0（源码 L2265）
+        if (context.Shape.Spec.Opcode == "modify_cost")
+        {
+            context.Card.SetToFreeThisCombat();
+            return;
+        }
+
         if (mirror.CombatState is not ICombatPredictionEffectSink effects)
             throw new InvalidOperationException("独立模板需要分支战斗状态效果汇。");
 
