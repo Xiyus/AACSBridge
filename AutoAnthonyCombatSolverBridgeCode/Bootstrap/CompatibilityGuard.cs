@@ -88,7 +88,10 @@ public static class CompatibilityGuard
         ("CombatSolver.Engine.InCombat.Mirrors.Cards.CardIsPlayableMirrorContext", []),
         ("CombatSolver.Engine.InCombat.Simulation.CombatPredictionSimulator",
             ["Damage", "GainBlock", "GainEnergy", "LoseEnergy", "GainStars", "Draw", "Shuffle", "Discard", "Exhaust", "Heal", "Kill", "Upgrade", "AddGeneratedCardToCombat"]),
-        ("CombatSolver.Engine.Common.PredictedCard", ["CreateClone", "Original", "Preview", "MutablePreview"]),
+        ("CombatSolver.Engine.Common.PredictedCard", ["Original", "Preview", "MutablePreview"]),
+        // CreateClone / Simulate 是扩展方法（不在类型成员上），必须挂在其静态类的契约条目里检查
+        ("CombatSolver.Engine.InCombat.Simulation.CombatPredictedCardExtensions", ["CreateClone"]),
+        ("CombatSolver.Engine.InCombat.Simulation.CombatPredictionSimulatorExtensions", ["Simulate"]),
         ("CombatSolver.Engine.InCombat.Simulation.CombatPredictionRngSet", []),
         ("CombatSolver.Engine.Common.Mirrors.MethodMirrorRegistry`2", ["Register", "RegisterIgnored", "RegisterInferrer", "TryInvokeRegistered", "Invoke"]),
         ("CombatSolver.Engine.Common.Mirrors.MethodMirrorRegistry`3", ["Register", "TryInvokeRegistered", "Invoke"]),
