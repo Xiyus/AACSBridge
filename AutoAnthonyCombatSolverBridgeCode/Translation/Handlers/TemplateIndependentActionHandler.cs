@@ -54,6 +54,11 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             "i_proxyatomic_whitenoise" => null,
             "i_reducethiscardcostcombat" => null,
             "i_drawuntilnonattack" => null,
+            // 与 template_self_action 同款的独立模板变体
+            "ncr_increasethiscarddamagerun" => null,
+            "cl_gainnextturnblockequalcurrent" => null,
+            "d_setthiscardcostzero" => null,
+            "d_increaseallclaws" => null,
             _ => $"template_independent_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -274,6 +279,40 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 // 源码 L3255：抽牌直到抽到非攻击牌
                 // 简化：抽 1 张（精确复刻需要逐张检查类型——分支状态读取）
                 mirror.Simulator.Draw(owner, 1);
+                return;
+            }
+            case "ncr_increasethiscarddamagerun":
+            {
+                // 源码 L1891：IncreaseCardDamageForRun(card, amount)
+                if (amount == 0) return;
+                context.Card.ExtraDamage += amount;
+                return;
+            }
+            case "cl_gainnextturnblockequalcurrent":
+            {
+                // 源码：PowerCmd.Apply<BlockNextTurnPower>(owner, owner.Block)
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects7)
+                    throw new InvalidOperationException("下回合格挡需要分支战斗状态效果汇。");
+                var block = mirror.Simulator.State.GetCreature(owner.Creature).Block;
+                if (block > 0)
+                    effects7.ApplyPowerFromSource(typeof(BlockNextTurnPower), owner.Creature, block, owner.Creature, context.Card);
+                return;
+            }
+            case "d_setthiscardcostzero":
+            {
+                // 源码 L2264：card.EnergyCost.SetThisCombat(0)
+                context.Card.SetToFreeThisCombat();
+                return;
+            }
+            case "d_increaseallclaws":
+            {
+                // 源码 L2201-2205：全部同名卡的 ExtraDamage += amount
+                if (amount == 0) return;
+                var allCards = mirror.Simulator.State.GetPlayerCombatState(owner).AllCards;
+                foreach (var chaosCard in allCards)
+                    if (chaosCard.Preview is ChaosCardModel chaos
+                        && chaos.Generated.Operations.Any(op => op.Template == "D:IncreaseAllClaws"))
+                        chaos.ExtraDamage += amount;
                 return;
             }
             default:
