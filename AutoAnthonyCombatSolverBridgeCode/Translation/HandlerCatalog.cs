@@ -92,6 +92,8 @@ public static class HandlerCatalog
                      // 更多卡牌创建
                      "r_adddebristohand", "d_createzerocostcopyindiscard",
                      "ncr_createsoulindiscard", "ncr_createsoulindraw", "ncr_createsoulinhand",
+                     // ncr_* 简单变体（非 Osty 依赖）
+                     "ncr_increasethiscarddamagerun", "ncr_allenemiesloseeventhp", "ncr_killenemiesatdoomthreshold",
                  })
             registry.Register(new OperationKey("template_self_action", variant), templateSelf);
 

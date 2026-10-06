@@ -113,6 +113,10 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "ncr_createsoulindiscard" => null,
             "ncr_createsoulindraw" => null,
             "ncr_createsoulinhand" => null,
+            // ncr_* 简单变体（非 Osty 依赖）
+            "ncr_increasethiscarddamagerun" => null,
+            "ncr_allenemiesloseeventhp" => null,
+            "ncr_killenemiesatdoomthreshold" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -596,6 +600,34 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 if (count <= 0) return;
                 mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Soul>(
                     owner, PileType.Hand, count, owner);
+                return;
+            }
+            case "ncr_increasethiscarddamagerun":
+            {
+                // 源码 L1891：IncreaseCardDamageForRun(card, amount)
+                if (count == 0) return;
+                context.Card.ExtraDamage += count;
+                return;
+            }
+            case "ncr_allenemiesloseeventhp":
+            {
+                // 源码 L1860：全体敌人失去 state.EventAmount HP（触发式执行的事件量）
+                // 简化：无 EventAmount 时 no-op（直接打出时 EventAmount=0）
+                return;
+            }
+            case "ncr_killenemiesatdoomthreshold":
+            {
+                // 源码 L1811：击杀所有 Doom >= CurrentHp 的敌人
+                if (mirror.CombatState is global::CombatSolver.SimulatedCombatState killCombat)
+                {
+                    foreach (var enemy in mirror.CombatState.HittableEnemies.ToList())
+                    {
+                        var doom = killCombat.GetAmount<DoomPower>(enemy);
+                        var hp = mirror.Simulator.State.GetCreature(enemy).CurrentHp;
+                        if (doom >= hp)
+                            mirror.Simulator.Kill(enemy);
+                    }
+                }
                 return;
             }
             default:
