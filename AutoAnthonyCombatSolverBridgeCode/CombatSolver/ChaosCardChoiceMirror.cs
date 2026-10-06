@@ -161,6 +161,24 @@ internal static class ChaosCardChoiceMirror
                     // 简化：全部抽牌堆卡作为候选（精确版需要 StableShuffle + Take(4)）
                     return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Draw, 1, draw);
                 }
+                case ("template_self_action", "r_putselectedhandcardsondraw", "none", "none"):
+                {
+                    // 源码：从手牌选 N 张放到抽牌堆
+                    var hand = owner.Hand.Cards;
+                    return NativeSpec(PlanChoiceEffect.MoveToDrawTop, PileType.Hand, 1, hand);
+                }
+                case ("template_self_action", "r_copyselectedcolorlesscard", "none", "none"):
+                {
+                    // 源码：从手牌选 1 张无色牌复制（简化：选 1 张手牌）
+                    var hand = owner.Hand.Cards;
+                    return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Hand, 1, hand);
+                }
+                case ("template_self_action", "cl_transformselectedhandcards", "none", "none"):
+                {
+                    // 源码：从手牌选 N 张变形（简化：选 1 张手牌）
+                    var hand = owner.Hand.Cards;
+                    return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Hand, 1, hand);
+                }
             }
         }
 
@@ -194,6 +212,9 @@ internal static class ChaosCardChoiceMirror
             ("choose_generated_card", "random_colorless", "colorless_pool", "hand") => true,
             ("choose_generated_card", "random_other_character_attack", "other_character_pools", "hand") => true,
             ("template_self_action", "cl_choosefromrandomdrawcards", "none", "none") => true,
+            ("template_self_action", "r_putselectedhandcardsondraw", "none", "none") => true,
+            ("template_self_action", "r_copyselectedcolorlesscard", "none", "none") => true,
+            ("template_self_action", "cl_transformselectedhandcards", "none", "none") => true,
             _ => false,
         };
 
