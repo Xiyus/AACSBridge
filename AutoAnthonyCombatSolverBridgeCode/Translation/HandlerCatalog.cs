@@ -92,7 +92,9 @@ public static class HandlerCatalog
         foreach (var variant in new[]
                  {
                      "a_proxyatomic_buffer", "a_proxyatomic_parry", "a_proxyatomic_royalties",
-                     "a_proxyatomic_calcify", "a_proxyatomic_swordsage",
+                     "a_proxyatomic_calcify", "a_proxyatomic_swordsage", "a_proxyatomic_forbiddengrimoire",
+                     "retain_hand_at_turn_end", "retain_block_between_turns",
+                     "kings_sword_hits_all", "skills_cost_zero",
                  })
             registry.Register(new OperationKey("combat_rule", variant), templateSelf);
 

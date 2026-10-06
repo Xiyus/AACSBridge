@@ -38,7 +38,11 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             return spec.Variant switch
             {
                 "a_proxyatomic_buffer" or "a_proxyatomic_parry" or "a_proxyatomic_royalties"
-                    or "a_proxyatomic_calcify" or "a_proxyatomic_swordsage" => null,
+                    or "a_proxyatomic_calcify" or "a_proxyatomic_swordsage"
+                    or "a_proxyatomic_forbiddengrimoire" => null,
+                // 简单 combat_rule 规则（Power 应用等价）
+                "retain_hand_at_turn_end" or "retain_block_between_turns"
+                    or "kings_sword_hits_all" or "skills_cost_zero" => null,
                 _ => $"combat_rule 的 variant={spec.Variant} 不在支持矩阵",
             };
         return spec.Variant switch
@@ -132,6 +136,22 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                     return;
                 case "a_proxyatomic_swordsage":
                     ApplySelf(context, typeof(SwordSagePower), proxyAmount);
+                    return;
+                case "a_proxyatomic_forbiddengrimoire":
+                    ApplySelf(context, typeof(ForbiddenGrimoirePower), proxyAmount);
+                    return;
+                // 简单 combat_rule 规则
+                case "retain_hand_at_turn_end":
+                    ApplySelf(context, typeof(RetainHandPower), 1);
+                    return;
+                case "retain_block_between_turns":
+                    ApplySelf(context, typeof(BlurPower), 1);
+                    return;
+                case "kings_sword_hits_all":
+                    ApplySelf(context, typeof(SeekingEdgePower), 1);
+                    return;
+                case "skills_cost_zero":
+                    ApplySelf(context, typeof(FreeSkillPower), 1);
                     return;
                 default:
                     throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);

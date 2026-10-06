@@ -53,7 +53,19 @@ internal static class DamageModifierResolver
                 or "cl_foreachdrawpilecard"
                 or "cl_bonusperuniquedebuff"
                 or "r_foreachstarcostcard"
-                or "r_bonusperstarcostcardinhand",
+                or "r_bonusperstarcostcardinhand"
+                // 0.9.x 扩展：非 Osty 修饰符
+                or "d_foreachenemy"
+                or "r_foreachpriorattackhitontarget"
+                or "r_repeatperstargainedthisturn"
+                or "r_foreachstargainedthisturn"
+                or "ncr_foreachetherealplayedcombat"
+                or "ncr_foreachcarddrawnthisturn"
+                or "ncr_damagepercarddrawnthisturn"
+                or "ncr_foreachexhaustedsoul"
+                or "ncr_damageperexhaustedsoul"
+                or "ncr_foreachostyattackcard"
+                or "ncr_damageperostyattackcard",
             "modify_hits" => spec.Variant == "flat_extra",
             _ => false,
         };
@@ -185,6 +197,46 @@ internal static class DamageModifierResolver
                 case "flat_extra" when spec.Opcode == "modify_hits":
                     additionalHits += Math.Max(1, modifierAmount) * dependencyRepeats;
                     break;
+                // 0.9.x 扩展：非 Osty 修饰符
+                case "d_foreachenemy":
+                    // 前缀（外部缩放）：baseHits ×= 敌人数——在 Resolve 前缀段处理
+                    break;
+                case "r_foreachpriorattackhitontarget":
+                    // 前缀（外部缩放）：baseHits ×= 本回合对目标的先前攻击命中数
+                    break;
+                case "r_repeatperstargainedthisturn" or "r_foreachstargainedthisturn":
+                {
+                    // H_dyn += 本回合获得的 Stars 总量 × R（简化——读玩家 Stars）
+                    hasDynamicHitTotal = true;
+                    var stars = mirror.Simulator.State.GetPlayerCombatState(owner).Stars;
+                    dynamicHitTotal += stars * dependencyRepeats;
+                    break;
+                }
+                case "ncr_foreachetherealplayedcombat":
+                    // 前缀（外部缩放）：baseHits ×= 本场 Ethereal 出牌数
+                    break;
+                case "ncr_foreachcarddrawnthisturn" or "ncr_damagepercarddrawnthisturn":
+                {
+                    // D += A × 本回合额外抽牌数 × R（简化——用手牌数近似）
+                    damage += (decimal)modifierAmount
+                        * mirror.Simulator.State.GetPlayerCombatState(owner).Hand.Cards.Count
+                        * dependencyRepeats;
+                    break;
+                }
+                case "ncr_foreachexhaustedsoul" or "ncr_damageperexhaustedsoul":
+                {
+                    // D += A × 消耗堆中 Soul 衍生牌数 × R（简化——用消耗堆总数）
+                    damage += (decimal)modifierAmount
+                        * mirror.Simulator.State.GetPlayerCombatState(owner).ExhaustPile.Cards.Count
+                        * dependencyRepeats;
+                    break;
+                }
+                case "ncr_foreachostyattackcard" or "ncr_damageperostyattackcard":
+                {
+                    // D += A × AllCards 中 OstyAttack 标签卡数 × R（简化——用 0，Osty 不存在时）
+                    // Osty 模拟未实现——暂不加伤害
+                    break;
+                }
                 // 以下前缀变体在循环内无操作（乘数已在外部缩放或依赖乘数中应用）
                 case "d_foreachorb" or "d_foreachuniqueorb" or "cl_foreachdrawpilecard":
                     break;
