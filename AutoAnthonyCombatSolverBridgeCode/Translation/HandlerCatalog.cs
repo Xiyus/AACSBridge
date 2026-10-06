@@ -39,7 +39,9 @@ public static class HandlerCatalog
 
         // 0.3.0：牌堆移动（确定性形状——选牌/RNG 形状仍由校验层拒绝）
         registry.Register(new OperationKey("exhaust_card", "all"), new Handlers.ExhaustHandler());
+        registry.Register(new OperationKey("exhaust_card", "random"), new Handlers.ExhaustHandler());
         registry.Register(new OperationKey("discard_card", "all"), new Handlers.DiscardHandler());
+        registry.Register(new OperationKey("move_card", "random"), new Handlers.MoveCardRandomHandler());
         registry.Register(new OperationKey("create_copy", "this_card"), new Handlers.CreateCopyHandler());
         registry.Register(new OperationKey("draw_and_discard", "nonzero_cost"), new Handlers.DrawAndDiscardHandler());
 

@@ -24,6 +24,7 @@ public sealed class ExhaustHandler : IOperationHandler
         {
             ("all", "all_cards", "hand", "none", "any") => null,
             ("all", "all_cards", "hand", "none", "non_attack") => null,
+            ("random", "random_card", "hand", "none", _) => null,
             _ => $"exhaust_card 的 (variant={spec.Variant}, target={spec.Target}, zones={spec.SourceZone}->{spec.DestinationZone}, filter={spec.CardFilter}) 组合不在支持矩阵",
         };
     }
@@ -31,10 +32,19 @@ public sealed class ExhaustHandler : IOperationHandler
     public void Execute(OperationExecutionContext context)
     {
         var spec = context.Shape.Spec;
-        var hand = context.Mirror.OwnerState.Hand.Cards.ToList();
+        if (spec.Variant == "random")
+        {
+            // 源码：随机消耗手牌 1 张（CombatCardSelection 随机）
+            var hand = context.Mirror.OwnerState.Hand.Cards.ToList();
+            var selected = context.Mirror.Rng.CombatCardSelection.NextItem(hand);
+            if (selected is not null)
+                context.Mirror.Simulator.Exhaust(selected);
+            return;
+        }
+        var handCards = context.Mirror.OwnerState.Hand.Cards.ToList();
         var targets = spec.CardFilter == "non_attack"
-            ? hand.Where(candidate => candidate.Preview.Type != CardType.Attack).ToList()
-            : hand;
+            ? handCards.Where(candidate => candidate.Preview.Type != CardType.Attack).ToList()
+            : handCards;
         foreach (var target in targets)
         {
             context.Mirror.Simulator.Exhaust(target);

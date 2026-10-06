@@ -193,6 +193,12 @@ internal static class ChaosCardChoiceMirror
                     var draw = owner.DrawPile.Cards.Where(candidate => candidate.Preview.IsTransformable).ToList();
                     return NativeSpec(PlanChoiceEffect.Transform, PileType.Draw, 1, draw);
                 }
+                case ("exhaust_card", "selected", "draw", "none"):
+                {
+                    // 源码：从抽牌堆选 1 张消耗
+                    var draw = owner.DrawPile.Cards;
+                    return NativeSpec(PlanChoiceEffect.Exhaust, PileType.Draw, 1, draw);
+                }
             }
         }
 
@@ -233,6 +239,7 @@ internal static class ChaosCardChoiceMirror
             ("template_independent_action", "i_proxyatomic_guards", "none", "none") => true,
             ("template_independent_action", "i_proxyatomic_charge", "none", "none") => true,
             ("template_independent_action", "i_proxyatomic_seance", "none", "none") => true,
+            ("exhaust_card", "selected", "draw", "none") => true,
             _ => false,
         };
 
