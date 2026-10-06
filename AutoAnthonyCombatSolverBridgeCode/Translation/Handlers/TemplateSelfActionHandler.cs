@@ -127,6 +127,9 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "ncr_addrandometherealcardtohand" => null,
             // Osty 伤害（模拟器已追踪 Osty creature）
             "ncr_ostyalldamage" => null,
+            // Osty 生命管理（模拟器追踪 Osty HP）
+            "ncr_healosty" => null,
+            "ncr_killosty" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -698,6 +701,24 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 if (ostyHits > 0)
                     mirror.Simulator.Damage(mirror.CombatState.HittableEnemies.ToArray(), ostyDamage,
                         context.DamageProps, osty, context.Mirror.Card, context.Mirror.CardPlay);
+                return;
+            }
+            case "ncr_healosty":
+            {
+                // 源码：治疗 Osty（模拟器 SimCreatureState 支持 HP 修改）
+                var osty = mirror.Simulator.State.GetOsty(owner);
+                if (osty is null) return;
+                var ostyState = mirror.Simulator.State.GetCreature(osty);
+                if (count > 0)
+                    ostyState.Heal(count);
+                return;
+            }
+            case "ncr_killosty":
+            {
+                // 源码：杀死 Osty
+                var osty = mirror.Simulator.State.GetOsty(owner);
+                if (osty is null) return;
+                mirror.Simulator.Kill(osty);
                 return;
             }
             default:

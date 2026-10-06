@@ -97,7 +97,7 @@ public static class HandlerCatalog
                      // 更多非 Osty 简单变体
                      "r_fillhandwithdebris", "ncr_increaseallcardcoststhisturn", "ncr_addrandometherealcardtohand",
                      // Osty 伤害（模拟器已追踪 Osty creature）
-                     "ncr_ostyalldamage",
+                     "ncr_ostyalldamage", "ncr_healosty", "ncr_killosty",
                  })
             registry.Register(new OperationKey("template_self_action", variant), templateSelf);
 
