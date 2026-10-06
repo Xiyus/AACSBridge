@@ -4,6 +4,7 @@ using CombatSolver.Engine.InCombat.Simulation;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.Powers;
 using CardTag = MegaCrit.Sts2.Core.Entities.Cards.CardTag;
 
@@ -24,7 +25,14 @@ internal static class DamageModifierResolver
             or "ncr_ostymaxhpbonusdamage"
             or "ncr_ostycurrenthpbonusdamage"
             or "ncr_repeatpervoidplayedcombat"
-            or "r_damageupwhendrawn",
+            or "r_damageupwhendrawn"
+            // Batch AO：ForEach/依赖前缀族（第三批）
+            or "d_foreachorb" or "d_foreachuniqueorb"
+            or "ncr_foreachostyattackcard" or "ncr_damageperostyattackcard"
+            or "ncr_foreachexhaustedsoul" or "ncr_damageperexhaustedsoul"
+            or "r_foreachskillplayedthisturn" or "r_foreachgeneratedcardcombat"
+            or "cl_foreachdrawpilecard" or "r_wheneverdrawn"
+            or "r_bonuspergeneratedcardthiscombat",
         "modify_hits" => spec.Variant is "flat_extra" or "hp_loss_scaled",
         "modify_damage" => spec.Variant is
             "vulnerable_scaled" or "strike_count_scaled" or "current_block"
@@ -123,6 +131,58 @@ internal static class DamageModifierResolver
                 case "r_damageupwhendrawn":
                     // 源码 ChaosCardModel L844-846：抽到时 ExtraDamage += max(0,A)
                     // 已在 ExtraDamage 中体现（每次抽到叠加）——此处无额外操作
+                    break;
+                // Batch AO：ForEach/依赖前缀族（第三批）
+                case "d_foreachorb":
+                    // 源码 L2369 与 D:RepeatPerOrb 同组：H_dyn += 球队列球数
+                    hasDynamicHits = true;
+                    dynamicHits += player.OrbQueue.Orbs.Count;
+                    break;
+                case "d_foreachuniqueorb":
+                    // 源码 L3754：H_dyn += 唯一球类型数
+                    hasDynamicHits = true;
+                    dynamicHits += player.OrbQueue.Orbs.Select(orb => orb.Id).Distinct().Count();
+                    break;
+                case "ncr_foreachostyattackcard":
+                case "ncr_foreachexhaustedsoul":
+                case "cl_foreachdrawpilecard":
+                case "r_wheneverdrawn":
+                    // 依赖前缀：计数由消费方（DamagePer 变体）自行解析，前缀本身 no-op
+                    // 源码 L3472-3477：外部缩放伤害依赖为空分支
+                    break;
+                case "ncr_damageperostyattackcard":
+                    // 源码 L3440-3445：damage += amount × OstyAttack 卡数（排除自身）
+                    // 依赖链近似：直接计数（实机由 ForEach 前缀提供 dependencyRepeats）
+                    damage += (decimal)amount * player.AllCards.Count(candidate =>
+                        !ReferenceEquals(candidate, mirror.Card)
+                        && candidate.Preview.Tags.Contains(CardTag.OstyAttack));
+                    break;
+                case "ncr_damageperexhaustedsoul":
+                    // 源码 L3432-3438：damage += amount × 消耗堆 Soul 衍生卡数
+                    damage += (decimal)amount * player.ExhaustPile.Cards
+                        .Count(candidate => candidate.Preview is Soul);
+                    break;
+                case "r_foreachskillplayedthisturn":
+                    // 源码 L3449-3455（等价 R:RepeatPerSkillPlayedThisTurn）：H_dyn += 本回合技能出牌数
+                    // 近似：模拟 History 内的技能出牌（根历史部分无法按类型过滤）
+                    hasDynamicHits = true;
+                    dynamicHits += mirror.Simulator.History.Entries
+                        .OfType<CombatPredictionCardPlayFinishedEntry>()
+                        .Count(entry => entry.CardPlay.Player == owner
+                            && entry.CardPlay.Card.Type == CardType.Skill);
+                    break;
+                case "r_foreachgeneratedcardcombat":
+                case "r_bonuspergeneratedcardthiscombat":
+                    // 源码 L3466-3468：damage += amount × 本战斗生成卡数（根历史 + 模拟内）
+                    damage += (decimal)amount * (combat.GetCardsGeneratedBeforePrediction(owner)
+                        + mirror.Simulator.History.Entries.OfType<CombatPredictionCardGeneratedEntry>()
+                            .Count(entry => entry.Creator == owner));
+                    break;
+                case "hp_loss_scaled" when spec.Opcode == "modify_hits":
+                    // 源码 L3385-3391：H += amount × HP 损失事件数
+                    // 近似：用累计 HP 损失量（事件数 ≤ 损失量，保守上界）
+                    additionalHits += Math.Max(0, amount)
+                        * Math.Max(0, combat.GetCumulativeHpLost(owner.Creature));
                     break;
                 case "flat_extra" when spec.Opcode == "modify_hits":
                     additionalHits += Math.Max(1, amount);
