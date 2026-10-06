@@ -5,26 +5,33 @@ using AutoAnthonyCombatSolverBridge.Translation;
 namespace AutoAnthonyCombatSolverBridge.Translation.Handlers;
 
 /// <summary>
-/// gain_stars(immediate/self) 的精确镜像。
-/// 复刻 ChaosOperationExecutor.TryExecuteStructuredCommon L862-864：
-/// PlayerCmd.GainStars(amount, owner) → simulator.GainStars(owner, amount)。
+/// gain_stars(immediate/self) + gain_max_hp(immediate/self) 的精确镜像。
+/// gain_stars：PlayerCmd.GainStars → simulator.GainStars
+/// gain_max_hp：CreatureCmd.GainMaxHp → simulator.GainMaxHp
 /// </summary>
 public sealed class GainStarsHandler : IOperationHandler
 {
-    public string Describe => "gain_stars(immediate)：simulator.GainStars 精确镜像";
+    public string Describe => "gain_stars/gain_max_hp(immediate)：simulator 精确镜像";
 
     public string? ValidateSupport(OperationShape shape)
     {
         var spec = shape.Spec;
-        return (spec.Variant, spec.Target) switch
+        return (spec.Opcode, spec.Variant, spec.Target) switch
         {
-            ("immediate", "self") => null,
-            _ => $"gain_stars 的 (variant={spec.Variant}, target={spec.Target}) 组合不在支持矩阵",
+            ("gain_stars", "immediate", "self") => null,
+            ("gain_max_hp", "immediate", "self") => null,
+            _ => $"{spec.Opcode} 的 (variant={spec.Variant}, target={spec.Target}) 组合不在支持矩阵",
         };
     }
 
     public void Execute(OperationExecutionContext context)
     {
+        if (context.Shape.Spec.Opcode == "gain_max_hp")
+        {
+            if (context.ExecutableAmount == 0) return;
+            context.Mirror.Simulator.GainMaxHp(context.Card.Owner.Creature, context.ExecutableAmount);
+            return;
+        }
         context.Mirror.Simulator.GainStars(context.Card.Owner, context.ExecutableAmount);
     }
 }
