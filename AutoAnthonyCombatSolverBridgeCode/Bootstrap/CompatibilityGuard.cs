@@ -47,7 +47,8 @@ public static class CompatibilityGuard
     private static readonly (string Type, string[] Members)[] AutoAnthonyContract =
     [
         ("AutoAnthony.ChaosCardModel", ["Generated", "Definition", "AfterCardEnteredCombat", "OnPlay", "IsClone",
-            "OperationAmount", "CapturedExternalDamageBonus", "ExtraDamage", "ExtraBlock", "IsUpgraded", "HasStarCostX", "EnergyCost"]),
+            "OperationAmount", "CapturedExternalDamageBonus", "ExtraDamage", "ExtraBlock", "IsUpgraded", "HasStarCostX", "EnergyCost",
+            "SetResolvedXValues", "ResolvedEnergyXValue", "ResolvedStarXValue"]),
         ("AutoAnthony.ChaosCardDefinition", ["Slot", "Card", "RuntimeSpecs", "UpgradeValueSlots"]),
         ("AutoAnthony.ChaosCardRegistry", ["IsGeneratedCardId", "TryGetGeneratedCardSlot", "Types", "TypesFor"]),
         ("AutoAnthony.ChaosRunDefinitions", ["ForSlot", "GetCards", "GetAllCards"]),

@@ -19,6 +19,7 @@ public static class HandlerCatalog
         var damage = new Handlers.DamageHandler();
         registry.Register(new OperationKey("deal_damage", "selected"), damage);
         registry.Register(new OperationKey("deal_damage", "all"), damage);
+        registry.Register(new OperationKey("deal_damage", "random"), damage);
         registry.Register(new OperationKey("gain_block", "immediate"), new Handlers.BlockHandler());
         registry.Register(new OperationKey("draw_cards", "immediate"), new Handlers.DrawHandler());
         registry.Register(new OperationKey("gain_energy", "immediate"), new Handlers.EnergyHandler());

@@ -3,6 +3,8 @@ using ChaosCardGenerator;
 using CombatSolver.Engine.Common;
 using CombatSolver.Engine.InCombat.Mirrors.Cards.OnPlay;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Hooks;
 using AutoAnthonyCombatSolverBridge.Diagnostics;
 using AutoAnthonyCombatSolverBridge.Translation;
 
@@ -40,6 +42,22 @@ internal static class ChaosCardOnPlayMirror
         if (reason is not null)
             throw PredictionUnsupportedException.ForContent(reason, typeof(ChaosCardModel));
 
+        // 复刻 ChaosCardModel.OnPlay 的 X 值解析（MODEL L751-761）：Hook.ModifyXValue 传
+        // 分支战斗状态——与 CombatSolver 自带的 ResolveEnergyXValue 扩展同款分支安全路径。
+        var resolvedEnergyX = card.EnergyCost.CostsX
+            ? Hook.ModifyXValue(context.CombatState, card,
+                context.CardPlay.Resources.EnergySpent > 0
+                    ? context.CardPlay.Resources.EnergySpent
+                    : card.EnergyCost.CapturedXValue)
+            : 0;
+        var resolvedStarX = card.HasStarCostX
+            ? Hook.ModifyXValue(context.CombatState, card,
+                context.CardPlay.Resources.StarsSpent > 0
+                    ? context.CardPlay.Resources.StarsSpent
+                    : card.LastStarsSpent)
+            : 0;
+        card.SetResolvedXValues(resolvedEnergyX, resolvedStarX);
+
         var operations = card.Generated.Operations;
         for (var index = 0; index < operations.Count; index++)
         {
@@ -58,7 +76,14 @@ internal static class ChaosCardOnPlayMirror
                     Describe(card, index, $"opcode={spec.Opcode} variant={spec.Variant} 无注册 handler（校验层遗漏，属桥的 bug）"),
                     typeof(ChaosCardModel));
 
-            handler.Execute(new OperationExecutionContext(context, card, new OperationShape(index, operation.Scope, spec)));
+            // 复刻 ExecuteWithResolvedTarget 的显式随机目标解析（L474-481）：RNG 消耗必须与
+            // 真实执行一致（即使结果只影响 state.Target）；分支的 CombatTargets 流。
+            Creature? resolvedRandomTarget = null;
+            if (spec.Flags.Contains("random_enemy_reference"))
+                resolvedRandomTarget = context.Rng.CombatTargets.NextItem(context.CombatState.HittableEnemies);
+
+            handler.Execute(new OperationExecutionContext(context, card,
+                new OperationShape(index, operation.Scope, spec), resolvedRandomTarget));
         }
     }
 
@@ -66,9 +91,6 @@ internal static class ChaosCardOnPlayMirror
 
     internal static string? ValidateCard(ChaosCardModel card)
     {
-        if (card.EnergyCost.CostsX || card.HasStarCostX)
-            return Describe(card, null, "X 费卡不在支持矩阵（0.4.0 解锁）");
-
         var operations = card.Generated.Operations;
         for (var index = 0; index < operations.Count; index++)
         {
@@ -148,19 +170,19 @@ internal static class ChaosCardOnPlayMirror
         return null;
     }
 
-    /// <summary>通用形状检查：Condition/Trigger、随机引用、X 值源。返回 null 表示通过。</summary>
+    /// <summary>通用形状检查：Condition/Trigger、X 值源。返回 null 表示通过。</summary>
     private static string? ValidateSpecShape(ChaosCardModel card, int index, OperationRuntimeSpec spec)
     {
         if (spec.Condition is not null || spec.Trigger is not null)
             return Describe(card, index, "spec 携带 Condition/Trigger（0.6.0 解锁）");
 
-        if (spec.Flags.Contains("random_enemy_reference"))
-            return Describe(card, index, "随机目标引用（0.4.0 解锁）");
-
         foreach (var slot in spec.Values)
         {
-            if (slot.Source != "fixed")
-                return Describe(card, index, $"值槽 {slot.Id} 的 Source={slot.Source}（X 值，0.4.0 解锁）");
+            // 0.4.0：X 源槽（energy_x/star_x/special_x）已支持——镜像层在执行前复刻
+            // OnPlay 的 X 解析（Hook.ModifyXValue + SetResolvedXValues），值槽经
+            // RuntimeSpecValue 自动读到解析后的 X 值。
+            if (slot.Source is not ("fixed" or "energy_x" or "star_x" or "special_x"))
+                return Describe(card, index, $"值槽 {slot.Id} 的 Source={slot.Source} 不在支持矩阵");
         }
 
         return null;

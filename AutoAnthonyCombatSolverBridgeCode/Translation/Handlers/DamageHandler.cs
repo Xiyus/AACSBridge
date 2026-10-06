@@ -32,6 +32,7 @@ public sealed class DamageHandler : IOperationHandler
         {
             ("selected", "selected_enemy") => null,
             ("all", "all_enemies") => null,
+            ("random", "random_enemy") => null,
             _ => $"deal_damage 的 (variant={spec.Variant}, target={spec.Target}) 组合不在支持矩阵",
         };
     }
@@ -65,6 +66,20 @@ public sealed class DamageHandler : IOperationHandler
                 return;
             }
 
+            if (spec.Variant == "random")
+            {
+                // 源码 L1183-1194：每 hit 独立从分支 CombatTargets 流抽一个敌人
+                for (var hit = 0; hit < hits; hit++)
+                {
+                    var randomTarget = mirror.Rng.CombatTargets.NextItem(mirror.CombatState.HittableEnemies);
+                    if (randomTarget is null)
+                        continue;
+                    mirror.Simulator.Damage([randomTarget], finalDamage,
+                        props, dealer, mirror.Card, mirror.CardPlay);
+                }
+                return;
+            }
+
             var powerTarget = mirror.CardPlay.Target;
             if (powerTarget is null)
                 return;    // 源码语义：无目标 = 成功 no-op
@@ -95,6 +110,16 @@ public sealed class DamageHandler : IOperationHandler
                     .WithHitCount(hits)
                     .FromCard(card, mirror.CardPlay)
                     .TargetingAllOpponents(mirror.CombatState)
+                    .Simulate(mirror.Simulator);
+                return;
+            case "random":
+                // 镜像层已按源码复刻 ExecuteWithResolvedTarget 的显式随机目标抽取
+                // （消耗一次 CombatTargets，结果不影响本路径）；命令自身的逐 hit 随机
+                // 目标由模拟器用分支 RNG 结算（与真实命令的 RNG 用法一致）。
+                DamageCmd.Attack(finalDamage)
+                    .WithHitCount(hits)
+                    .FromCard(card, mirror.CardPlay)
+                    .TargetingRandomOpponents(mirror.CombatState)
                     .Simulate(mirror.Simulator);
                 return;
             default:
