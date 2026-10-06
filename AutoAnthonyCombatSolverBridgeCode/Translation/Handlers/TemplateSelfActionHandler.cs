@@ -39,7 +39,11 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             {
                 "a_proxyatomic_buffer" or "a_proxyatomic_parry" or "a_proxyatomic_royalties"
                     or "a_proxyatomic_calcify" or "a_proxyatomic_swordsage"
-                    or "kings_sword_hits_all" => null,
+                    or "kings_sword_hits_all"
+                    // A:rule 族（ApplyBoundPower 一行式）
+                    or "poison_extra_triggers" or "derivative_bonus_damage"
+                    or "derivative_hits_all" or "played_skills_gain_sly"
+                    or "derivative_retain" => null,
                 _ => $"combat_rule 的 variant={spec.Variant} 不在支持矩阵",
             };
         return spec.Variant switch
@@ -165,6 +169,22 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                     return;
                 case "skills_cost_zero":
                     ApplySelf(context, typeof(FreeSkillPower), 1);
+                    return;
+                // A:rule 族（ApplyBoundPower 一行式）
+                case "poison_extra_triggers":
+                    ApplySelf(context, typeof(AccelerantPower), proxyAmount);
+                    return;
+                case "derivative_bonus_damage":
+                    ApplySelf(context, typeof(AccuracyPower), proxyAmount);
+                    return;
+                case "derivative_hits_all":
+                    ApplySelf(context, typeof(FanOfKnivesPower), 1);
+                    return;
+                case "played_skills_gain_sly":
+                    ApplySelf(context, typeof(MasterPlannerPower), 1);
+                    return;
+                case "derivative_retain":
+                    ApplySelf(context, typeof(PhantomBladesPower), proxyAmount);
                     return;
                 default:
                     throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);

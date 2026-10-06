@@ -104,6 +104,9 @@ public static class HandlerCatalog
                      "a_proxyatomic_calcify", "a_proxyatomic_swordsage", "a_proxyatomic_forbiddengrimoire",
                      "retain_hand_at_turn_end", "retain_block_between_turns",
                      "kings_sword_hits_all", "skills_cost_zero",
+                     // A:rule 族（ApplyBoundPower 一行式）
+                     "poison_extra_triggers", "derivative_bonus_damage",
+                     "derivative_hits_all", "played_skills_gain_sly", "derivative_retain",
                  })
             registry.Register(new OperationKey("combat_rule", variant), templateSelf);
 
