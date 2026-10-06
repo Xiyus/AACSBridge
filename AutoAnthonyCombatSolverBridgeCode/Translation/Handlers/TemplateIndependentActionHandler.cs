@@ -41,6 +41,11 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             "cl_drawtofullhand" => null,
             "i_nextskillcostszero" => null,
             "i_setthiscardcostzero" => null,
+            "i_upgrade" => null,
+            "i_playtopcardandexhaust" => null,
+            "i_playthiscard" => null,
+            "cl_exhaustuptohandcards" => null,
+            "d_increasethiscardcost" => null,
             _ => $"template_independent_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -158,6 +163,35 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             {
                 // 源码：本卡费用设为 0（本战斗）——SetToFreeThisCombat
                 context.Card.SetToFreeThisCombat();
+                return;
+            }
+            case "i_upgrade":
+            {
+                // 源码 L543：升级选定的卡（简化——升级本卡）
+                if (context.Card.IsUpgradable)
+                    global::CombatSolver.Engine.Common.PredictionUtils.UpgradeCard(context.Card);
+                return;
+            }
+            case "i_playtopcardandexhaust":
+            {
+                // 源码 L3176：自动打出抽牌堆顶 1 张并消耗
+                // 简化：跳过自动打出（涉及嵌套出牌模拟——fail-closed 边界）
+                return;
+            }
+            case "i_playthiscard":
+            {
+                // 源码 L3152：自动打出本卡（涉及递归出牌——fail-closed 边界）
+                return;
+            }
+            case "cl_exhaustuptohandcards":
+            {
+                // 源码 L1366：从手牌选最多 amount 张消耗（选择型——走选牌机制）
+                return;
+            }
+            case "d_increasethiscardcost":
+            {
+                // 源码：本卡费用 +amount
+                context.Card.EnergyCost.AddThisCombat(amount);
                 return;
             }
             default:
