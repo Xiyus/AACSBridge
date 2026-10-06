@@ -131,15 +131,16 @@ internal static class ChaosCompositePowerMirror
         }
     }
 
-    private static PredictedCard Source(ChaosCompositePower power)
+    private static PredictedCard Source(ChaosCompositePower power, CombatPredictionSimulator simulator)
     {
         if (power.ProfileId.Length != 0)
             throw Unsupported("外部角色 Profile 的复合 Power 尚未适配");
-        // 模拟分支中的克隆 Creature 可能没有 Player 引用（例如根捕获时来自非玩家侧的
-        // Power 克隆）——fail-closed 而不是 NullReference 崩溃
-        if (power.Owner?.Player is null)
-            throw Unsupported("复合 Power 的 Owner Creature 缺少 Player 引用（模拟克隆边界）");
-        var predicted = PredictedCard.Create(ChaosCardRegistry.Canonical(power.Character, power.Slot), power.Owner.Player);
+        // 模拟克隆的 Creature 可能丢失 Player 引用（浅拷贝边界）——从模拟器状态回退查找
+        var player = power.Owner?.Player
+            ?? simulator.State.CombatState.Players.FirstOrDefault(p => p.Creature == power.Owner);
+        if (player is null)
+            throw Unsupported("复合 Power 的 Owner Creature 无法解析到玩家（模拟克隆边界）");
+        var predicted = PredictedCard.Create(ChaosCardRegistry.Canonical(power.Character, power.Slot), player);
         var card = (ChaosCardModel)predicted.MutablePreview;
         if (power.SourceTinkeredDefinitionPayload.Length > 0)
             card.ApplyCapturedDefinition(CardTinkeringApi.DeserializeCard(power.SourceTinkeredDefinitionPayload));
@@ -154,7 +155,7 @@ internal static class ChaosCompositePowerMirror
     {
         if (!BridgeBootstrap.IsReady) throw Unsupported("桥未完成全部初始化，拒绝部分适配预测");
         if (power.Owner.Player is null) throw Unsupported("复合 Power Owner 不是玩家");
-        var card = (ChaosCardModel)Source(power).MutablePreview;
+        var card = (ChaosCardModel)Source(power, simulator).MutablePreview;
         var reason = ChaosCardOnPlayMirror.ValidateCard(card);
         if (reason is not null) throw Unsupported(reason);
         if (!card.Generated.Operations.Any(ChaosOperationExecutor.RequiresCompositePower))
@@ -281,7 +282,7 @@ internal static class ChaosCompositePowerMirror
     {
         var state = Read(simulator, power);
         var snapshot = state.Snapshot;
-        var predicted = Source(snapshot);
+        var predicted = Source(snapshot, simulator);
         var card = (ChaosCardModel)predicted.MutablePreview;
         var operations = card.Generated.Operations;
         for (var trigger = 0; trigger < operations.Count; trigger++)
