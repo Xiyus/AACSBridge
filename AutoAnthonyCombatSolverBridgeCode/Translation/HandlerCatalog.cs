@@ -1,14 +1,16 @@
 namespace AutoAnthonyCombatSolverBridge.Translation;
 
 /// <summary>
-/// 0.1.0 翻译表：把支持的 (Opcode, Variant) 形状登记进注册表。
+/// 翻译表：把支持的 (Opcode, Variant) 形状登记进注册表。
 /// 支持矩阵与 AutoAnthony 组件目录（catalog_runtime_specs.json，931 条）逐形状核对过：
-///  - deal_damage：selected/selected_enemy（131 条）与 all/all_enemies（32 条），fixed 值；
-///  - gain_block / draw_cards / gain_energy：immediate/self，各 78/50/30 条，fixed 值；
-///  - lose_hp：immediate/self（8 条）与 immediate/selected_enemy（2 条）；
-///  - heal：immediate/self（1 条）。
-/// 其余形状（X 值源、随机目标引用、事件目标、历史计数、阈值翻倍等）由镜像层的校验
-/// fail-closed 拒绝，等 0.4.0+ 的对应里程碑。
+///  - 0.1.0：deal_damage(selected/all 163) + gain_block(78) + draw_cards(50) + gain_energy(30)
+///    + lose_hp(10) + heal(1)，全部 fixed 值；
+///  - 0.2.0：apply_power 的 20 个 variant（76 条：vulnerable 18 / weak 17 / strength 9 /
+///    strength_loss_this_turn 7 / dexterity_gain 4 / retain_hand_this_turn 3 / plating 3 /
+///    vigor 3 / strength_loss 2 / strength_this_turn 2 / 其余各 1）+ Power 卡 Unpowered
+///    伤害路径 + M:base/strength_scaled 格挡修饰符数学。
+/// 其余形状（X 值源、随机目标、事件目标、历史计数、阈值翻倍、绑定 Power 等）由镜像层
+/// 的校验 fail-closed 拒绝，等后续里程碑。
 /// </summary>
 public static class HandlerCatalog
 {
@@ -22,5 +24,15 @@ public static class HandlerCatalog
         registry.Register(new OperationKey("gain_energy", "immediate"), new Handlers.EnergyHandler());
         registry.Register(new OperationKey("lose_hp", "immediate"), new Handlers.LoseHpHandler());
         registry.Register(new OperationKey("heal", "immediate"), new Handlers.HealHandler());
+
+        var power = new Handlers.PowerHandler();
+        foreach (var variant in new[]
+                 {
+                     "vulnerable", "weak", "strength_loss", "strength_loss_this_turn", "strength_gain",
+                     "vulnerable_double", "retain_hand_this_turn", "strength", "strength_per_target_vulnerable",
+                     "dexterity_gain", "dexterity_loss", "dexterity_gain_this_turn", "doom", "focus_loss",
+                     "thorns", "intangible", "blur", "plating", "strength_this_turn", "vigor",
+                 })
+            registry.Register(new OperationKey("apply_power", variant), power);
     }
 }
