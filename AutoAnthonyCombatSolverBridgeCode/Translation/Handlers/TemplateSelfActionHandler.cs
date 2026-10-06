@@ -106,11 +106,11 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 // 源码：CreateDerivatives(card, index, op, Hand, ExecutableOperationCount(op, amount))
                 // 镜像：与原生 BespokeCardMirrors L138 同款
                 var operation = context.Card.Generated.Operations[context.Shape.OperationIndex];
-                var count = ChaosOperationExecutor.ExecutableOperationCount(operation, amount);
-                if (count == 0)
+                var shivCount = ChaosOperationExecutor.ExecutableOperationCount(operation, amount);
+                if (shivCount == 0)
                     return;
                 mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Shiv>(
-                    owner, PileType.Hand, count, owner);
+                    owner, PileType.Hand, shivCount, owner);
                 return;
             }
             default:
