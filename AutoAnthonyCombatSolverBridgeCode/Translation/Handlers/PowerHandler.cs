@@ -64,6 +64,8 @@ public sealed class PowerHandler : IOperationHandler
             ("strength_loss_this_turn", "all_enemies") => null,
             ("strength_gain", "selected_enemy") => null,
             ("vulnerable_double", "selected_enemy") => null,
+            ("poison", "selected_enemy") => null,
+            ("poison", "all_enemies") => null,
             _ => $"apply_power 的 (variant={spec.Variant}, target={spec.Target}) 组合不在 0.2.0 支持矩阵",
         };
     }
@@ -138,6 +140,9 @@ public sealed class PowerHandler : IOperationHandler
                 return;
             case "strength_gain":
                 ApplyToEnemies(context, effects, typeof(StrengthPower), amount);
+                return;
+            case "poison":
+                ApplyToEnemies(context, effects, typeof(PoisonPower), amount);
                 return;
             default:
                 throw new UnsupportedRuntimeSpecException(spec.Opcode, spec.Variant);
