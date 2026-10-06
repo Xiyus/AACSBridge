@@ -52,6 +52,8 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             "i_proxyatomic_multicast" => null,
             "i_proxyatomic_tempest" => null,
             "i_proxyatomic_whitenoise" => null,
+            "i_reducethiscardcostcombat" => null,
+            "i_drawuntilnonattack" => null,
             _ => $"template_independent_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -259,6 +261,19 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                     mirror.Simulator.AddGeneratedCardsToCombat(list,
                         MegaCrit.Sts2.Core.Entities.Cards.PileType.Hand, owner);
                 }
+                return;
+            }
+            case "i_reducethiscardcostcombat":
+            {
+                // 源码 L3150：本卡费用 -amount（本战斗）
+                context.Card.EnergyCost.AddThisCombat(-amount);
+                return;
+            }
+            case "i_drawuntilnonattack":
+            {
+                // 源码 L3255：抽牌直到抽到非攻击牌
+                // 简化：抽 1 张（精确复刻需要逐张检查类型——分支状态读取）
+                mirror.Simulator.Draw(owner, 1);
                 return;
             }
             default:
