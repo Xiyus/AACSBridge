@@ -45,5 +45,12 @@ public static class HandlerCatalog
         // 0.6.x：代理模板（解决 Imbued 附魔自动施放矩阵外卡导致的 TURN_SETUP_FAILURE）
         registry.Register(new OperationKey("template_independent_action", "cl_proxyatomic_hiddengem"),
             new Handlers.HiddenGemHandler());
+
+        // 0.7.0：随机生成（分支 RNG + 递归镜像覆盖）
+        var createCard = new Handlers.CreateCardHandler();
+        registry.Register(new OperationKey("create_card", "random_colorless"), createCard);
+        registry.Register(new OperationKey("create_card", "current_character_random"), createCard);
+        registry.Register(new OperationKey("create_card", "random_zero_cost"), createCard);
+        registry.Register(new OperationKey("create_card", "random_attack_zero_cost_this_turn"), createCard);
     }
 }
