@@ -94,12 +94,14 @@ public static class CompatibilityGuard
         ("CombatSolver.Engine.InCombat.Mirrors.Cards.CardIsPlayableMirrors", ["Registry"]),
         ("CombatSolver.Engine.InCombat.Mirrors.Cards.CardIsPlayableMirrorContext", []),
         ("CombatSolver.Engine.InCombat.Simulation.CombatPredictionSimulator",
-            ["Damage", "GainBlock", "GainEnergy", "LoseEnergy", "GainStars", "Draw", "Shuffle", "Discard", "Exhaust", "Heal", "Kill", "Upgrade", "AddGeneratedCardToCombat"]),
-        ("CombatSolver.Engine.Common.PredictedCard", ["Original", "Preview", "MutablePreview", "SetToFreeThisTurn"]),
+            ["Damage", "GainBlock", "GainEnergy", "LoseEnergy", "GainStars", "Draw", "Shuffle", "Discard", "Exhaust", "Heal", "Kill", "Upgrade",
+             "AddGeneratedCardToCombat", "AddGeneratedCardsToCombat", "GetMaxHandSize"]),
+        ("CombatSolver.Engine.Common.PredictedCard", ["Original", "Preview", "MutablePreview"]),
         ("CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions",
             ["GetDistinctUnlockedColorlessForCombat", "GetDistinctUnlockedCharacterCardsForCombat", "GetUnlockedCharacterCardsForCombat"]),
-        // CreateClone / Simulate 是扩展方法（不在类型成员上），必须挂在其静态类的契约条目里检查
-        ("CombatSolver.Engine.InCombat.Simulation.CombatPredictedCardExtensions", ["CreateClone"]),
+        // 扩展方法不在类型成员上，必须挂在其静态类的契约条目里检查（CreateClone/Simulate/SetToFreeThisTurn
+        // 均为扩展方法——前三次实机测试各抓过一次此类契约错误）
+        ("CombatSolver.Engine.InCombat.Simulation.CombatPredictedCardExtensions", ["CreateClone", "SetToFreeThisTurn", "SetToFreeThisCombat"]),
         ("CombatSolver.Engine.InCombat.Simulation.CombatPredictionSimulatorExtensions", ["Simulate"]),
         ("CombatSolver.CardChoiceMirrors", ["Register", "TryGetSpec", "TryApply"]),
         ("CombatSolver.CardChoiceSpec", ["Effect", "SourcePile", "MinCount", "MaxCount", "Options"]),
