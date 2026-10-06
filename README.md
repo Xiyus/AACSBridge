@@ -26,6 +26,7 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 | 0.2.0 | apply_power(20 variant) + Power 卡伤害 + strength_scaled 修饰符 | ✅ 实机验证（**严格 diff 零差异**，见下） |
 | 0.2.0+ | 保守可打性模式（矩阵外卡模拟中不可打） | ✅ 实机验证（搜索从必然失败变为完整完成） |
 | 0.3.0 | 牌堆移动：exhaust/discard(all) + create_copy + draw_and_discard | ✅ 实机验证（严格 diff 零差异 + **生成牌递归**） |
+| 0.4.0 | X 费卡（OnPlay X 解析复刻）+ 随机目标（分支 RNG 消耗对齐） | ✅ 编译通过，待实机验证 |
 
 ### 0.3.0 实机验证记录（2026-10-06）
 
@@ -64,11 +65,11 @@ CHAOS_CARD id=CARD.CHAOS_CARD000 title="岿然防御" type=Skill cost=1 ... oper
 
 | Opcode | 支持形状 | 目录条目数 |
 |---|---|---|
-| `deal_damage` | (selected, selected_enemy) / (all, all_enemies)，fixed 值 + 可选 fixed hits；含 Power 卡 Unpowered 逐 hit 路径 | 131 + 32 |
+| `deal_damage` | (selected, selected_enemy) / (all, all_enemies) / **(random, random_enemy)**（0.4.0），fixed 值 + 可选 hits（**含 energy_x/star_x X 值源**）；含 Power 卡 Unpowered 逐 hit 路径 | 174 |
 | `gain_block` | (immediate, self)，fixed 值；含 M:base/strength_scaled 修饰符数学 | 78 |
 | `draw_cards` | (immediate, self)，fixed 值 | 50 |
 | `gain_energy` | (immediate, self)，fixed 值 | 30 |
-| `lose_hp` | (immediate, self) / (immediate, selected_enemy)，fixed 值 | 8 + 2 |
+| `lose_hp` | (immediate, self) / (immediate, selected_enemy) / **(immediate, random_enemy)**（0.4.0），fixed 值 | 11 |
 | `heal` | (immediate, self)，fixed 值 | 1 |
 | `apply_power` | 20 个 variant（0.2.0）：vulnerable/weak/strength_loss(_this_turn)/strength_gain（selected_enemy+all_enemies）、vulnerable_double、strength/dexterity_gain(_loss/_this_turn)/doom/focus_loss/thorns/intangible/blur/plating/strength_this_turn/vigor/strength_loss(_this_turn)/retain_hand_this_turn/strength_per_target_vulnerable（self） | 76 |
 | `exhaust_card` | (all, all_cards, hand→none)，filter=any/non_attack | 3 |
@@ -78,12 +79,13 @@ CHAOS_CARD id=CARD.CHAOS_CARD000 title="岿然防御" type=Skill cost=1 ... oper
 
 **卡级生效条件**：卡上全部操作都在矩阵内，且不触发以下任一排除项（fail-closed，逐项对应后续里程碑）：
 
-- X 费卡（`CostsX`/`HasStarCostX`）与 X 值源槽（`energy_x`/`star_x`/`special_x`）→ 0.4.0；
+- ~~X 费卡与 X 值源槽~~ → **0.4.0 已支持**（镜像层复刻 OnPlay 的 X 解析：`Hook.ModifyXValue` 分支状态 + `SetResolvedXValues`；值槽经 RuntimeSpecValue 自动读到解析后 X 值，含 ChaosXValueMultiplier 翻倍）；
+- ~~随机目标引用~~ → **0.4.0 已支持**（显式抽取消耗分支 CombatTargets 流——RNG 消耗与真实一致；deal_damage/random 走命令随机目标，lose_hp/random 走抽取结果）；
 - Modifier scope 操作，**唯一例外**：`M:base/strength_scaled`（0.2.0 已建模，整数除法后乘）；
   其余修饰符（modify_damage/modify_hits 家族）→ 后续版本；
 - AbilityTrigger / ConditionalTrigger / AbilityRule scope 操作（触发器、复合 Power）→ 0.6.0；
 - 玩家选牌（选择器模板 / `CardTargetSlot`）→ 0.5.0；
-- 随机目标引用（`random_enemy_reference`）、事件目标、历史计数、阈值翻倍 → 0.4.0；
+- 事件目标（event_enemy）、历史计数（cards_played_combat）、阈值翻倍（selected_energy_x_threshold）→ 后续版本；
 - 结构性升级（RepeatOperation / ExecuteOperationOnPlay / ChooseExhaust / 衍生卡升级等）。
 
 **支持矩阵外的卡的处理——保守可打性模式（默认开启）**：
@@ -234,9 +236,8 @@ dotnet build -c Debug
 | 0.1.0 | ✅ Damage / Block / Draw / Energy(+lose_hp/heal) handler + 逐具体类镜像注册 + fail-closed 校验（实机验证） |
 | 0.2.0 | ✅ apply_power 20 variant + Power 卡 Unpowered 伤害 + strength_scaled 格挡修饰符（**严格 diff 零差异**实机验证） |
 | 0.2.0+ | ✅ 保守可打性模式（矩阵外卡模拟中不可打，搜索可完成） |
-| 0.3.0 | ✅ 牌堆移动：exhaust_card/discard_card(all) + create_copy(this_card) + draw_and_discard(nonzero_cost) |
-| 0.3.0 | 牌堆移动（Discard / Exhaust / Create / Shuffle） |
-| 0.4.0 | Target 展开 / X 费 / 模拟 RNG（随机目标引用、事件目标、历史计数、阈值翻倍） |
+| 0.3.0 | ✅ 牌堆移动：exhaust_card/discard_card(all) + create_copy(this_card) + draw_and_discard(nonzero_cost)（严格 diff + 生成牌递归实机验证） |
+| 0.4.0 | ✅ X 费卡（OnPlay X 解析复刻）+ 随机目标（分支 RNG 消耗对齐） |
 | 0.5.0 | Player Choice（选牌分支） |
 | 0.6.0 | Trigger / `ChaosCompositePower` 跨回合（含 `PowerHiddenStateMirrors`） |
 | 0.7.0 | 生成牌递归模拟 |
