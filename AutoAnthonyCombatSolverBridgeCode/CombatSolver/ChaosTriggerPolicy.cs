@@ -18,26 +18,8 @@ internal static class ChaosTriggerPolicy
             ("next_turns_start", "next_n_turns") => true,
             ("turn_start" or "turn_end" or "card_played" or "attack_played" or "skill_played"
                 or "power_played" or "card_drawn" or "card_exhausted", "combat") => true,
-            // 0.9.x：扩展事件触发器族（52 条）——这些事件由 ChaosCompositePower 的
-            // 对应 Hook 重写派发，桥的 ChaosCompositePowerMirror 已有事件派发基础设施
-            ("owner_hp_lost_during_turn" or "for_each_exhausted_card" or "card_generated"
-                or "status_generated" or "attack_dealt_damage" or "energy_cost_at_least_card_played"
-                or "derivative_played" or "next_attack" or "ethereal_card_drawn"
-                or "first_attack_played_each_turn" or "vulnerable_applied" or "doom_threshold"
-                or "osty_hp_lost" or "energy_spent_threshold" or "attack_damaged_enemy"
-                or "skill_played_cost_reduction" or "for_each_discarded_card"
-                or "card_drawn_during_turn" or "stars_spent_threshold" or "enemy_debuff_applied"
-                or "doom_applied" or "ethereal_card_played" or "turn_start_if_self_in_exhaust"
-                or "stars_spent_or_gained" or "first_zero_cost_attack_played_each_turn"
-                or "first_card_played_each_turn" or "for_each_exhausted_status"
-                or "first_status_drawn_each_turn" or "energy_spent_this_turn_excluding_self"
-                or "first_attack_or_skill_each_turn" or "cards_drawn_threshold"
-                or "cards_played_this_turn_threshold" or "turns_elapsed" or "draw_pile_shuffled"
-                or "lightning_orb_evoked" or "nth_attack_played_this_turn" or "block_gained"
-                or "next_attacks_this_turn" or "attack_played_cost_reduction"
-                or "for_each_exhausted_non_attack" or "self_exhausted"
-                or "vulnerable_enemy_damage_reduction" or "attack_received"
-                or "turn_end_if_self_in_exhaust" or "strike_card_drawn", "combat") => true,
+            ("strike_card_drawn" or "ethereal_card_drawn" or "card_drawn_during_turn"
+                or "first_status_drawn_each_turn", "combat") => true,
             _ => false
         };
         if (!supported || trigger.ThresholdSlot is not null

@@ -2,6 +2,8 @@ using AutoAnthony;
 using AutoAnthonyCombatSolverBridge.Translation;
 using ChaosCardGenerator;
 using CombatSolver.Engine.Common;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Orbs;
 using MegaCrit.Sts2.Core.Models.Powers;
 
 // 命名空间说明见 AutoAnthonyFacade.cs：外部类型一律通过文件级 using + 非限定名引用。
@@ -41,11 +43,14 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             "cl_drawtofullhand" => null,
             "i_nextskillcostszero" => null,
             "i_setthiscardcostzero" => null,
-            "i_upgrade" => null,
-            "i_playtopcardandexhaust" => null,
-            "i_playthiscard" => null,
-            "cl_exhaustuptohandcards" => null,
+            "i_upgrade" => "手牌升级选择尚未接入选牌镜像",
+            "i_playtopcardandexhaust" or "i_playthiscard" => "嵌套自动出牌尚未接入执行续接",
+            "cl_exhaustuptohandcards" => "可选数量的手牌消耗尚未接入选牌镜像",
             "d_increasethiscardcost" => null,
+            // 代理模板（简单 Power/球操作）
+            "i_proxyatomic_foregoneconclusion" => null,
+            "i_proxyatomic_multicast" => null,
+            "i_proxyatomic_tempest" => null,
             _ => $"template_independent_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -115,14 +120,23 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             }
             case "i_drawwithretain":
             {
-                // 源码 L3091：抽 amount 张并施加单回合保留
+                // 对实际抽到的分支卡施加单回合保留（含抽牌事件的结算）。
                 if (amount <= 0) return;
-                mirror.Simulator.Draw(owner, amount);
+                var drawn = mirror.Simulator.Draw(owner, amount);
+                if (mirror.Simulator.HasPendingChoice)
+                    throw new InvalidOperationException("抽牌保留需要抽牌事件完整结算，不能丢弃保留续接。");
+                foreach (var drawnCard in drawn)
+                    drawnCard.MutablePreview.GiveSingleTurnRetain();
                 return;
             }
             case "i_triggerpoisonnow":
             {
-                // 源码 L3126：触发所有敌人的毒（简化——毒的触发由模拟器的 Power 结算处理）
+                // 立即触发毒伤害及层数递减，复用 Solver 的原版毒结算。
+                if (mirror.CombatState is not global::CombatSolver.SimulatedCombatState combat)
+                    throw new InvalidOperationException("即时毒结算需要分支战斗状态。");
+                if (!global::CombatSolver.CorePowerSupport.TriggerPoison(mirror.Simulator, combat,
+                        mirror.CombatState.HittableEnemies.ToArray()))
+                    throw new InvalidOperationException("即时毒结算出现选择，尚未接入执行续接。");
                 return;
             }
             case "i_replaynextskills":
@@ -153,10 +167,10 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             }
             case "i_nextskillcostszero":
             {
-                // 源码 L3131：下一张技能牌免费（FreePowerPower 等效——简化为通用免费 Power）
+                // 原版区分下一张技能与下一张能力牌免费。
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects5)
                     throw new InvalidOperationException("技能免费需要分支战斗状态效果汇。");
-                effects5.ApplyPowerFromSource(typeof(FreePowerPower), owner.Creature, 1, owner.Creature, context.Card);
+                effects5.ApplyPowerFromSource(typeof(FreeSkillPower), owner.Creature, 1, owner.Creature, context.Card);
                 return;
             }
             case "i_setthiscardcostzero":
@@ -166,32 +180,66 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 return;
             }
             case "i_upgrade":
-            {
-                // 源码 L543：升级选定的卡（简化——升级本卡）
-                if (context.Card.IsUpgradable)
-                    global::CombatSolver.Engine.Common.PredictionUtils.UpgradeCard(context.Card);
-                return;
-            }
             case "i_playtopcardandexhaust":
-            {
-                // 源码 L3176：自动打出抽牌堆顶 1 张并消耗
-                // 简化：跳过自动打出（涉及嵌套出牌模拟——fail-closed 边界）
-                return;
-            }
             case "i_playthiscard":
-            {
-                // 源码 L3152：自动打出本卡（涉及递归出牌——fail-closed 边界）
-                return;
-            }
             case "cl_exhaustuptohandcards":
-            {
-                // 源码 L1366：从手牌选最多 amount 张消耗（选择型——走选牌机制）
-                return;
-            }
+                throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);
             case "d_increasethiscardcost":
             {
                 // 源码：本卡费用 +amount
                 context.Card.EnergyCost.AddThisCombat(amount);
+                return;
+            }
+            case "i_proxyatomic_foregoneconclusion":
+            {
+                // 源码 L2727：ApplyGeneratedProxyPower<ForegoneConclusionPower>
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects6)
+                    throw new InvalidOperationException("既定结论需要分支战斗状态效果汇。");
+                var proxyAmount = Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex));
+                effects6.ApplyPowerFromSource(typeof(ForegoneConclusionPower), owner.Creature,
+                    proxyAmount, owner.Creature, context.Card);
+                return;
+            }
+            case "i_proxyatomic_multicast":
+            {
+                // 每次重新获取队首球，只有最后一次移除；不能提前固定球实例。
+                var evokeCount = context.RuntimeValue("amount",
+                    Math.Max(0, context.Card.ResolveEffectEnergyXValue()));
+                if (evokeCount <= 0) return;
+                for (var i = 0; i < evokeCount; i++)
+                {
+                    if (mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue.Orbs.Count == 0) break;
+                    mirror.Simulator.OrbEvokeNext(owner, 1, dequeue: i == evokeCount - 1);
+                    if (mirror.Simulator.HasPendingChoice)
+                        throw new InvalidOperationException("多重激发出现选择，尚未接入执行续接。");
+                }
+                return;
+            }
+            case "i_proxyatomic_tempest":
+            {
+                // 源码 L2657-2662：引导 X 个球（X = RuntimeSpecValue amount / EnergyX）
+                var channels = context.RuntimeValue("amount",
+                    Math.Max(0, context.Card.ResolveEffectEnergyXValue()));
+                if (channels <= 0) return;
+                var operation = context.Card.Generated.Operations[context.Shape.OperationIndex];
+                var output = OrbSlotCatalog.ResolveOutput(operation.OrbOutputId, operation.Template)?.Id;
+                for (var i = 0; i < channels; i++)
+                {
+                    // 引导失败仍继续消耗下一次随机生成 RNG，与 AutoAnthony 的循环一致。
+                    var orb = output switch
+                    {
+                        "lightning" => CanonicalModels.Orb<LightningOrb>().ToMutable(),
+                        "frost" => CanonicalModels.Orb<FrostOrb>().ToMutable(),
+                        "dark" => CanonicalModels.Orb<DarkOrb>().ToMutable(),
+                        "plasma" => CanonicalModels.Orb<PlasmaOrb>().ToMutable(),
+                        "glass" => CanonicalModels.Orb<GlassOrb>().ToMutable(),
+                        "random" => OrbModel.GetRandomOrb(mirror.Rng.CombatOrbGeneration).ToMutable(),
+                        _ => throw new InvalidOperationException($"Tempest 的输出球槽 {output} 不在支持矩阵。"),
+                    };
+                    mirror.Simulator.OrbChannel(owner, orb);
+                    if (mirror.Simulator.HasPendingChoice)
+                        throw new InvalidOperationException("Tempest 引导出现选择，尚未接入执行续接。");
+                }
                 return;
             }
             default:

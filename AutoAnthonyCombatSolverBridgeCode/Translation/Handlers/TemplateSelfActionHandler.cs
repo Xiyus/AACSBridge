@@ -39,17 +39,15 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             {
                 "a_proxyatomic_buffer" or "a_proxyatomic_parry" or "a_proxyatomic_royalties"
                     or "a_proxyatomic_calcify" or "a_proxyatomic_swordsage"
-                    or "a_proxyatomic_forbiddengrimoire" => null,
-                // 简单 combat_rule 规则（Power 应用等价）
-                "retain_hand_at_turn_end" or "retain_block_between_turns"
-                    or "kings_sword_hits_all" or "skills_cost_zero" => null,
+                    or "kings_sword_hits_all" => null,
                 _ => $"combat_rule 的 variant={spec.Variant} 不在支持矩阵",
             };
         return spec.Variant switch
         {
             "d_channelfrost" or "d_channeldark" or "d_channellightning"
                 or "d_channelglass" or "d_channelplasma" or "d_channelrandom" => null,
-            "d_gainfocus" or "d_gaintemporaryfocus" => null,
+            "d_gainfocus" => null,
+            "d_gaintemporaryfocus" => "临时聚焦的 AutoAnthony Power 生命周期尚未适配",
             "d_gainorbslots" => null,
             "n_createshiv" => null,
             "r_forge" => null,
@@ -100,7 +98,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             // 更多球激发/简单变体
             "d_evokeleftmostorb" => null,
             "d_evokealltwice" => null,
-            "n_createinkshiv" => null,
+            "n_createinkshiv" => "墨色小刀衍生槽不能用原生 Shiv 替代",
             "n_blockequalallpoison" => null,
             "d_exhaustallstatuses" => null,
             "d_shuffleallunexhaustedintodraw" => null,
@@ -200,7 +198,6 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 return;
             }
             case "d_gainfocus":
-            case "d_gaintemporaryfocus":
             {
                 // 源码：PowerCmd.Apply<FocusPower>(ctx, owner, amount, owner, card)
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects)
@@ -246,11 +243,17 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             case "d_evokerightmostorb":
             {
                 // 源码 L2296-2307：evokeCount 次 EvokeNext，仅最后一次 dequeue（Dualcast 式）
-                if (count == 0) return;
+                var operation = context.Card.Generated.Operations[context.Shape.OperationIndex];
+                var evokeCount = ChaosOperationExecutor.OrbEvokeRepeatCount(operation, amount);
+                if (evokeCount == 0) return;
                 var orbQueue = mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue;
                 if (orbQueue.Orbs.Count == 0) return;
-                for (var i = 0; i < count; i++)
-                    mirror.Simulator.OrbEvokeNext(owner, 1, dequeue: i == count - 1);
+                for (var i = 0; i < evokeCount; i++)
+                {
+                    mirror.Simulator.OrbEvokeNext(owner, 1, dequeue: i == evokeCount - 1);
+                    if (mirror.Simulator.HasPendingChoice)
+                        throw new InvalidOperationException("球激发出现选择，尚未接入整卡续接。");
+                }
                 return;
             }
             case "d_loseorbslots":
@@ -445,12 +448,18 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 return;
             case "d_evokeleftmostorb":
             {
-                // 源码 L2309-2312：左球激发（仅最后一次 dequeue）
-                if (count == 0) return;
+                var operation = context.Card.Generated.Operations[context.Shape.OperationIndex];
+                var evokeCount = ChaosOperationExecutor.OrbEvokeRepeatCount(operation, amount);
+                if (evokeCount == 0) return;
                 var orbQueue = mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue;
                 if (orbQueue.Orbs.Count == 0) return;
-                for (var i = 0; i < count; i++)
-                    mirror.Simulator.OrbEvokeNext(owner, 1, dequeue: i == count - 1);
+                for (var i = 0; i < evokeCount; i++)
+                {
+                    if (orbQueue.Orbs.Count == 0) break;
+                    mirror.Simulator.OrbEvoke(owner, orbQueue.Orbs[^1], dequeue: i == evokeCount - 1);
+                    if (mirror.Simulator.HasPendingChoice)
+                        throw new InvalidOperationException("球激发出现选择，尚未接入整卡续接。");
+                }
                 return;
             }
             case "d_evokealltwice":
@@ -459,21 +468,18 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 var orbQueue2 = mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue;
                 var orbCount = orbQueue2.Orbs.Count;
                 if (count == 0 || orbCount == 0) return;
-                for (var i = 0; i < orbCount * count; i++)
-                    mirror.Simulator.OrbEvokeNext(owner, 1, dequeue: true);
+                for (var i = 0; i < orbCount; i++)
+                    for (var repeat = 0; repeat < count; repeat++)
+                    {
+                        mirror.Simulator.OrbEvokeNext(owner, 1, dequeue: repeat == count - 1);
+                        if (mirror.Simulator.HasPendingChoice)
+                            throw new InvalidOperationException("全体球激发出现选择，尚未接入整卡续接。");
+                    }
                 return;
             }
             case "n_createinkshiv":
-            {
-                // 源码：CreateDerivatives → Ink Shiv（与 n_createshiv 同款但生成 InkShiv）
-                // InkShiv 不在游戏类型中——用 Shiv 替代（效果等价：0 费 4 伤害攻击）
-                var operation = context.Card.Generated.Operations[context.Shape.OperationIndex];
-                var shivCount = ChaosOperationExecutor.ExecutableOperationCount(operation, amount);
-                if (shivCount == 0) return;
-                mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Shiv>(
-                    owner, PileType.Hand, shivCount, owner);
-                return;
-            }
+            case "d_gaintemporaryfocus":
+                throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);
             case "n_blockequalallpoison":
             {
                 // 源码 L697-699：格挡 = 全部敌人毒层数之和
@@ -492,7 +498,8 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 // 源码 L2243：消耗所有非已消耗的状态牌
                 var playerState = mirror.Simulator.State.GetPlayerCombatState(owner);
                 var statuses = playerState.AllCards
-                    .Where(candidate => candidate.Preview.Type == CardType.Status)
+                    .Where(candidate => candidate.Preview.Type == CardType.Status
+                        && !playerState.ExhaustPile.Cards.Contains(candidate))
                     .ToList();
                 foreach (var status in statuses)
                     mirror.Simulator.Exhaust(status);
@@ -500,10 +507,10 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             }
             case "d_shuffleallunexhaustedintodraw":
             {
-                // 源码 L2266：手牌全部放回抽牌堆并洗牌（简化：弃牌后洗牌）
+                // 直接移动到抽牌堆，不能触发弃牌事件。
                 var hand = mirror.Simulator.State.GetPlayerCombatState(owner).Hand.Cards.ToList();
                 foreach (var handCard in hand)
-                    mirror.Simulator.Discard(handCard);
+                    mirror.Simulator.AddToPile(handCard, PileType.Draw);
                 mirror.Simulator.Shuffle(owner);
                 return;
             }

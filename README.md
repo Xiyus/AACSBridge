@@ -17,7 +17,36 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 
 ---
 
-## 当前状态：v1.0.0（64 翻译键 / 63.1% 目录覆盖 / 全链路实机验证）
+## 当前开发状态（2026-10-06，1.1.0 开发树验收纠偏）
+
+当前源码已超过历史 1.0.0：**147 个注册键，113 项离线检查通过**。本机已安装 DLL 枚举到
+467 个目录原子，235 个通过单操作校验；这是单操作准入统计，**不是整卡覆盖率或实机等价率**，
+不能与历史 587/931 直接比较。逐条结果及二进制 hash 见 [目录审计](docs/catalog-audit.json)，
+本轮结论与剩余工作见 [验收与后续清单](docs/acceptance-and-backlog.md)。
+
+本轮新增唯一抽到技能牌条件和四种有实际派发的抽牌触发；修复规则代理被跳过、左球位置、
+全体球重复激发、状态牌重复消耗、回洗手牌误触发弃牌，以及修饰符历史计数近似。
+未接入的触发事件、依赖前缀、条件修饰符、临时聚焦和墨色小刀替代路径明确拒绝。
+整卡执行遇到 pending choice 而没有续接时硬失败，不再继续执行后续操作。
+
+**本轮新增行为尚未进行实机严格 diff，不据此宣布发布验收完成。** 以下为上一批和历史记录。
+
+### Batch M 与独立模板纠偏
+
+本批接续已有 Batch A–L 的模板扩展和三个未提交代理模板，完成：
+
+- `I:ProxyAtomic_ForegoneConclusion`：按原始 OperationAmount（最少 1）施加对应 Power。
+- `I:ProxyAtomic_MultiCast`：读取解析后的 X 槽值，每次重新读取队首球，仅最后一次移除。
+- `I:ProxyAtomic_Tempest`：读取生成操作的 OrbOutputId，支持五种固定球与随机球；随机球使用分支 CombatOrbGeneration 流，保留原版循环的 RNG 消耗。
+- 修正 `I:DrawWithRetain` 遗漏单回合保留、`I:TriggerPoisonNow` 跳过即时毒结算、`I:NextSkillCostsZero` 错用 FreePowerPower 的问题。
+- `I:Upgrade`、`I:PlayTopCardAndExhaust`、`I:PlayThisCard`、`CL:ExhaustUpToHandCards` 尚缺选牌或嵌套出牌续接，明确拒绝，移除升级本卡或空操作的近似执行。
+- 条件门控收益继续执行完整 handler 校验，不能因条件受支持而放行未知或未实现的收益。
+
+抽牌保留、即时毒结算与代理球操作若出现 pending choice，本批显式失败，避免遗漏后续效果。AutoAnthony 守卫增加 OrbOutputId / OrbSlotCatalog.ResolveOutput 契约。
+
+**验证：58 项已安装 DLL 的离线契约检查通过，编译通过。** 新增操作和上述纠偏尚未进行实机逐动作严格 diff；这些结果不代表全目录覆盖或整桥发布验收完成。历史覆盖率与实机记录如下，仅对应当时版本。
+
+## v1.0.0 历史记录（64 翻译键 / 63.1% 目录覆盖）
 
 | 里程碑 | 内容 | 状态 |
 |---|---|---|

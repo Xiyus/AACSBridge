@@ -8,8 +8,7 @@ namespace AutoAnthonyCombatSolverBridge.Translation.Handlers;
 /// draw_cards(immediate/self) 的精确镜像。
 /// 复刻 ChaosOperationExecutor.TryExecuteStructuredCommon L834-837：
 /// CardPileCmd.Draw(choiceContext, amount, owner) → simulator.Draw(owner, amount)。
-/// （源码还把结果记进 state.LastDrawnCards 供后续依赖操作消费——校验层已拒绝依赖操作，
-/// 简单卡不需要。）
+/// 返回值记录到本次出牌的局部结算状态，供后续条件读取。
 /// </summary>
 public sealed class DrawHandler : IOperationHandler
 {
@@ -27,6 +26,7 @@ public sealed class DrawHandler : IOperationHandler
 
     public void Execute(OperationExecutionContext context)
     {
-        context.Mirror.Simulator.Draw(context.Card.Owner, context.ExecutableAmount);
+        var drawn = context.Mirror.Simulator.Draw(context.Card.Owner, context.ExecutableAmount);
+        context.Resolution?.RecordDrawnTypes(drawn.Select(card => card.Preview.Type));
     }
 }

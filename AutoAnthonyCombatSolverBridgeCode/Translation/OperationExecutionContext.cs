@@ -24,7 +24,8 @@ public sealed record OperationExecutionContext(
     ChaosCardModel Card,
     OperationShape Shape,
     Creature? ResolvedTarget = null,
-    bool IsTriggered = false)
+    bool IsTriggered = false,
+    OperationResolutionState? Resolution = null)
 {
     /// <summary>
     /// 主数值：OperationAmount（live DynamicVar 优先，含升级/成长）+ 非卡牌的外部伤害加成。

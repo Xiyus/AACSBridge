@@ -61,12 +61,22 @@ internal static class ChaosCompositePowerMirror
         AfterCardDrawnMirrors.Registry.Register<ChaosCompositePower>((p, c) =>
         {
             if (c.PreviewCard.Owner != p.Owner.Player) return;
-            Fire(p, c.Simulator, "card_drawn");
-            if (c.PreviewCard.Type == CardType.Status)
+            var state = Read(c.Simulator, p);
+            var events = ChaosDrawEventPolicy.Events(
+                c.PreviewCard.Tags.Contains(MegaCrit.Sts2.Core.Entities.Cards.CardTag.Strike),
+                c.PreviewCard.Keywords.Contains(CardKeyword.Ethereal),
+                c.PreviewCard.Type == CardType.Status, state.Snapshot.StatusDrawnThisTurn,
+                c.FromHandDraw, c.CombatState.CurrentSide == p.Owner.Side);
+            foreach (var kind in events)
             {
-                var state = Read(c.Simulator, p);
-                state.Snapshot.StatusDrawnThisTurn = true;
-                state.Refresh();
+                if (kind == "first_status_drawn_each_turn")
+                {
+                    if (state.Snapshot.StatusDrawnThisTurn) continue;
+                    // Commit before firing: recursive draws must see that the first status was consumed.
+                    state.Snapshot.StatusDrawnThisTurn = true;
+                    state.Refresh();
+                }
+                Fire(p, c.Simulator, kind);
             }
         });
         AfterCardExhaustedMirrors.Registry.Register<ChaosCompositePower>((p, c) =>

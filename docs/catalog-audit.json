@@ -1,0 +1,3747 @@
+{
+  "schema": 1,
+  "autoAnthonySha256": "ad004f42f18ed86ccc7f66317823cf77fb40195b6466872bbd7038b3d8952965",
+  "combatSolverSha256": "832060172aa5eae8d79546f120a10e4571c324b7c0d6ab2c6abc2bcad24323cd",
+  "registeredKeys": 147,
+  "catalogAtoms": 467,
+  "acceptedAtoms": 235,
+  "note": "Singleton operation validation only. Whole-card dependencies, upgrades and live strict diff remain required.",
+  "rows": [
+    {
+      "template": "A:turnStart",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Move",
+      "scope": "NonTargeted",
+      "opcode": "move_card",
+      "variant": "random",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=N:Move\uFF1Aopcode=move_card variant=random \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:UpgradeThatCard",
+      "scope": "Independent",
+      "opcode": "upgrade_card",
+      "variant": "referenced",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:UpgradeThatCard\uFF1Aopcode=upgrade_card variant=referenced \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:D",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Create",
+      "scope": "NonTargeted",
+      "opcode": "create_copy",
+      "variant": "this_card",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:B",
+      "scope": "NonTargeted",
+      "opcode": "gain_block",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:Upgrade",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_upgrade",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:Upgrade\uFF1A\u624B\u724C\u5347\u7EA7\u9009\u62E9\u5C1A\u672A\u63A5\u5165\u9009\u724C\u955C\u50CF\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "M:DamagePerExhaustCard",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "m_damageperexhaustcard",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:rule",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "retain_block_between_turns",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:rule\uFF1A\u590D\u5408\u89C4\u5219 Power \u6216\u6761\u4EF6\u89C4\u5219\u5C1A\u672A\u63A5\u5165\u7CBE\u786E hook\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:Apply",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "vulnerable",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Draw",
+      "scope": "NonTargeted",
+      "opcode": "draw_cards",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:PreventDrawThisTurn",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_preventdrawthisturn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:HP-",
+      "scope": "NonTargeted",
+      "opcode": "lose_hp",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:E",
+      "scope": "NonTargeted",
+      "opcode": "gain_energy",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "M:value",
+      "scope": "Modifier",
+      "opcode": "modify_damage",
+      "variant": "current_block",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=M:value\uFF1AModifier \u64CD\u4F5C\uFF08M:value\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Exhaust",
+      "scope": "NonTargeted",
+      "opcode": "exhaust_card",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Self",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "strength",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:AllD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "M:base",
+      "scope": "Modifier",
+      "opcode": "modify_damage",
+      "variant": "vulnerable_scaled",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=M:base\uFF1A\u4FEE\u9970\u7B26\uFF08modify_damage/vulnerable_scaled\uFF09\u7684\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:PlayTopXCards",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_playtopxcards",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:PlayTopXCards\uFF1Aopcode=template_independent_action variant=i_playtopxcards \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Exhaust",
+      "scope": "NonTargeted",
+      "opcode": "exhaust_card",
+      "variant": "random",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=N:Exhaust\uFF1Aopcode=exhaust_card variant=random \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "C:VulnerableEnemyDamageReductionThisTurn",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:VulnerableEnemyDamageReductionThisTurn\uFF1A\u89E6\u53D1\u5668 vulnerable_enemy_damage_reduction/this_turn \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:AllD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:rule",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "skills_cost_zero",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:rule\uFF1A\u590D\u5408\u89C4\u5219 Power \u6216\u6761\u4EF6\u89C4\u5219\u5C1A\u672A\u63A5\u5165\u7CBE\u786E hook\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenSkillPlayed",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Exhaust",
+      "scope": "NonTargeted",
+      "opcode": "exhaust_card",
+      "variant": "referenced",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=N:Exhaust\uFF1Aopcode=exhaust_card variant=referenced \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:rule",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "vulnerable_enemy_damage_bonus",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:rule\uFF1A\u590D\u5408\u89C4\u5219 Power \u6216\u6761\u4EF6\u89C4\u5219\u5C1A\u672A\u63A5\u5165\u7CBE\u786E hook\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenCardExhausted",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:ifTargetVulnerable",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "target_has_vulnerable",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "M:repeat",
+      "scope": "Modifier",
+      "opcode": "modify_hits",
+      "variant": "flat_extra",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:StrengthPerTargetVulnerable",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "strength_per_target_vulnerable",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:whenThisCardExhausted",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:whenThisCardExhausted\uFF1A\u4E0D\u662F\u5DF2\u5EFA\u6A21\u7684\u590D\u5408 Power \u89E6\u53D1\u5668\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "C:ifCardExhaustedThisTurn",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "card_exhausted_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "M:base",
+      "scope": "Modifier",
+      "opcode": "modify_block",
+      "variant": "strength_scaled",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:ifFatal",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "fatal",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:ifFatal\uFF1A\u6761\u4EF6 kind=fatal \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:GainMaxHp",
+      "scope": "Independent",
+      "opcode": "gain_max_hp",
+      "variant": "immediate",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:GainMaxHp\uFF1Aopcode=gain_max_hp variant=immediate \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Exhaust",
+      "scope": "NonTargeted",
+      "opcode": "exhaust_card",
+      "variant": "all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:forEachExhaustedCard",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:forEachExhaustedCard\uFF1A\u4E0D\u662F\u5DF2\u5EFA\u6A21\u7684\u590D\u5408 Power \u89E6\u53D1\u5668\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:D",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:Apply",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "strength_gain",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:untilTurnEndAttackReceived",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:untilTurnEndAttackReceived\uFF1A\u89E6\u53D1\u5668 attack_received/this_turn \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:PlayTopCardAndExhaust",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_playtopcardandexhaust",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:PlayTopCardAndExhaust\uFF1A\u5D4C\u5957\u81EA\u52A8\u51FA\u724C\u5C1A\u672A\u63A5\u5165\u6267\u884C\u7EED\u63A5\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Move",
+      "scope": "NonTargeted",
+      "opcode": "move_card",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenStrikeCardDrawn",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:PlayAtRandomEnemy",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_playatrandomenemy",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:PlayAtRandomEnemy\uFF1Aopcode=template_independent_action variant=i_playatrandomenemy \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "C:AtTurnEndIfInExhaust",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:AtTurnEndIfInExhaust\uFF1A\u4E0D\u662F\u5DF2\u5EFA\u6A21\u7684\u590D\u5408 Power \u89E6\u53D1\u5668\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:PlayThisCard",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_playthiscard",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:PlayThisCard\uFF1A\u5D4C\u5957\u81EA\u52A8\u51FA\u724C\u5C1A\u672A\u63A5\u5165\u6267\u884C\u7EED\u63A5\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:Create",
+      "scope": "Independent",
+      "opcode": "create_card",
+      "variant": "random_attack_zero_cost_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenOwnerHpLostDuringTurn",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenOwnerHpLostDuringTurn\uFF1A\u89E6\u53D1\u5668 owner_hp_lost_during_turn/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenBlockGained",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenBlockGained\uFF1A\u89E6\u53D1\u5668 block_gained/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:RandomD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "random",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenNthAttackPlayed",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenNthAttackPlayed\uFF1A\u89E6\u53D1\u5668 nth_attack_played_this_turn/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Create",
+      "scope": "NonTargeted",
+      "opcode": "create_copy",
+      "variant": "referenced_card",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=N:Create\uFF1Aopcode=create_copy variant=referenced_card \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:TempStrengthLoss",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "strength_loss_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:Apply",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "vulnerable_double",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Heal",
+      "scope": "NonTargeted",
+      "opcode": "heal",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:grantNextAttacksThisTurn",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:grantNextAttacksThisTurn\uFF1A\u89E6\u53D1\u5668 next_attacks_this_turn/this_turn \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ReplayAttack",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_replayattack",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ReplayAttack\uFF1Aopcode=template_independent_action variant=i_replayattack \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "C:ifExhaustPileAtLeast",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "exhaust_pile_minimum",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "M:base",
+      "scope": "Modifier",
+      "opcode": "modify_damage",
+      "variant": "strike_count_scaled",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=M:base\uFF1A\u4FEE\u9970\u7B26\uFF08modify_damage/strike_count_scaled\uFF09\u7684\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:DrawUntilNonAttack",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_drawuntilnonattack",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:DrawUntilNonAttack\uFF1Aopcode=template_independent_action variant=i_drawuntilnonattack \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:Transform",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_transform",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:Transform\uFF1Aopcode=template_independent_action variant=i_transform \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "C:untilTurnEndAttackPlayed",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:untilTurnEndAttackPlayed\uFF1A\u89E6\u53D1\u5668 attack_played/this_turn \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:IncreaseDamageThisCombat",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_increasedamagethiscombat",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Exhaust",
+      "scope": "NonTargeted",
+      "opcode": "exhaust_card",
+      "variant": "all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:forEachExhaustedNonAttack",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:forEachExhaustedNonAttack\uFF1A\u4E0D\u662F\u5DF2\u5EFA\u6A21\u7684\u590D\u5408 Power \u89E6\u53D1\u5668\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:TempStrength",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "strength_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:ifOwnerLostHpThisTurn",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "owner_lost_hp_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:turnEnd",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:AutoPlayRandomAttackFromHand",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_autoplayrandomattackfromhand",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:AutoPlayRandomAttackFromHand\uFF1Aopcode=template_independent_action variant=i_autoplayrandomattackfromhand \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:CreateCurrentCharacterCardInHand",
+      "scope": "NonTargeted",
+      "opcode": "create_card",
+      "variant": "current_character_random",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:whileInCombat",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:whileInCombat\uFF1A\u4E0D\u662F\u5DF2\u5EFA\u6A21\u7684\u590D\u5408 Power \u89E6\u53D1\u5668\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Self",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "plating",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:RandomD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "random",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "M:repeat",
+      "scope": "Modifier",
+      "opcode": "modify_hits",
+      "variant": "hp_loss_scaled",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=M:repeat\uFF1AModifier \u64CD\u4F5C\uFF08M:repeat\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ExhaustRandomAttack",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_exhaustrandomattack",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ExhaustRandomAttack\uFF1Aopcode=template_independent_action variant=i_exhaustrandomattack \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:AddExhaustedAttackDamage",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_addexhaustedattackdamage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:AddExhaustedAttackDamage\uFF1Aopcode=template_independent_action variant=i_addexhaustedattackdamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ApplyToAllEnemies",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_applytoallenemies",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:rule",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "first_card_block_doubled_each_turn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:rule\uFF1A\u590D\u5408\u89C4\u5219 Power \u6216\u6761\u4EF6\u89C4\u5219\u5C1A\u672A\u63A5\u5165\u7CBE\u786E hook\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "C:grantNextAttack",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:grantNextAttack\uFF1A\u89E6\u53D1\u5668 next_attack/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:SetCostZero",
+      "scope": "Independent",
+      "opcode": "modify_cost",
+      "variant": "set_zero",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:SetCostZero\uFF1Aopcode=modify_cost variant=set_zero \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:Apply",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "weak",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenVulnerableApplied",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenVulnerableApplied\uFF1A\u89E6\u53D1\u5668 vulnerable_applied/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:AllD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Dex",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "dexterity_gain",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Thorns",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "n_thorns",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:rulePoisonExtraTriggers",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "poison_extra_triggers",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:rulePoisonExtraTriggers\uFF1AAbilityRule \u64CD\u4F5C\u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:ruleShivBonusDamage",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "derivative_bonus_damage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:ruleShivBonusDamage\uFF1AAbilityRule \u64CD\u4F5C\u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Draw",
+      "scope": "NonTargeted",
+      "opcode": "draw_cards",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Discard",
+      "scope": "NonTargeted",
+      "opcode": "discard_card",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:E",
+      "scope": "NonTargeted",
+      "opcode": "gain_energy",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenCardPlayed",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:B",
+      "scope": "NonTargeted",
+      "opcode": "gain_block",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:TempDex",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "n_tempdex",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:D",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:Apply",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "vulnerable",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:CreateInkShiv",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "n_createinkshiv",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=N:CreateInkShiv\uFF1A\u58A8\u8272\u5C0F\u5200\u884D\u751F\u69FD\u4E0D\u80FD\u7528\u539F\u751F Shiv \u66FF\u4EE3\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:CreateShiv",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "n_createshiv",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:KeepBlockNextTurn",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "n_keepblocknextturn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:RandomPoison",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "poison",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=N:RandomPoison\uFF1Aapply_power \u7684 (variant=poison, target=random_enemy) \u7EC4\u5408\u4E0D\u5728 0.2.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "C:ifTargetPoisoned",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "target_has_poison",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:Poison",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "t_poison",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:PreventDrawThisTurn",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_preventdrawthisturn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:FreeHandThisTurn",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_freehandthisturn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:ReplayNextSkills",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_replaynextskills",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:DiscardHandDrawSame",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_discardhanddrawsame",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:untilTurnEndCardDrawn",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:untilTurnEndCardDrawn\uFF1A\u89E6\u53D1\u5668 card_drawn/this_turn \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:AllPoison",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "n_allpoison",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:AllD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:NextTurnStart",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:AllD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "M:RepeatAreaOnKill",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "m_repeatareaonkill",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=M:RepeatAreaOnKill\uFF1AModifier \u64CD\u4F5C\uFF08M:RepeatAreaOnKill\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenAttackDealsUnblockedDamage",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenAttackDealsUnblockedDamage\uFF1A\u89E6\u53D1\u5668 attack_dealt_damage/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "C:ifLastDrawnSkill",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "last_drawn_card_is_skill",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:DrawWithRetain",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_drawwithretain",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:RemoveBlockAndArtifact",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "t_removeblockandartifact",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:ruleShivsHitAll",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "derivative_hits_all",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:ruleShivsHitAll\uFF1AAbilityRule \u64CD\u4F5C\u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "M:RepeatPerAttackThisTurn",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "m_repeatperattackthisturn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=M:RepeatPerAttackThisTurn\uFF1AModifier \u64CD\u4F5C\uFF08M:RepeatPerAttackThisTurn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "M:RepeatPerSkillInHand",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "m_repeatperskillinhand",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:playableIfDrawPileEmpty",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "draw_pile_empty",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:GrantSlyToHandSkillThisTurn",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_grantslytohandskillthisturn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:GrantSlyToHandSkillThisTurn\uFF1Aopcode=template_independent_action variant=i_grantslytohandskillthisturn \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:AllWeak",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "weak",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:turnStart",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:PlayExhaustedShivsAtTarget",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_playexhaustedshivsattarget",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:PlayExhaustedShivsAtTarget\uFF1Aopcode=template_independent_action variant=i_playexhaustedshivsattarget \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:Apply",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "weak",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:XStrengthLoss",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "t_xstrengthloss",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:XWeak",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "t_xweak",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:rulePlayedSkillsGainSly",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "played_skills_gain_sly",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:rulePlayedSkillsGainSly\uFF1AAbilityRule \u64CD\u4F5C\u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "M:DamagePerDiscardThisTurn",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "m_damageperdiscardthisturn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:BlockEqualAllPoison",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "n_blockequalallpoison",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "M:DamagePerCardDrawnCombat",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "m_damagepercarddrawncombat",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:CopySelectedCardNextTurn",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_copyselectedcardnextturn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:CopySelectedCardNextTurn\uFF1Aopcode=template_independent_action variant=i_copyselectedcardnextturn \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:TriggerPoisonNow",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_triggerpoisonnow",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:ruleShivsRetain",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "derivative_retain",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:ruleShivsRetain\uFF1A\u590D\u5408\u89C4\u5219 Power \u6216\u6761\u4EF6\u89C4\u5219\u5C1A\u672A\u63A5\u5165\u7CBE\u786E hook\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:ruleFirstShivBonusDamage",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "first_derivative_bonus_damage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:ruleFirstShivBonusDamage\uFF1A\u590D\u5408\u89C4\u5219 Power \u6216\u6761\u4EF6\u89C4\u5219\u5C1A\u672A\u63A5\u5165\u7CBE\u786E hook\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:AllTempStrengthLoss",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "strength_loss_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:whileInCombatSkillCostReduction",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:whileInCombatSkillCostReduction\uFF1A\u4E0D\u662F\u5DF2\u5EFA\u6A21\u7684\u590D\u5408 Power \u89E6\u53D1\u5668\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:NextSkillCostsZero",
+      "scope": "Independent",
+      "opcode": "modify_cost",
+      "variant": "set_zero",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:NextSkillCostsZero\uFF1Aopcode=modify_cost variant=set_zero \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "M:DamageMinusPerCardInHand",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "m_damageminuspercardinhand",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:RandomD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "random",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:RandomD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "random",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:DiscardAll",
+      "scope": "NonTargeted",
+      "opcode": "discard_card",
+      "variant": "all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:DoubleAttackDamageNextTurn",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_doubleattackdamagenextturn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:DoubleBlockThisTurn",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_doubleblockthisturn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:DX",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenCardDrawnDuringTurn",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:forEachDiscarded",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:forEachDiscarded\uFF1A\u4E0D\u662F\u5DF2\u5EFA\u6A21\u7684\u590D\u5408 Power \u89E6\u53D1\u5668\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "C:untilTurnEndCardPlayed",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:untilTurnEndCardPlayed\uFF1A\u89E6\u53D1\u5668 card_played/this_turn \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:LoseHp",
+      "scope": "SingleEnemyOnly",
+      "opcode": "lose_hp",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:ifFatal",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "fatal",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:ifFatal\uFF1A\u6761\u4EF6 kind=fatal \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:AddCardReward",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_addcardreward",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:AddCardReward\uFF1Aopcode=template_independent_action variant=i_addcardreward \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:ruleWeakEnemiesTakeMoreAttackDamage",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "weak_enemy_attack_damage_bonus",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:ruleWeakEnemiesTakeMoreAttackDamage\uFF1A\u590D\u5408\u89C4\u5219 Power \u6216\u6761\u4EF6\u89C4\u5219\u5C1A\u672A\u63A5\u5165\u7CBE\u786E hook\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ReduceThisCardCostCombat",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_reducethiscardcostcombat",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ReduceThisCardCostCombat\uFF1Aopcode=template_independent_action variant=i_reducethiscardcostcombat \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:ruleRetainHand",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "retain_hand_at_turn_end",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:ruleRetainHand\uFF1A\u590D\u5408\u89C4\u5219 Power \u6216\u6761\u4EF6\u89C4\u5219\u5C1A\u672A\u63A5\u5165\u7CBE\u786E hook\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Intangible",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "n_intangible",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:LoseDex",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "dexterity_loss",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:D",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:CreateZeroCostCopyInDiscard",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_createzerocostcopyindiscard",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:CreateZeroCostCopyInDiscard\uFF1Aopcode=template_self_action variant=d_createzerocostcopyindiscard \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:ReturnZeroCostDiscardToHand",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_returnzerocostdiscardtohand",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:ChannelLightning",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_channellightning",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:ForEachOrb",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "d_foreachorb",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:ForEachOrb\uFF1AModifier \u64CD\u4F5C\uFF08D:ForEachOrb\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:RepeatPerOrb",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "d_repeatperorb",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:Apply",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "vulnerable",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:turnStart",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:LoseFocus",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "focus_loss",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:GainFocus",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_gainfocus",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:B",
+      "scope": "NonTargeted",
+      "opcode": "gain_block",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:CreateDazedInDiscard",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_createdazedindiscard",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:ProxyAtomic_Buffer",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "a_proxyatomic_buffer",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Self",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "strength",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Dex",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "dexterity_gain",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:LoseOrbSlots",
+      "scope": "NonTargeted",
+      "opcode": "modify_orb_slots",
+      "variant": "loss",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:LoseOrbSlots\uFF1Aopcode=modify_orb_slots variant=loss \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:GainOrbSlots",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_gainorbslots",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:ChannelRandom",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_channelrandom",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:NextTurnStart",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:E",
+      "scope": "NonTargeted",
+      "opcode": "gain_energy",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:ForEachEnemy",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "d_foreachenemy",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:ForEachEnemy\uFF1AModifier \u64CD\u4F5C\uFF08D:ForEachEnemy\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:ChannelFrost",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_channelfrost",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:IncreaseAllClaws",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "d_increaseallclaws",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:IncreaseAllClaws\uFF1Aopcode=template_independent_action variant=d_increaseallclaws \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:TransformStatusesToFuel",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_transformstatusestofuel",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:TransformStatusesToFuel\uFF1Aopcode=template_self_action variant=d_transformstatusestofuel \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:ForEachUniqueOrb",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "d_foreachuniqueorb",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:ForEachUniqueOrb\uFF1AModifier \u64CD\u4F5C\uFF08D:ForEachUniqueOrb\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Draw",
+      "scope": "NonTargeted",
+      "opcode": "draw_cards",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:turnEnd",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:EvokeLeftmostOrb",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_evokeleftmostorb",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:ChannelDark",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_channeldark",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:AddRandomPowerToHand",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_addrandompowertohand",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:TriggerDarkPassives",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_triggerdarkpassives",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:TriggerDarkPassives\uFF1Aopcode=template_self_action variant=d_triggerdarkpassives \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ProxyAtomic_DoubleEnergy",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_doubleenergy",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_DoubleEnergy\uFF1Aopcode=template_independent_action variant=i_proxyatomic_doubleenergy \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:EvokeRightmostOrb",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_evokerightmostorb",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:firstCardPlayedEachTurn",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:firstCardPlayedEachTurn\uFF1A\u89E6\u53D1\u5668 first_card_played_each_turn/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:ReplayEventCard",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "d_replayeventcard",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:ReplayEventCard\uFF1Aopcode=template_independent_action variant=d_replayeventcard \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:firstZeroCostAttackPlayedEachTurn",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:firstZeroCostAttackPlayedEachTurn\uFF1A\u89E6\u53D1\u5668 first_zero_cost_attack_played_each_turn/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:ReturnEventCardToHand",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "d_returneventcardtohand",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:ReturnEventCardToHand\uFF1Aopcode=template_independent_action variant=d_returneventcardtohand \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:CreateTwoWoundsInDiscard",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_createtwowoundsindiscard",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:ExhaustAllStatuses",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_exhaustallstatuses",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:ForEachExhaustedStatus",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:ForEachExhaustedStatus\uFF1A\u4E0D\u662F\u5DF2\u5EFA\u6A21\u7684\u590D\u5408 Power \u89E6\u53D1\u5668\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:RandomD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "random",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:GainTemporaryFocus",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_gaintemporaryfocus",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:GainTemporaryFocus\uFF1A\u4E34\u65F6\u805A\u7126\u7684 AutoAnthony Power \u751F\u547D\u5468\u671F\u5C1A\u672A\u9002\u914D\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:IfCardsPlayedBelow",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "cards_played_this_turn_below",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:IfCardsPlayedBelow\uFF1A\u6761\u4EF6 kind=cards_played_this_turn_below \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:ChannelPlasma",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_channelplasma",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:IncreaseThisCardBlockRun",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "d_increasethiscardblockrun",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:ChannelGlass",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_channelglass",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:IfEnemyIntendsAttack",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "enemy_intends_attack",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:Apply",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "weak",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:D",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:CreateSlimeInDiscard",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_createslimeindiscard",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:IfHasFrost",
+      "scope": "Modifier",
+      "opcode": "condition",
+      "variant": "has_frost_orb",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:IfHasFrost\uFF1AModifier \u64CD\u4F5C\uFF08D:IfHasFrost\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:AllD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:ForEachEnergySpentThisTurn",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:ForEachEnergySpentThisTurn\uFF1A\u4E0D\u662F\u5DF2\u5EFA\u6A21\u7684\u590D\u5408 Power \u89E6\u53D1\u5668\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:MoveDiscardCardToHand",
+      "scope": "NonTargeted",
+      "opcode": "move_card",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:LoseTemporaryFocus",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "focus_loss_this_turn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:LoseTemporaryFocus\uFF1Aopcode=apply_power variant=focus_loss_this_turn \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenFirstStatusDrawn",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:NextTurnsStart",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:TriggerRightmostOrbPassive",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_triggerrightmostorbpassive",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:IncreaseThisCardCost",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "d_increasethiscardcost",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:SetThisCardCostZero",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "d_setthiscardcostzero",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:SetThisCardCostZero\uFF1Aopcode=template_independent_action variant=d_setthiscardcostzero \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ProxyAtomic_MultiCast",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_multicast",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:CreateBurnInDiscard",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_createburnindiscard",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:ShuffleAllUnexhaustedIntoDraw",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_shuffleallunexhaustedintodraw",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:WheneverStatusGenerated",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "d_wheneverstatusgenerated",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:WheneverStatusGenerated\uFF1AModifier \u64CD\u4F5C\uFF08D:WheneverStatusGenerated\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:CostDownWhenStatusGenerated",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "d_costdownwhenstatusgenerated",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:CostDownWhenStatusGenerated\uFF1Aopcode=template_independent_action variant=d_costdownwhenstatusgenerated \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Exhaust",
+      "scope": "NonTargeted",
+      "opcode": "exhaust_card",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:DrawAndDiscardNonZero",
+      "scope": "NonTargeted",
+      "opcode": "draw_and_discard",
+      "variant": "nonzero_cost",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:EvokeAllTwice",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_evokealltwice",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:ProxyAtomic_SignalBoost",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_signalboost",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_SignalBoost\uFF1Aopcode=template_independent_action variant=i_proxyatomic_signalboost \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenStatusGenerated",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenStatusGenerated\uFF1A\u89E6\u53D1\u5668 status_generated/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenPowerPlayed",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:ifFatal",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "fatal",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:ifFatal\uFF1A\u6761\u4EF6 kind=fatal \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:NextPowerCostsZero",
+      "scope": "NonTargeted",
+      "opcode": "modify_cost",
+      "variant": "set_zero",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:NextPowerCostsZero\uFF1Aopcode=modify_cost variant=set_zero \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ProxyAtomic_Tempest",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_tempest",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:TriggerLightningPassivesAtTarget",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "d_triggerlightningpassivesattarget",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:TriggerLightningPassivesAtTarget\uFF1Aopcode=template_target_action variant=d_triggerlightningpassivesattarget \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenLightningEvoked",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenLightningEvoked\uFF1A\u89E6\u53D1\u5668 lightning_orb_evoked/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:D",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "selected",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=T:D\uFF1Adeal_damage \u7684 (variant=selected, target=event_enemy) \u7EC4\u5408\u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "D:CreateVoidInDiscard",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_createvoidindiscard",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "D:AutoPlayRandomAttackFromDraw",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "d_autoplayrandomattackfromdraw",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:AutoPlayRandomAttackFromDraw\uFF1Aopcode=template_self_action variant=d_autoplayrandomattackfromdraw \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ProxyAtomic_Voltaic",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_voltaic",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Voltaic\uFF1Aopcode=template_independent_action variant=i_proxyatomic_voltaic \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ProxyAtomic_WhiteNoise",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_whitenoise",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_WhiteNoise\uFF1Aopcode=template_independent_action variant=i_proxyatomic_whitenoise \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:Summon",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_summon",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:Summon\uFF1Aopcode=template_self_action variant=ncr_summon \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:AllD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:ForEachEtherealPlayedCombat",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_foreachetherealplayedcombat",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ForEachEtherealPlayedCombat\uFF1AModifier \u64CD\u4F5C\uFF08NCR:ForEachEtherealPlayedCombat\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:CostDownPerVoidPlayed",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_costdownpervoidplayed",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:CostDownPerVoidPlayed\uFF1AModifier \u64CD\u4F5C\uFF08NCR:CostDownPerVoidPlayed\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:D",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:ApplyDoomEqualDamage",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "ncr_applydoomequaldamage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ApplyDoomEqualDamage\uFF1Aopcode=template_target_action variant=ncr_applydoomequaldamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:IfOstyAlive",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "osty_alive",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:OstyAllDamage",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_ostyalldamage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:OstyAllDamage\uFF1Aopcode=template_self_action variant=ncr_ostyalldamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:B",
+      "scope": "NonTargeted",
+      "opcode": "gain_block",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:KillOsty",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_killosty",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:KillOsty\uFF1Aopcode=template_self_action variant=ncr_killosty \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:E",
+      "scope": "NonTargeted",
+      "opcode": "gain_energy",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:IncreaseAllCardCostsThisTurn",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_increaseallcardcoststhisturn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:IncreaseAllCardCostsThisTurn\uFF1Aopcode=template_self_action variant=ncr_increaseallcardcoststhisturn \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:ProxyAtomic_Calcify",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "a_proxyatomic_calcify",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:turnStart",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:AddRandomEtherealCardToHand",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_addrandometherealcardtohand",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:AddRandomEtherealCardToHand\uFF1Aopcode=template_self_action variant=ncr_addrandometherealcardtohand \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:LoseHp",
+      "scope": "SingleEnemyOnly",
+      "opcode": "lose_hp",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:CreateSoulInDraw",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_createsoulindraw",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:CreateSoulInDraw\uFF1Aopcode=template_self_action variant=ncr_createsoulindraw \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:ExhaustSelectedDrawCard",
+      "scope": "NonTargeted",
+      "opcode": "exhaust_card",
+      "variant": "selected",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ExhaustSelectedDrawCard\uFF1Aopcode=exhaust_card variant=selected \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:ApplyDoom",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "ncr_applydoom",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenEnergyCostAtLeast",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenEnergyCostAtLeast\uFF1A\u89E6\u53D1\u5668 energy_cost_at_least_card_played/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:ForEachCardDrawnThisTurn",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_foreachcarddrawnthisturn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ForEachCardDrawnThisTurn\uFF1AModifier \u64CD\u4F5C\uFF08NCR:ForEachCardDrawnThisTurn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:DamagePerCardDrawnThisTurn",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_damagepercarddrawnthisturn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:ApplyDoomAll",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_applydoomall",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:AllWeak",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "weak",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:IfDoomAppliedThisTurn",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "doom_applied_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:DoubleVulnerableWeak",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "ncr_doublevulnerableweak",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:Apply",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "weak",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:NextTurnStart",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Draw",
+      "scope": "NonTargeted",
+      "opcode": "draw_cards",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenSoulPlayed",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenSoulPlayed\uFF1A\u89E6\u53D1\u5668 derivative_played/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:SummonX",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_summonx",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:SummonX\uFF1Aopcode=template_self_action variant=ncr_summonx \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:CreateSoulInDrawX",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_createsoulindrawx",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:CreateSoulInDrawX\uFF1Aopcode=template_self_action variant=ncr_createsoulindrawx \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:UpgradeRandomDiscardCards",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_upgraderandomdiscardcards",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:UpgradeRandomDiscardCards\uFF1Aopcode=template_self_action variant=ncr_upgraderandomdiscardcards \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ProxyAtomic_Dredge",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_dredge",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Dredge\uFF1Aopcode=template_independent_action variant=i_proxyatomic_dredge \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ProxyAtomic_Eidolon",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_eidolon",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Eidolon\uFF1Aopcode=template_independent_action variant=i_proxyatomic_eidolon \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:KillEnemiesAtDoomThreshold",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_killenemiesatdoomthreshold",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:KillEnemiesAtDoomThreshold\uFF1Aopcode=template_self_action variant=ncr_killenemiesatdoomthreshold \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:TempStrengthLoss",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "strength_loss_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:ProxyDamage_Atomic_EnergyX_Eradicate",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "selected_energy_x_hits",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=T:ProxyDamage_Atomic_EnergyX_Eradicate\uFF1Aopcode=deal_damage variant=selected_energy_x_hits \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:Apply",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "vulnerable",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:OstyDamage",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "ncr_ostydamage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:OstyDamage\uFF1Aopcode=template_target_action variant=ncr_ostydamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:IfFirstPlayThisTurn",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "first_play_of_this_card_this_turn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:IfFirstPlayThisTurn\uFF1A\u6761\u4EF6 kind=first_play_of_this_card_this_turn \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:IfOstyAttackedThisTurn",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "osty_attacked_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:SetCostZeroIfOstyAttacked",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "ncr_setcostzeroifostyattacked",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:SetCostZeroIfOstyAttacked\uFF1Aopcode=template_independent_action variant=ncr_setcostzeroifostyattacked \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:ProxyAtomic_ForbiddenGrimoire",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "a_proxyatomic_forbiddengrimoire",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:ProxyAtomic_ForbiddenGrimoire\uFF1AAbilityRule \u64CD\u4F5C\u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:LoseStrength",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "strength_loss",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:MoveDiscardCardToHand",
+      "scope": "NonTargeted",
+      "opcode": "move_card",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:DoubleHangDamage",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "ncr_doublehangdamage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:DoubleHangDamage\uFF1Aopcode=template_target_action variant=ncr_doublehangdamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:LoseHp",
+      "scope": "SingleEnemyOnly",
+      "opcode": "lose_hp",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:AllVulnerable",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "vulnerable",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:FirstAttackPlayedEachTurn",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:FirstAttackPlayedEachTurn\uFF1A\u89E6\u53D1\u5668 first_attack_played_each_turn/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "M:TriggeredAttackDamagePercent",
+      "scope": "Modifier",
+      "opcode": "modify_damage",
+      "variant": "triggered_attack_percentage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=M:TriggeredAttackDamagePercent\uFF1AModifier \u64CD\u4F5C\uFF08M:TriggeredAttackDamagePercent\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:WheneverCreatureDies",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_whenevercreaturedies",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:WheneverCreatureDies\uFF1AModifier \u64CD\u4F5C\uFF08NCR:WheneverCreatureDies\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:CostDownWhenCreatureDies",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "ncr_costdownwhencreaturedies",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:CostDownWhenCreatureDies\uFF1Aopcode=template_independent_action variant=ncr_costdownwhencreaturedies \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:CopyTargetDebuffsToOthers",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "ncr_copytargetdebuffstoothers",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:CopyTargetDebuffsToOthers\uFF1Aopcode=template_target_action variant=ncr_copytargetdebuffstoothers \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenOstyLosesHp",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenOstyLosesHp\uFF1A\u89E6\u53D1\u5668 osty_hp_lost/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:AllEnemiesLoseEventHp",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_allenemiesloseeventhp",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:AllEnemiesLoseEventHp\uFF1Aopcode=template_self_action variant=ncr_allenemiesloseeventhp \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:ApplySelfDoom",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "doom",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:ApplyDoom",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "ncr_applydoom",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:ForEachDoomThreshold",
+      "scope": "Modifier",
+      "opcode": "trigger",
+      "variant": "doom_threshold",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ForEachDoomThreshold\uFF1AModifier \u64CD\u4F5C\uFF08NCR:ForEachDoomThreshold\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:DoomPerDoomThreshold",
+      "scope": "Modifier",
+      "opcode": "modify_power",
+      "variant": "doom_per_threshold",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:DoomPerDoomThreshold\uFF1AModifier \u64CD\u4F5C\uFF08NCR:DoomPerDoomThreshold\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "C:untilTurnEndCardPlayed",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:untilTurnEndCardPlayed\uFF1A\u89E6\u53D1\u5668 card_played/this_turn \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenEtherealDrawn",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:OstyMaxHpBonusDamage",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_ostymaxhpbonusdamage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:OstyMaxHpBonusDamage\uFF1AModifier \u64CD\u4F5C\uFF08NCR:OstyMaxHpBonusDamage\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:RepeatPerVoidPlayedCombat",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_repeatpervoidplayedcombat",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:RepeatPerVoidPlayedCombat\uFF1AModifier \u64CD\u4F5C\uFF08NCR:RepeatPerVoidPlayedCombat\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:ForEachOstyAttackThisTurn",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_foreachostyattackthisturn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ForEachOstyAttackThisTurn\uFF1AModifier \u64CD\u4F5C\uFF08NCR:ForEachOstyAttackThisTurn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:RepeatPerOstyAttackThisTurn",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_repeatperostyattackthisturn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:RepeatPerOstyAttackThisTurn\uFF1AModifier \u64CD\u4F5C\uFF08NCR:RepeatPerOstyAttackThisTurn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenAttackDealsUnblockedDamage",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenAttackDealsUnblockedDamage\uFF1A\u89E6\u53D1\u5668 attack_dealt_damage/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:ApplyEventDamageAsDoom",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "ncr_applyeventdamageasdoom",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ApplyEventDamageAsDoom\uFF1Aopcode=template_target_action variant=ncr_applyeventdamageasdoom \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:WheneverHighCostCardPlayed",
+      "scope": "Modifier",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:WheneverHighCostCardPlayed\uFF1AModifier \u64CD\u4F5C\uFF08NCR:WheneverHighCostCardPlayed\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:ReturnFromDiscardOnHighCostPlay",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "ncr_returnfromdiscardonhighcostplay",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ReturnFromDiscardOnHighCostPlay\uFF1Aopcode=template_independent_action variant=ncr_returnfromdiscardonhighcostplay \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:BlockTripleOstyMaxHp",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_blocktripleostymaxhp",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:BlockTripleOstyMaxHp\uFF1Aopcode=template_self_action variant=ncr_blocktripleostymaxhp \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:AddVoidToSelectedHandCard",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_addvoidtoselectedhandcard",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:AddVoidToSelectedHandCard\uFF1Aopcode=template_self_action variant=ncr_addvoidtoselectedhandcard \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ProxyAtomic_Seance",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_seance",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Seance\uFF1Aopcode=template_independent_action variant=i_proxyatomic_seance \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:AddSweepingGazeToHand",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_addsweepinggazetohand",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:AddSweepingGazeToHand\uFF1Aopcode=template_self_action variant=ncr_addsweepinggazetohand \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:CreateSoulInHand",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_createsoulinhand",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:CreateSoulInHand\uFF1Aopcode=template_self_action variant=ncr_createsoulinhand \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:CreateSoulInDiscard",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_createsoulindiscard",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:CreateSoulInDiscard\uFF1Aopcode=template_self_action variant=ncr_createsoulindiscard \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:TargetLoseStrength",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "ncr_targetlosestrength",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenDoomApplied",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenDoomApplied\uFF1A\u89E6\u53D1\u5668 doom_applied/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:WheneverOstyAttacksTargetThisTurn",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_wheneverostyattackstargetthisturn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:WheneverOstyAttacksTargetThisTurn\uFF1AModifier \u64CD\u4F5C\uFF08NCR:WheneverOstyAttacksTargetThisTurn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:ApplyPower_SicEmPower",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "ncr_applypower_sicempower",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ApplyPower_SicEmPower\uFF1Aopcode=template_target_action variant=ncr_applypower_sicempower \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenDebuffApplied",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenDebuffApplied\uFF1A\u89E6\u53D1\u5668 enemy_debuff_applied/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:UnpoweredDamage",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "ncr_unpowereddamage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:UnpoweredDamage\uFF1Aopcode=template_target_action variant=ncr_unpowereddamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:AddRetainToSelectedHandCard",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_addretaintoselectedhandcard",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:AddRetainToSelectedHandCard\uFF1Aopcode=template_self_action variant=ncr_addretaintoselectedhandcard \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:ForEachExhaustedSoul",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_foreachexhaustedsoul",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ForEachExhaustedSoul\uFF1AModifier \u64CD\u4F5C\uFF08NCR:ForEachExhaustedSoul\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:DamagePerExhaustedSoul",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_damageperexhaustedsoul",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:DamagePerExhaustedSoul\uFF1AModifier \u64CD\u4F5C\uFF08NCR:DamagePerExhaustedSoul\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenEtherealPlayed",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenEtherealPlayed\uFF1A\u89E6\u53D1\u5668 ethereal_card_played/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:HealOsty",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "ncr_healosty",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:HealOsty\uFF1Aopcode=template_self_action variant=ncr_healosty \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:ForEachOstyAttackCard",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_foreachostyattackcard",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ForEachOstyAttackCard\uFF1AModifier \u64CD\u4F5C\uFF08NCR:ForEachOstyAttackCard\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:DamagePerOstyAttackCard",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_damageperostyattackcard",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:DamagePerOstyAttackCard\uFF1AModifier \u64CD\u4F5C\uFF08NCR:DamagePerOstyAttackCard\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:IncreaseThisCardDamageRun",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "ncr_increasethiscarddamagerun",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:IncreaseThisCardDamageRun\uFF1Aopcode=template_independent_action variant=ncr_increasethiscarddamagerun \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:DoomScaledDamage",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "ncr_doomscaleddamage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:DoomScaledDamage\uFF1Aopcode=template_target_action variant=ncr_doomscaleddamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ProxyAtomic_Transfigure",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_transfigure",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Transfigure\uFF1Aopcode=template_independent_action variant=i_proxyatomic_transfigure \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Create",
+      "scope": "NonTargeted",
+      "opcode": "create_copy",
+      "variant": "this_card",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "NCR:OstyCurrentHpBonusDamage",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "ncr_ostycurrenthpbonusdamage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:OstyCurrentHpBonusDamage\uFF1AModifier \u64CD\u4F5C\uFF08NCR:OstyCurrentHpBonusDamage\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "NCR:NextVoidCostsZero",
+      "scope": "NonTargeted",
+      "opcode": "modify_cost",
+      "variant": "set_zero",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:NextVoidCostsZero\uFF1Aopcode=modify_cost variant=set_zero \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:E",
+      "scope": "NonTargeted",
+      "opcode": "gain_energy",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenCardGenerated",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenCardGenerated\uFF1A\u89E6\u53D1\u5668 card_generated/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Self",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "strength",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:AllD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:D",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:Forge",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "r_forge",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:ForEachPriorAttackHitOnTarget",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "r_foreachpriorattackhitontarget",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:ForEachPriorAttackHitOnTarget\uFF1AModifier \u64CD\u4F5C\uFF08R:ForEachPriorAttackHitOnTarget\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ProxyAtomic_Begone",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_begone",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Begone\uFF1Aopcode=template_independent_action variant=i_proxyatomic_begone \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Draw",
+      "scope": "NonTargeted",
+      "opcode": "draw_cards",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:GainStars",
+      "scope": "NonTargeted",
+      "opcode": "gain_stars",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenStarsChanged",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenStarsChanged\uFF1A\u89E6\u53D1\u5668 stars_spent_or_gained/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:AllD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:AtTurnStartIfInExhaust",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:AtTurnStartIfInExhaust\uFF1A\u4E0D\u662F\u5DF2\u5EFA\u6A21\u7684\u590D\u5408 Power \u89E6\u53D1\u5668\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:PlayThisCard",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "r_playthiscard",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:PlayThisCard\uFF1Aopcode=template_independent_action variant=r_playthiscard \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:B",
+      "scope": "NonTargeted",
+      "opcode": "gain_block",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:AddRandomColorlessToHand",
+      "scope": "NonTargeted",
+      "opcode": "create_card",
+      "variant": "random_colorless",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:D",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "I:ProxyAtomic_Charge",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_charge",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Charge\uFF1Aopcode=template_independent_action variant=i_proxyatomic_charge \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:whenOneStarSpent",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenOneStarSpent\uFF1A\u89E6\u53D1\u5668 stars_spent_threshold/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:AddDebrisToHand",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "r_adddebristohand",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:AddDebrisToHand\uFF1Aopcode=template_self_action variant=r_adddebristohand \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:Apply",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "weak",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "T:Apply",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "vulnerable",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:KingsSwordDoubleDamageThisTurn",
+      "scope": "SingleEnemyOnly",
+      "opcode": "template_target_action",
+      "variant": "r_kingssworddoubledamagethisturn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:KingsSwordDoubleDamageThisTurn\uFF1Aopcode=template_target_action variant=r_kingssworddoubledamagethisturn \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:RetainHandThisTurn",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "retain_hand_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:NextTurnStart",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:MoveDiscardCardToDrawTop",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "r_movediscardcardtodrawtop",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:FillHandWithDebris",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "r_fillhandwithdebris",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:FillHandWithDebris\uFF1Aopcode=template_self_action variant=r_fillhandwithdebris \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:ForEachStarCostCard",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "r_foreachstarcostcard",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:ForEachStarCostCard\uFF1AModifier \u64CD\u4F5C\uFF08R:ForEachStarCostCard\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:BonusPerStarCostCardInHand",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "r_bonusperstarcostcardinhand",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:AllTempStrengthLoss",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "strength_loss_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:PlaySelectedSkillMultipleTimes",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "r_playselectedskillmultipletimes",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:PlaySelectedSkillMultipleTimes\uFF1Aopcode=template_self_action variant=r_playselectedskillmultipletimes \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ProxyAtomic_ForegoneConclusion",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_foregoneconclusion",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:turnStart",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:PutSelectedHandCardsOnDraw",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "r_putselectedhandcardsondraw",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:PutSelectedHandCardsOnDraw\uFF1Aopcode=template_self_action variant=r_putselectedhandcardsondraw \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ProxyAtomic_Guards",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "i_proxyatomic_guards",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Guards\uFF1Aopcode=template_independent_action variant=i_proxyatomic_guards \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:D_EnergyX",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "selected_energy_x_threshold",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=T:D_EnergyX\uFF1Aopcode=deal_damage variant=selected_energy_x_threshold \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:DoubleEitherXAtThreshold",
+      "scope": "Modifier",
+      "opcode": "modify_x",
+      "variant": "double_at_threshold",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:DoubleEitherXAtThreshold\uFF1AModifier \u64CD\u4F5C\uFF08R:DoubleEitherXAtThreshold\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:CopySelectedColorlessCard",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "r_copyselectedcolorlesscard",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:CopySelectedColorlessCard\uFF1Aopcode=template_self_action variant=r_copyselectedcolorlesscard \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:AtTurnEndWhenTopOfDraw",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "r_atturnendwhentopofdraw",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:AtTurnEndWhenTopOfDraw\uFF1AModifier \u64CD\u4F5C\uFF08R:AtTurnEndWhenTopOfDraw\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:PlayAtTurnEndIfTopOfDraw",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "r_playatturnendiftopofdraw",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:PlayAtTurnEndIfTopOfDraw\uFF1Aopcode=template_independent_action variant=r_playatturnendiftopofdraw \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:WheneverDrawn",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "r_wheneverdrawn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:WheneverDrawn\uFF1AModifier \u64CD\u4F5C\uFF08R:WheneverDrawn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:CostDownWhenDrawn",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "r_costdownwhendrawn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:CostDownWhenDrawn\uFF1Aopcode=template_independent_action variant=r_costdownwhendrawn \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:DamageUpWhenDrawn",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "r_damageupwhendrawn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:DamageUpWhenDrawn\uFF1AModifier \u64CD\u4F5C\uFF08R:DamageUpWhenDrawn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "C:ifFatal",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "fatal",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:ifFatal\uFF1A\u6761\u4EF6 kind=fatal \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:ForEachSkillPlayedThisTurn",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "r_foreachskillplayedthisturn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:ForEachSkillPlayedThisTurn\uFF1AModifier \u64CD\u4F5C\uFF08R:ForEachSkillPlayedThisTurn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:RepeatPerSkillPlayedThisTurn",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "r_repeatperskillplayedthisturn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:RepeatPerSkillPlayedThisTurn\uFF1AModifier \u64CD\u4F5C\uFF08R:RepeatPerSkillPlayedThisTurn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:ReturnAfterSkillsPlayed",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "r_returnafterskillsplayed",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:ReturnAfterSkillsPlayed\uFF1Aopcode=template_independent_action variant=r_returnafterskillsplayed \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:AllWeak",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "weak",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:AllVulnerable",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "vulnerable",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenAttackDamagesEnemy",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenAttackDamagesEnemy\uFF1A\u89E6\u53D1\u5668 attack_damaged_enemy/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:TempStrengthLoss",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "strength_loss_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:untilTurnEndCardPlayed",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:untilTurnEndCardPlayed\uFF1A\u89E6\u53D1\u5668 card_played/this_turn \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:TempStrength",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "strength_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Self",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "plating",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenEnergySpent",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenEnergySpent\uFF1A\u89E6\u53D1\u5668 energy_spent_threshold/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:turnEnd",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:IfCardsPlayedAtLeastThisTurn",
+      "scope": "Modifier",
+      "opcode": "condition",
+      "variant": "cards_played_this_turn_at_least",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:IfCardsPlayedAtLeastThisTurn\uFF1AModifier \u64CD\u4F5C\uFF08R:IfCardsPlayedAtLeastThisTurn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:NextTurnDraw",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "n_nextturndraw",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:ProxyAtomic_Parry",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "a_proxyatomic_parry",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:ReturnThisToHand",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "r_returnthistohand",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:ReturnThisToHand\uFF1Aopcode=template_independent_action variant=r_returnthistohand \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Vigor",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "vigor",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:PutSelectedHandCardOnDraw",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "r_putselectedhandcardondraw",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:PutSelectedHandCardOnDraw\uFF1Aopcode=template_self_action variant=r_putselectedhandcardondraw \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "I:ProxyAtomic_Quasar",
+      "scope": "Independent",
+      "opcode": "choose_generated_card",
+      "variant": "random_colorless",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Quasar\uFF1Aopcode=choose_generated_card variant=random_colorless \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:ForEachStarGainedThisTurn",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "r_foreachstargainedthisturn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:ForEachStarGainedThisTurn\uFF1AModifier \u64CD\u4F5C\uFF08R:ForEachStarGainedThisTurn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:RepeatPerStarGainedThisTurn",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "r_repeatperstargainedthisturn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:ReflectBlockedDamageThisTurn",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "r_reflectblockeddamagethisturn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:EnemiesLoseStrength",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "r_enemieslosestrength",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:ProxyAtomic_Royalties",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "a_proxyatomic_royalties",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:KingsSwordHitsAllEnemies",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "kings_sword_hits_all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:PutThisOnDraw",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "r_putthisondraw",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:PutThisOnDraw\uFF1Aopcode=template_independent_action variant=r_putthisondraw \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:ProxyDamage_Atomic_StarX_Stardust",
+      "scope": "Independent",
+      "opcode": "deal_damage",
+      "variant": "random_star_x_hits",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=N:ProxyDamage_Atomic_StarX_Stardust\uFF1Aopcode=deal_damage variant=random_star_x_hits \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:PutKingsSwordInHand",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "r_putkingsswordinhand",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:ForEachGeneratedCardCombat",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "r_foreachgeneratedcardcombat",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:ForEachGeneratedCardCombat\uFF1AModifier \u64CD\u4F5C\uFF08R:ForEachGeneratedCardCombat\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "R:BonusPerGeneratedCardThisCombat",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "r_bonuspergeneratedcardthiscombat",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:BonusPerGeneratedCardThisCombat\uFF1AModifier \u64CD\u4F5C\uFF08R:BonusPerGeneratedCardThisCombat\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:ProxyAtomic_SwordSage",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "a_proxyatomic_swordsage",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:whenCardPlayed",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Exhaust",
+      "scope": "NonTargeted",
+      "opcode": "exhaust_card",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "R:EndTurn",
+      "scope": "Independent",
+      "opcode": "end_turn",
+      "variant": "after_card_resolution",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:EndTurn\uFF1A\u7ED3\u675F\u56DE\u5408\u64CD\u4F5C\u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "A:VoidFormFirstCardsFree",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "first_cards_free_each_turn",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:VoidFormFirstCardsFree\uFF1AAbilityRule \u64CD\u4F5C\u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:ProxyAtomic_Alchemize",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "cl_proxyatomic_alchemize",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ProxyAtomic_Alchemize\uFF1Aopcode=template_independent_action variant=cl_proxyatomic_alchemize \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:ProxyAtomic_Anointed",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "cl_proxyatomic_anointed",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ProxyAtomic_Anointed\uFF1Aopcode=template_independent_action variant=cl_proxyatomic_anointed \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:EveryCardsDrawn",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:EveryCardsDrawn\uFF1A\u89E6\u53D1\u5668 cards_drawn_threshold/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:E",
+      "scope": "NonTargeted",
+      "opcode": "gain_energy",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:ProxyAtomic_BeatDown",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "cl_proxyatomic_beatdown",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ProxyAtomic_BeatDown\uFF1Aopcode=template_independent_action variant=cl_proxyatomic_beatdown \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:D",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "selected",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "C:NextTurnStart",
+      "scope": "ConditionalTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:ReturnThisToHand",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "cl_returnthistohand",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ReturnThisToHand\uFF1Aopcode=template_independent_action variant=cl_returnthistohand \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:WheneverAttackPlayed",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:AddRandomAttackToHand",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "cl_addrandomattacktohand",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:ProxyAtomic_Catastrophe",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "cl_proxyatomic_catastrophe",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ProxyAtomic_Catastrophe\uFF1Aopcode=template_independent_action variant=cl_proxyatomic_catastrophe \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "T:TempStrengthLoss",
+      "scope": "SingleEnemyOnly",
+      "opcode": "apply_power",
+      "variant": "strength_loss_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:ProxyAtomic_Discovery",
+      "scope": "Independent",
+      "opcode": "choose_generated_card",
+      "variant": "random_current_character",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ProxyAtomic_Discovery\uFF1Aopcode=choose_generated_card variant=random_current_character \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:AllD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "all",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "A:turnStart",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:TransformSelectedHandCards",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "cl_transformselectedhandcards",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:TransformSelectedHandCards\uFF1Aopcode=template_self_action variant=cl_transformselectedhandcards \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:B",
+      "scope": "NonTargeted",
+      "opcode": "gain_block",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:RetainHandThisTurn",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "retain_hand_this_turn",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Self",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "plating",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Draw",
+      "scope": "NonTargeted",
+      "opcode": "draw_cards",
+      "variant": "immediate",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:GainBlockEqualDamage",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "cl_gainblockequaldamage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:GainBlockEqualDamage\uFF1Aopcode=template_self_action variant=cl_gainblockequaldamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:DamageEqualCardsPlayedCombat",
+      "scope": "SingleEnemyOnly",
+      "opcode": "deal_damage",
+      "variant": "cards_played_combat",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:DamageEqualCardsPlayedCombat\uFF1Aopcode=deal_damage variant=cards_played_combat \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "C:ifFatal",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "fatal",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:ifFatal\uFF1A\u6761\u4EF6 kind=fatal \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:GainGold",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "cl_gaingold",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:ProxyAtomic_HiddenGem",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "cl_proxyatomic_hiddengem",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:IfNoAttacksInHand",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "no_attacks_in_hand",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:AddRandomColorlessToHand",
+      "scope": "NonTargeted",
+      "opcode": "create_card",
+      "variant": "random_colorless",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:AddRandomZeroCostCardsToHand",
+      "scope": "NonTargeted",
+      "opcode": "create_card",
+      "variant": "random_zero_cost",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:PlayTopDrawCard",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "cl_playtopdrawcard",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:PlayTopDrawCard\uFF1Aopcode=template_self_action variant=cl_playtopdrawcard \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:ForEachDrawPileCard",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "cl_foreachdrawpilecard",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ForEachDrawPileCard\uFF1AModifier \u64CD\u4F5C\uFF08CL:ForEachDrawPileCard\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:FirstAttackOrSkillEachTurn",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:FirstAttackOrSkillEachTurn\uFF1A\u89E6\u53D1\u5668 first_attack_or_skill_each_turn/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:PutEventCardOnDrawTop",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "cl_puteventcardondrawtop",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:PutEventCardOnDrawTop\uFF1Aopcode=template_independent_action variant=cl_puteventcardondrawtop \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:DamageOtherEnemiesEqual",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "cl_damageotherenemiesequal",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:DamageOtherEnemiesEqual\uFF1Aopcode=template_self_action variant=cl_damageotherenemiesequal \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:EveryCardsPlayedThisTurn",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:EveryCardsPlayedThisTurn\uFF1A\u89E6\u53D1\u5668 cards_played_this_turn_threshold/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:NoBlockFromCards",
+      "scope": "Independent",
+      "opcode": "restrict_block_from_cards",
+      "variant": "next_n_turns",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:NoBlockFromCards\uFF1Aopcode=restrict_block_from_cards variant=next_n_turns \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Vigor",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "vigor",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:GainNextTurnBlockEqualCurrent",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "cl_gainnextturnblockequalcurrent",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:GainNextTurnBlockEqualCurrent\uFF1Aopcode=template_independent_action variant=cl_gainnextturnblockequalcurrent \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:Self",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "strength",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:Dex",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "dexterity_gain",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:ExhaustUpToHandCards",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "cl_exhaustuptohandcards",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ExhaustUpToHandCards\uFF1A\u53EF\u9009\u6570\u91CF\u7684\u624B\u724C\u6D88\u8017\u5C1A\u672A\u63A5\u5165\u9009\u724C\u955C\u50CF\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:BonusPerUniqueDebuff",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "cl_bonusperuniquedebuff",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:IfHandEmpty",
+      "scope": "ConditionalTrigger",
+      "opcode": "condition",
+      "variant": "hand_empty",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:IncreaseRollingDamage",
+      "scope": "Modifier",
+      "opcode": "template_modifier",
+      "variant": "cl_increaserollingdamage",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:IncreaseRollingDamage\uFF1AModifier \u64CD\u4F5C\uFF08CL:IncreaseRollingDamage\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:DrawToFullHand",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "cl_drawtofullhand",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:MoveSelectedSkillDrawToHand",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "cl_moveselectedskilldrawtohand",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:MoveSelectedAttackDrawToHand",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "cl_moveselectedattackdrawtohand",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:ChooseFromRandomDrawCards",
+      "scope": "NonTargeted",
+      "opcode": "template_self_action",
+      "variant": "cl_choosefromrandomdrawcards",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ChooseFromRandomDrawCards\uFF1Aopcode=template_self_action variant=cl_choosefromrandomdrawcards \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:AllWeak",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "weak",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "N:AllVulnerable",
+      "scope": "NonTargeted",
+      "opcode": "apply_power",
+      "variant": "vulnerable",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    },
+    {
+      "template": "CL:ProxyAtomic_Splash",
+      "scope": "Independent",
+      "opcode": "choose_generated_card",
+      "variant": "random_other_character_attack",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ProxyAtomic_Splash\uFF1Aopcode=choose_generated_card variant=random_other_character_attack \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:WheneverDrawPileShuffled",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:WheneverDrawPileShuffled\uFF1A\u89E6\u53D1\u5668 draw_pile_shuffled/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:ChooseDrawCardToHand",
+      "scope": "Independent",
+      "opcode": "move_card",
+      "variant": "selected",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ChooseDrawCardToHand\uFF1Aopcode=move_card variant=selected \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:AfterTurns",
+      "scope": "AbilityTrigger",
+      "opcode": "trigger",
+      "variant": "event",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:AfterTurns\uFF1A\u89E6\u53D1\u5668 turns_elapsed/delayed \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:DieOnUnblockedAttack",
+      "scope": "AbilityRule",
+      "opcode": "combat_rule",
+      "variant": "die_on_unblocked_attack",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:DieOnUnblockedAttack\uFF1A\u590D\u5408\u89C4\u5219 Power \u6216\u6761\u4EF6\u89C4\u5219\u5C1A\u672A\u63A5\u5165\u7CBE\u786E hook\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "CL:PutSelectedHandCardOnDrawTop",
+      "scope": "Independent",
+      "opcode": "template_independent_action",
+      "variant": "cl_putselectedhandcardondrawtop",
+      "acceptedAtomicShape": false,
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:PutSelectedHandCardOnDrawTop\uFF1Aopcode=template_independent_action variant=cl_putselectedhandcardondrawtop \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+    },
+    {
+      "template": "N:RandomD",
+      "scope": "NonTargeted",
+      "opcode": "deal_damage",
+      "variant": "random",
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
+    }
+  ]
+}

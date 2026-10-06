@@ -120,6 +120,8 @@ public static class HandlerCatalog
                      "i_nextskillcostszero", "i_setthiscardcostzero",
                      "i_upgrade", "i_playtopcardandexhaust", "i_playthiscard",
                      "cl_exhaustuptohandcards", "d_increasethiscardcost",
+                     // 代理模板（简单 Power/球操作）
+                     "i_proxyatomic_foregoneconclusion", "i_proxyatomic_multicast", "i_proxyatomic_tempest",
                  })
             registry.Register(new OperationKey("template_independent_action", variant), templateIndependent);
     }
