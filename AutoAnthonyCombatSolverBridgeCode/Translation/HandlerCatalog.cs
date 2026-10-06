@@ -68,6 +68,15 @@ public static class HandlerCatalog
                      "d_nextturnenergy", "d_losefocus", "d_gainstrength", "d_gaindexterity",
                      "d_triggerrightmostorbpassive", "ncr_applydoomall", "ncr_applyselfdoom",
                      "ncr_applyweakall", "ncr_applyvulnerableall", "r_enemieslosestrengththisturn",
+                     // 单行 Power 模板族
+                     "cl_retainhandthisturn", "r_retainhandthisturn", "cl_gaingold", "cl_noblockfromcards",
+                     "cl_gainvigor", "r_gainvigor", "cl_gainnextturnblockequalcurrent",
+                     "cl_applyweakall", "r_applyweakall", "n_allweak",
+                     "cl_applyvulnerableall", "r_applyvulnerableall",
+                     "r_gainstrengththisturn", "r_reflectblockeddamagethisturn", "r_gainstrength",
+                     "r_enemieslosestrength", "r_kingsswordhitsallenemies",
+                     "ncr_nextturnenergy", "ncr_losestrength", "ncr_nextvoidcostszero",
+                     "d_nextpowercostszero",
                  })
             registry.Register(new OperationKey("template_self_action", variant), templateSelf);
 

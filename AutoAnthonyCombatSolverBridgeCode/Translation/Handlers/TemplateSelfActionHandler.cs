@@ -54,6 +54,24 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "ncr_applyweakall" => null,
             "ncr_applyvulnerableall" => null,
             "r_enemieslosestrengththisturn" => null,
+            // 单行 Power 模板族（源码 case 路由，全部 PowerCmd.Apply 一行式）
+            "cl_retainhandthisturn" or "r_retainhandthisturn" => null,
+            "cl_gaingold" => null,
+            "cl_noblockfromcards" => null,
+            "cl_gainvigor" or "r_gainvigor" => null,
+            "cl_gainnextturnblockequalcurrent" => null,
+            "cl_applyweakall" or "r_applyweakall" => null,
+            "cl_applyvulnerableall" or "r_applyvulnerableall" => null,
+            "r_gainstrengththisturn" => null,
+            "r_reflectblockeddamagethisturn" => null,
+            "r_gainstrength" => null,
+            "r_enemieslosestrength" => null,
+            "r_kingsswordhitsallenemies" => null,
+            "ncr_nextturnenergy" => null,
+            "ncr_losestrength" => null,
+            "ncr_nextvoidcostszero" => null,
+            "d_nextpowercostszero" => null,
+            "n_allweak" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -240,8 +258,96 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 foreach (var enemy in mirror.CombatState.HittableEnemies)
                     effects10.ApplyPowerFromSource(typeof(PiercingWailPower), enemy, count, owner.Creature, context.Card);
                 return;
+            // ===== 单行 Power 模板族（通用路由）=====
+            case "cl_retainhandthisturn" or "r_retainhandthisturn":
+                ApplySelf(context, typeof(RetainHandPower), 1);
+                return;
+            case "cl_gaingold":
+                if (count == 0) return;
+                if (mirror.CombatState is not global::CombatSolver.SimulatedCombatState simCombat)
+                    throw new InvalidOperationException("金币需要分支战斗状态。");
+                simCombat.GainPlayerGold(mirror.Simulator, owner, count);
+                return;
+            case "cl_noblockfromcards":
+                ApplySelf(context, typeof(NoBlockPower), 1);
+                return;
+            case "cl_gainvigor" or "r_gainvigor":
+                if (count == 0) return;
+                ApplySelf(context, typeof(VigorPower), count);
+                return;
+            case "cl_gainnextturnblockequalcurrent":
+            {
+                // 源码：PowerCmd.Apply<BlockNextTurnPower>(owner, owner.Creature.Block)
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects11)
+                    throw new InvalidOperationException("下回合格挡需要分支战斗状态效果汇。");
+                var block = mirror.Simulator.State.GetCreature(owner.Creature).Block;
+                if (block > 0)
+                    effects11.ApplyPowerFromSource(typeof(BlockNextTurnPower), owner.Creature, block, owner.Creature, context.Card);
+                return;
+            }
+            case "cl_applyweakall" or "r_applyweakall" or "n_allweak":
+                ApplyToAll(context, typeof(WeakPower), count);
+                return;
+            case "cl_applyvulnerableall" or "r_applyvulnerableall":
+                ApplyToAll(context, typeof(VulnerablePower), count);
+                return;
+            case "r_gainstrengththisturn":
+                if (count == 0) return;
+                ApplySelf(context, typeof(FlexPotionPower), count);
+                return;
+            case "r_reflectblockeddamagethisturn":
+                if (count == 0) return;
+                ApplySelf(context, typeof(ReflectPower), count);
+                return;
+            case "r_gainstrength":
+                if (count == 0) return;
+                ApplySelf(context, typeof(StrengthPower), count);
+                return;
+            case "r_enemieslosestrength":
+                ApplyToAll(context, typeof(StrengthPower), -count);
+                return;
+            case "r_kingsswordhitsallenemies":
+                if (count == 0) return;
+                ApplySelf(context, typeof(SeekingEdgePower), count);
+                return;
+            case "ncr_nextturnenergy":
+                if (count == 0) return;
+                ApplySelf(context, typeof(EnergyNextTurnPower), count);
+                return;
+            case "ncr_losestrength":
+                if (count == 0) return;
+                ApplySelf(context, typeof(StrengthPower), -count);
+                return;
+            case "ncr_nextvoidcostszero":
+                ApplySelf(context, typeof(VeilpiercerPower), 1);
+                return;
+            case "d_nextpowercostszero":
+                ApplySelf(context, typeof(FreePowerPower), 1);
+                return;
             default:
                 throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);
         }
+    }
+
+    /// <summary>施加 Power 到自身（与源码 PowerCmd.Apply&lt;T&gt;(owner, amount, owner, card) 等价）。</summary>
+    private static void ApplySelf(OperationExecutionContext context, Type powerType, int amount)
+    {
+        var mirror = context.Mirror;
+        if (mirror.CombatState is not ICombatPredictionEffectSink effects)
+            throw new InvalidOperationException($"Power 施加需要分支战斗状态效果汇：{powerType.Name}。");
+        effects.ApplyPowerFromSource(powerType, context.Card.Owner.Creature, amount,
+            context.Card.Owner.Creature, context.Card);
+    }
+
+    /// <summary>施加 Power 到全部敌人（与源码 foreach HittableEnemies 等价）。</summary>
+    private static void ApplyToAll(OperationExecutionContext context, Type powerType, int amount)
+    {
+        if (amount == 0) return;
+        var mirror = context.Mirror;
+        if (mirror.CombatState is not ICombatPredictionEffectSink effects)
+            throw new InvalidOperationException($"全体 Power 施加需要分支战斗状态效果汇：{powerType.Name}。");
+        foreach (var enemy in mirror.CombatState.HittableEnemies)
+            effects.ApplyPowerFromSource(powerType, enemy, amount,
+                context.Card.Owner.Creature, context.Card);
     }
 }
