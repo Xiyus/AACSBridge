@@ -220,7 +220,15 @@ internal static class ChaosCardOnPlayMirror
             return triggerReason is null ? null : Describe(card, index, triggerReason);
         }
         if (operation.Scope is OperationScope.AbilityRule)
+        {
+            // 0.9.x：combat_rule 的代理 Power 模板（A:ProxyAtomic 族）放行
+            var ruleSpec = TryEffectiveSpec(card, index);
+            if (ruleSpec is not null && ruleSpec.Opcode == "combat_rule"
+                && ruleSpec.Variant is "a_proxyatomic_buffer" or "a_proxyatomic_parry"
+                    or "a_proxyatomic_royalties" or "a_proxyatomic_calcify" or "a_proxyatomic_swordsage")
+                return ValidateSpecShape(card, index, ruleSpec);
             return Describe(card, index, "AbilityRule 操作不在支持矩阵");
+        }
 
         if (operation.Parameters.ContainsKey("triggerIndex"))
         {

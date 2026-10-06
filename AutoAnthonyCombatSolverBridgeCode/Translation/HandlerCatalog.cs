@@ -85,6 +85,14 @@ public static class HandlerCatalog
                  })
             registry.Register(new OperationKey("template_self_action", variant), templateSelf);
 
+        // 0.9.x：combat_rule 代理 Power 模板（A:ProxyAtomic 族，5 条）
+        foreach (var variant in new[]
+                 {
+                     "a_proxyatomic_buffer", "a_proxyatomic_parry", "a_proxyatomic_royalties",
+                     "a_proxyatomic_calcify", "a_proxyatomic_swordsage",
+                 })
+            registry.Register(new OperationKey("combat_rule", variant), templateSelf);
+
         // 0.8.x：template_target_action 目标模板（毒/X 力量损失/X 虚弱/末日，11 条）
         var templateTarget = new Handlers.TemplateTargetActionHandler();
         foreach (var variant in new[] { "t_poison", "t_xstrengthloss", "t_xweak", "ncr_applydoom" })

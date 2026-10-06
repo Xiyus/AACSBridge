@@ -33,6 +33,14 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
     public string? ValidateSupport(OperationShape shape)
     {
         var spec = shape.Spec;
+        // combat_rule 的代理 Power 模板（A:ProxyAtomic 族——简单 PowerCmd.Apply）
+        if (spec.Opcode == "combat_rule")
+            return spec.Variant switch
+            {
+                "a_proxyatomic_buffer" or "a_proxyatomic_parry" or "a_proxyatomic_royalties"
+                    or "a_proxyatomic_calcify" or "a_proxyatomic_swordsage" => null,
+                _ => $"combat_rule 的 variant={spec.Variant} 不在支持矩阵",
+            };
         return spec.Variant switch
         {
             "d_channelfrost" or "d_channeldark" or "d_channellightning"
@@ -96,6 +104,32 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
         var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
         // 源码门控：ExecutableOrbRepeatCount(amount) = Math.Max(0, amount)，== 0 时跳过
         var count = Math.Max(0, amount);
+
+        // combat_rule 的代理 Power 模板（A:ProxyAtomic 族）
+        if (context.Shape.Spec.Opcode == "combat_rule")
+        {
+            var proxyAmount = Math.Max(1, amount);    // 源码 ApplyGeneratedProxyPower：max(1, amount)
+            switch (context.Shape.Spec.Variant)
+            {
+                case "a_proxyatomic_buffer":
+                    ApplySelf(context, typeof(BufferPower), proxyAmount);
+                    return;
+                case "a_proxyatomic_parry":
+                    ApplySelf(context, typeof(ParryPower), proxyAmount);
+                    return;
+                case "a_proxyatomic_royalties":
+                    ApplySelf(context, typeof(RoyaltiesPower), proxyAmount);
+                    return;
+                case "a_proxyatomic_calcify":
+                    ApplySelf(context, typeof(CalcifyPower), proxyAmount);
+                    return;
+                case "a_proxyatomic_swordsage":
+                    ApplySelf(context, typeof(SwordSagePower), proxyAmount);
+                    return;
+                default:
+                    throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);
+            }
+        }
 
         switch (context.Shape.Spec.Variant)
         {
