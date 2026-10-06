@@ -52,5 +52,8 @@ public static class HandlerCatalog
         registry.Register(new OperationKey("create_card", "current_character_random"), createCard);
         registry.Register(new OperationKey("create_card", "random_zero_cost"), createCard);
         registry.Register(new OperationKey("create_card", "random_attack_zero_cost_this_turn"), createCard);
+
+        // 0.8.0：目录审计补遗——gain_stars 是唯一"简单但未做"的即时效果（13 条）
+        registry.Register(new OperationKey("gain_stars", "immediate"), new Handlers.GainStarsHandler());
     }
 }

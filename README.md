@@ -308,7 +308,46 @@ dotnet build -c Debug
 | 0.8.0 | 全 Component Catalog 审计（931 条 spec 逐条核对） |
 | 1.0.0 | strict diff 全通过 + PredictionGaps = 0 → 发布 |
 
-## 0.1.0 实机验证指引
+## 0.8.0 目录审计（2026-10-06）
+
+对组件目录 931 条 RuntimeSpec 逐条核对支持矩阵：
+
+**总覆盖率：507 / 931 = 54.5%**
+
+| 状态 | 条目数 | 说明 |
+|---|---|---|
+| handler（即时效果） | 430 | 37 个 (Opcode, Variant) 键 |
+| trigger（受限触发器） | 64 | 10 种回合/事件边界 kind |
+| selection（选牌分支） | 13 | 6 种选择形状 |
+| **合计支持** | **507** | **54.5%** |
+
+不支持家族按大类（424 条）：
+
+| 家族 | 条目数 | 说明 |
+|---|---|---|
+| `template_self_action` | 130 | 角色专属模板（召唤/球/ Shiv/锻造/毒等）——遗留模板路由 |
+| `template_independent_action` | 71 | 代理/独立模板（Discovery/Splash/Begone/Quasar 等）——遗留模板路由 |
+| `trigger`（不支持的事件种类） | 52 | for_each 家族/energy_spent/vulnerable_applied 等事件触发 |
+| `template_modifier` | 46 | 伤害/命中修饰符（DamageAndHits 数学） |
+| `template_target_action` | 33 | 目标模板（Osty 伤害/毒/末日等） |
+| `condition` | 23 | 条件门控（fatal/hand_empty 等） |
+| `combat_rule` | 21 | 战斗规则 |
+| `gain_stars` | 13 | 星能获得 |
+| 其余 | 95 | 零散形状（modify_cost/choose/end_turn 等） |
+
+**关键结论**：
+1. 剩余缺口的 **82%** 集中在 `template_*` 遗留模板族（280 条）——这些操作的执行不走
+   结构化 RuntimeSpec 分派，而是走 AutoAnthony 的模板路由（遗留代码路径）。支持它们
+   需要逐模板镜像遗留实现，是独立的大工程；
+2. 触发器族已覆盖 64/116 = 55%（10 种回合/事件边界 kind）；剩余 52 条是
+   for_each/energy_spent/vulnerable_applied 等事件触发——需要复合 Power 的事件派发
+   扩展到这些 kind；
+3. 条件门控（23 条）需要复合 Power 的条件评估镜像；
+4. `gain_stars`（13 条）是唯一一个"简单但未做"的即时效果——simulator 有
+   `GainStars` 入口，补一个 handler 即可。
+
+**卡级生效率**（实测牌组）：铁甲局 10-13/14 张矩阵内（71-93%）；死灵法师局
+1-3/12（Osty 模板族占主导）。卡级生效率取决于牌组的模板族占比，而非总覆盖率。
 
 **已实机验证（2026-10-06 第四/五次测试）**：
 
