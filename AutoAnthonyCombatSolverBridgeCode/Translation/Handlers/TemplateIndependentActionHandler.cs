@@ -61,6 +61,21 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             "i_proxyatomic_multicast" => null,
             "i_proxyatomic_tempest" => null,
             "i_proxyatomic_whitenoise" => null,
+            // 代理模板（第二批——直接执行/变形/能量）
+            "i_proxyatomic_voltaic" => null,
+            "i_proxyatomic_dredge" => null,
+            "i_proxyatomic_transfigure" => null,
+            "i_proxyatomic_begone" => null,
+            "i_proxyatomic_guards" => null,
+            "i_proxyatomic_charge" => null,
+            "i_proxyatomic_seance" => null,
+            "cl_proxyatomic_alchemize" => null,
+            "cl_proxyatomic_catastrophe" => null,
+            "cl_proxyatomic_beatdown" => null,
+            "cl_proxyatomic_anointed" => null,
+            "i_proxyatomic_doubleenergy" => null,
+            "i_proxyatomic_signalboost" => null,
+            "i_proxyatomic_eidolon" => null,
             "i_reducethiscardcostcombat" => null,
             "i_drawuntilnonattack" => null,
             // 与 template_self_action 同款的独立模板变体
@@ -297,6 +312,136 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                     mirror.Simulator.AddGeneratedCardsToCombat(list,
                         MegaCrit.Sts2.Core.Entities.Cards.PileType.Hand, owner);
                 }
+                return;
+            }
+            case "i_proxyatomic_voltaic":
+            {
+                // 源码 L2682-2690：引导 = 本战斗已引导的匹配球数
+                // 模拟近似：当前球队列中的匹配球数（已激发的不计——保守下界）
+                var orbQueue = mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue;
+                var operation = context.Card.Generated.Operations[context.Shape.OperationIndex];
+                var output = OrbSlotCatalog.ResolveOutput(operation.OrbOutputId, operation.Template)?.Id;
+                var sourceCount = output switch
+                {
+                    "lightning" => orbQueue.Orbs.OfType<LightningOrb>().Count(),
+                    "frost" => orbQueue.Orbs.OfType<FrostOrb>().Count(),
+                    "dark" => orbQueue.Orbs.OfType<DarkOrb>().Count(),
+                    "plasma" => orbQueue.Orbs.OfType<PlasmaOrb>().Count(),
+                    "glass" => orbQueue.Orbs.OfType<GlassOrb>().Count(),
+                    _ => orbQueue.Orbs.Count,
+                };
+                if (sourceCount > 0)
+                {
+                    for (var i = 0; i < sourceCount; i++)
+                    {
+                        var orb = output switch
+                        {
+                            "lightning" => CanonicalModels.Orb<LightningOrb>().ToMutable(),
+                            "frost" => CanonicalModels.Orb<FrostOrb>().ToMutable(),
+                            "dark" => CanonicalModels.Orb<DarkOrb>().ToMutable(),
+                            "plasma" => CanonicalModels.Orb<PlasmaOrb>().ToMutable(),
+                            "glass" => CanonicalModels.Orb<GlassOrb>().ToMutable(),
+                            _ => OrbModel.GetRandomOrb(mirror.Rng.CombatOrbGeneration).ToMutable(),
+                        };
+                        mirror.Simulator.OrbChannel(owner, orb);
+                    }
+                }
+                return;
+            }
+            case "i_proxyatomic_dredge":
+            {
+                // 源码 L2711-2715：选 N 张弃牌堆卡入手
+                // 求解器原生 PlanChoiceEffect.MoveToHand（选牌镜像通道）
+                var count = Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex));
+                var discard = mirror.Simulator.State.GetPlayerCombatState(owner).DiscardPile.Cards;
+                if (discard.Count == 0) return;
+                var selected = discard.Take(count).ToList();
+                foreach (var card in selected)
+                    mirror.Simulator.AddToPile(card,
+                        MegaCrit.Sts2.Core.Entities.Cards.PileType.Hand);
+                return;
+            }
+            case "i_proxyatomic_transfigure":
+            {
+                // 源码 L2717-2725：选手牌 1 张，费用 +amount（本战斗），Replay +1
+                var hand = mirror.Simulator.State.GetPlayerCombatState(owner).Hand.Cards;
+                var selected2 = hand.FirstOrDefault();
+                if (selected2 is null) return;
+                var addAmount = Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex));
+                if (!selected2.Preview.EnergyCost.CostsX)
+                    selected2.MutablePreview.EnergyCost.AddThisCombat(addAmount);
+                selected2.MutablePreview.BaseReplayCount++;
+                return;
+            }
+            case "i_proxyatomic_begone":
+            case "i_proxyatomic_guards":
+            case "i_proxyatomic_charge":
+            case "i_proxyatomic_seance":
+            {
+                // 源码 L2785-2838：变形选牌（Begone/Guards 从手牌，Charge/Seance 从抽牌堆）
+                // 模拟近似：消耗选中卡并替换为衍生卡（简化——移除选中卡）
+                // 精确变形需要 TransformToDerivatives 的完整复刻
+                var isHand = context.Shape.Spec.Variant is "i_proxyatomic_begone" or "i_proxyatomic_guards";
+                var pile = isHand
+                    ? mirror.Simulator.State.GetPlayerCombatState(owner).Hand.Cards
+                    : mirror.Simulator.State.GetPlayerCombatState(owner).DrawPile.Cards;
+                var transformCount = context.Shape.Spec.Variant switch
+                {
+                    "i_proxyatomic_begone" => Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex)),
+                    "i_proxyatomic_guards" => pile.Count,
+                    _ => Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex)),
+                };
+                var toTransform = pile.Where(c => c.Preview.IsTransformable).Take(transformCount).ToList();
+                foreach (var card in toTransform)
+                    mirror.Simulator.Exhaust(card);
+                return;
+            }
+            case "cl_proxyatomic_alchemize":
+            {
+                // 源码 L2445-2455：随机药水并立即使用
+                // 药水效果超出战斗模拟范围——no-op（保守）
+                return;
+            }
+            case "cl_proxyatomic_catastrophe":
+            {
+                // 源码 L2527-2547：自动打出抽牌堆随机卡 N 次
+                // 嵌套自动出牌超出镜像边界——no-op（保守）
+                return;
+            }
+            case "cl_proxyatomic_beatdown":
+            {
+                // 源码 L2571-2596：自动打出弃牌堆攻击卡 N 次
+                // 嵌套自动出牌超出镜像边界——no-op（保守）
+                return;
+            }
+            case "cl_proxyatomic_anointed":
+            {
+                // 源码：Anointed 原卡（触发型——OnPlay 极简）
+                // no-op（保守）
+                return;
+            }
+            case "i_proxyatomic_doubleenergy":
+            {
+                // 源码：DoubleEnergy 原卡 OnPlay——GainEnergy(currentEnergy)
+                var currentEnergy = mirror.Simulator.State.GetPlayerCombatState(owner).Energy;
+                if (currentEnergy > 0)
+                    mirror.Simulator.GainEnergy(owner, currentEnergy);
+                return;
+            }
+            case "i_proxyatomic_signalboost":
+            {
+                // 源码：SignalBoost 原卡 OnPlay——Apply<SignalBoostPower>(amount)
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects8)
+                    throw new InvalidOperationException("信号增强需要分支战斗状态效果汇。");
+                var sbAmount = Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex));
+                effects8.ApplyPowerFromSource(typeof(SignalBoostPower), owner.Creature,
+                    sbAmount, owner.Creature, context.Card);
+                return;
+            }
+            case "i_proxyatomic_eidolon":
+            {
+                // 源码：Eidolon 原卡 OnPlay——仅 EnergyCost.UpgradeBy(-1)
+                // 费用修改对模拟影响极小——no-op（保守）
                 return;
             }
             case "i_reducethiscardcostcombat":

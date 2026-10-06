@@ -148,6 +148,12 @@ public static class HandlerCatalog
                      // 代理模板（简单 Power/球操作）
                      "i_proxyatomic_foregoneconclusion", "i_proxyatomic_multicast", "i_proxyatomic_tempest",
                      "i_proxyatomic_whitenoise", "i_reducethiscardcostcombat", "i_drawuntilnonattack",
+                      // 代理模板（第二批——直接执行/变形/能量）
+                      "i_proxyatomic_voltaic", "i_proxyatomic_dredge", "i_proxyatomic_transfigure",
+                      "i_proxyatomic_begone", "i_proxyatomic_guards", "i_proxyatomic_charge",
+                      "i_proxyatomic_seance", "cl_proxyatomic_alchemize", "cl_proxyatomic_catastrophe",
+                      "cl_proxyatomic_beatdown", "cl_proxyatomic_anointed", "i_proxyatomic_doubleenergy",
+                      "i_proxyatomic_signalboost", "i_proxyatomic_eidolon",
                      // 与 template_self_action 同款的独立模板变体
                      "ncr_increasethiscarddamagerun", "cl_gainnextturnblockequalcurrent",
                      "d_setthiscardcostzero", "d_increaseallclaws",
