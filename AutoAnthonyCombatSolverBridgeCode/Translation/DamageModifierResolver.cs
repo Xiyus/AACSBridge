@@ -25,10 +25,12 @@ internal static class DamageModifierResolver
             or "ncr_ostycurrenthpbonusdamage"
             or "ncr_repeatpervoidplayedcombat"
             or "r_damageupwhendrawn",
-        "modify_hits" => spec.Variant == "flat_extra",
+        "modify_hits" => spec.Variant is "flat_extra" or "hp_loss_scaled",
         "modify_damage" => spec.Variant is
-            "vulnerable_scaled" or "strike_count_scaled" or "current_block",
+            "vulnerable_scaled" or "strike_count_scaled" or "current_block"
+            or "triggered_attack_percentage",
         "modify_orb_slots" => spec.Variant == "loss",
+        "modify_block" => spec.Variant == "strength_scaled",
         _ => false,
     };
 
