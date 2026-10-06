@@ -112,6 +112,15 @@ internal static class ChaosCardChoiceMirror
                     var hand = owner.Hand.Cards;
                     return NativeSpec(PlanChoiceEffect.MoveToDrawTop, PileType.Hand, 1, hand);
                 }
+                case ("template_independent_action", "i_proxyatomic_dredge", "none", "none"):
+                {
+                    // 源码 L2711-2715：从弃牌堆选 N 张入手（Dredge 代理）
+                    var discard = owner.DiscardPile.Cards;
+                    var dredgeCount = Math.Max(1, card.OperationAmount(
+                        card.Generated.Operations.ToList().FindIndex(op =>
+                            op.Template == "I:ProxyAtomic_Dredge")));
+                    return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Discard, dredgeCount, discard);
+                }
                 case ("template_self_action", "cl_choosefromrandomdrawcards", "none", "none"):
                 {
                     // 源码 L1398-1408：从随机抽牌堆卡中选 1 张入手
@@ -147,6 +156,7 @@ internal static class ChaosCardChoiceMirror
             ("template_independent_action", "cl_moveselectedskilldrawtohand", "none", "none") => true,
             ("template_self_action", "r_movediscardcardtodrawtop", "none", "none") => true,
             ("template_self_action", "r_putselectedhandcardondraw", "none", "none") => true,
+            ("template_independent_action", "i_proxyatomic_dredge", "none", "none") => true,
             ("template_self_action", "cl_choosefromrandomdrawcards", "none", "none") => true,
             _ => false,
         };
