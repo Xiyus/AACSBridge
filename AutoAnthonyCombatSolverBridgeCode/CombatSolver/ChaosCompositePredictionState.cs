@@ -1,6 +1,7 @@
 using AutoAnthony;
 using CombatSolver;
 using CombatSolver.Engine.Common;
+using MegaCrit.Sts2.Core.Entities.Players;
 
 namespace AutoAnthonyCombatSolverBridge.CombatSolver;
 
@@ -10,6 +11,8 @@ internal sealed class ChaosCompositePredictionState : IPredictionStateForkable, 
     public HashSet<int> ActiveTriggers { get; private set; } = [];
     public Dictionary<int, int> Activations { get; private set; } = [];
     public ChaosCompositePower Snapshot { get; private set; }
+    /// <summary>创建时捕获的 Player 引用——克隆 Creature 的 Player 属性在模拟分支中可能丢失。</summary>
+    public Player? OwnerPlayer { get; }
     public int[] FingerprintValues { get; private set; }
     public long CapturedValuesHash { get; }
     public long DefinitionHash { get; }
@@ -19,6 +22,7 @@ internal sealed class ChaosCompositePredictionState : IPredictionStateForkable, 
     {
         Snapshot = PredictionUtils.CloneModelForSimulation(source);
         Snapshot.CapturedOperationValues = source.CapturedOperationValues.ToArray();
+        OwnerPlayer = source.Owner?.Player;
         FingerprintValues = Snapshot.CaptureMultiplayerState();
         if (FingerprintValues.Length < 34 || FingerprintValues[0] != 5)
             throw PredictionUnsupportedException.ForContent("ChaosCompositePower 隐藏状态 schema 不是 5。", typeof(ChaosCompositePower));

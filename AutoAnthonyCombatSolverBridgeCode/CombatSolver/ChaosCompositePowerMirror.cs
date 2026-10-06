@@ -13,6 +13,7 @@ using CombatSolver.Engine.InCombat.Simulation;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using AutoAnthonyCombatSolverBridge.Translation;
 using AutoAnthonyCombatSolverBridge.Bootstrap;
@@ -131,16 +132,14 @@ internal static class ChaosCompositePowerMirror
         }
     }
 
-    private static PredictedCard Source(ChaosCompositePower power, CombatPredictionSimulator simulator)
+    private static PredictedCard Source(ChaosCompositePower power, Player? ownerPlayer)
     {
         if (power.ProfileId.Length != 0)
             throw Unsupported("外部角色 Profile 的复合 Power 尚未适配");
-        // 模拟克隆的 Creature 可能丢失 Player 引用（浅拷贝边界）——从模拟器状态回退查找
-        var player = power.Owner?.Player
-            ?? simulator.State.CombatState.Players.FirstOrDefault(p => p.Creature == power.Owner);
-        if (player is null)
-            throw Unsupported("复合 Power 的 Owner Creature 无法解析到玩家（模拟克隆边界）");
-        var predicted = PredictedCard.Create(ChaosCardRegistry.Canonical(power.Character, power.Slot), player);
+        // 预测状态创建时捕获的 Player 引用（克隆 Creature 的 Player 属性在模拟分支中可能丢失）
+        if (ownerPlayer is null)
+            throw Unsupported("复合 Power 的 Owner Player 无法解析（模拟克隆边界）");
+        var predicted = PredictedCard.Create(ChaosCardRegistry.Canonical(power.Character, power.Slot), ownerPlayer);
         var card = (ChaosCardModel)predicted.MutablePreview;
         if (power.SourceTinkeredDefinitionPayload.Length > 0)
             card.ApplyCapturedDefinition(CardTinkeringApi.DeserializeCard(power.SourceTinkeredDefinitionPayload));
@@ -154,8 +153,8 @@ internal static class ChaosCompositePowerMirror
     private static void ValidatePower(ChaosCompositePower power, CombatPredictionSimulator simulator)
     {
         if (!BridgeBootstrap.IsReady) throw Unsupported("桥未完成全部初始化，拒绝部分适配预测");
-        if (power.Owner.Player is null) throw Unsupported("复合 Power Owner 不是玩家");
-        var card = (ChaosCardModel)Source(power, simulator).MutablePreview;
+        if (power.Owner?.Player is null) throw Unsupported("复合 Power Owner 不是玩家");
+        var card = (ChaosCardModel)Source(power, power.Owner.Player).MutablePreview;
         var reason = ChaosCardOnPlayMirror.ValidateCard(card);
         if (reason is not null) throw Unsupported(reason);
         if (!card.Generated.Operations.Any(ChaosOperationExecutor.RequiresCompositePower))
@@ -282,7 +281,7 @@ internal static class ChaosCompositePowerMirror
     {
         var state = Read(simulator, power);
         var snapshot = state.Snapshot;
-        var predicted = Source(snapshot, simulator);
+        var predicted = Source(snapshot, state.OwnerPlayer);
         var card = (ChaosCardModel)predicted.MutablePreview;
         var operations = card.Generated.Operations;
         for (var trigger = 0; trigger < operations.Count; trigger++)
