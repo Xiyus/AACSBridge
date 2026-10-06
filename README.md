@@ -72,15 +72,17 @@ CHAOS_CARD id=CARD.CHAOS_CARD000 title="岿然防御" type=Skill cost=1 ... oper
 | `lose_hp` | (immediate, self) / (immediate, selected_enemy) / **(immediate, random_enemy)**（0.4.0），fixed 值 | 11 |
 | `heal` | (immediate, self)，fixed 值 | 1 |
 | `apply_power` | 20 个 variant（0.2.0）：vulnerable/weak/strength_loss(_this_turn)/strength_gain（selected_enemy+all_enemies）、vulnerable_double、strength/dexterity_gain(_loss/_this_turn)/doom/focus_loss/thorns/intangible/blur/plating/strength_this_turn/vigor/strength_loss(_this_turn)/retain_hand_this_turn/strength_per_target_vulnerable（self） | 76 |
-| `exhaust_card` | (all, all_cards, hand→none)，filter=any/non_attack | 3 |
-| `discard_card` | (all, all_cards, hand→none)，filter=any | 2 |
+| `exhaust_card` | (all, all_cards, hand→none)，filter=any/non_attack；**(selected, selected_card, hand→none)（0.5.0 选牌分支）** | 3 + 4 |
+| `discard_card` | (all, all_cards, hand→none)，filter=any；**(selected, selected_card, hand→none)（0.5.0）** | 2 + 6 |
 | `create_copy` | (this_card, self_card, none→discard)——Anger 式克隆进弃牌堆 | 2 |
 | `draw_and_discard` | (nonzero_cost, self)——Scrape 式抽后弃非零费 | 1 |
+| `move_card` | **(selected, discard→hand) / (selected, discard→draw)（0.5.0 选牌分支）** | 2 + 1 |
 
 **卡级生效条件**：卡上全部操作都在矩阵内，且不触发以下任一排除项（fail-closed，逐项对应后续里程碑）：
 
 - ~~X 费卡与 X 值源槽~~ → **0.4.0 已支持**（镜像层复刻 OnPlay 的 X 解析：`Hook.ModifyXValue` 分支状态 + `SetResolvedXValues`；值槽经 RuntimeSpecValue 自动读到解析后 X 值，含 ChaosXValueMultiplier 翻倍）；
 - ~~随机目标引用~~ → **0.4.0 已支持**（显式抽取消耗分支 CombatTargets 流——RNG 消耗与真实一致；deal_damage/random 走命令随机目标，lose_hp/random 走抽取结果）；
+- ~~玩家选牌（exhaust/discard/move 的 selected）~~ → **0.5.0 已支持**（`CardChoiceMirrors` 登记原生 Effect，求解器在 OwnChoice 阶段展开分支并施加效果；单选卡限制——多选卡仍拒绝）；
 - Modifier scope 操作，**唯一例外**：`M:base/strength_scaled`（0.2.0 已建模，整数除法后乘）；
   其余修饰符（modify_damage/modify_hits 家族）→ 后续版本；
 - AbilityTrigger / ConditionalTrigger / AbilityRule scope 操作（触发器、复合 Power）→ 0.6.0；
@@ -238,6 +240,7 @@ dotnet build -c Debug
 | 0.2.0+ | ✅ 保守可打性模式（矩阵外卡模拟中不可打，搜索可完成） |
 | 0.3.0 | ✅ 牌堆移动：exhaust_card/discard_card(all) + create_copy(this_card) + draw_and_discard(nonzero_cost)（严格 diff + 生成牌递归实机验证） |
 | 0.4.0 | ✅ X 费卡（OnPlay X 解析复刻）+ 随机目标（分支 RNG 消耗对齐） |
+| 0.5.0 | ✅ 玩家选牌：exhaust/discard/move(selected)——CardChoiceMirrors 原生 Effect 登记，求解器展开分支 |
 | 0.5.0 | Player Choice（选牌分支） |
 | 0.6.0 | Trigger / `ChaosCompositePower` 跨回合（含 `PowerHiddenStateMirrors`） |
 | 0.7.0 | 生成牌递归模拟 |
