@@ -87,6 +87,12 @@ internal static class ChaosCardChoiceMirror
                     var discard = owner.DiscardPile.Cards;
                     return NativeSpec(PlanChoiceEffect.MoveToDrawTop, PileType.Discard, 1, discard);
                 }
+                case ("move_card", "selected", "draw", "hand"):
+                {
+                    // 源码：从抽牌堆选 1 张入手（无类型过滤）
+                    var draw = owner.DrawPile.Cards;
+                    return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Draw, 1, draw);
+                }
                 case ("template_independent_action", "cl_moveselectedattackdrawtohand", "none", "none"):
                 case ("template_independent_action", "cl_moveselectedskilldrawtohand", "none", "none"):
                 {
@@ -152,6 +158,7 @@ internal static class ChaosCardChoiceMirror
             ("discard_card", "selected", "hand", "none") => true,
             ("move_card", "selected", "discard", "hand") => true,
             ("move_card", "selected", "discard", "draw") => true,
+            ("move_card", "selected", "draw", "hand") => true,
             ("template_independent_action", "cl_moveselectedattackdrawtohand", "none", "none") => true,
             ("template_independent_action", "cl_moveselectedskilldrawtohand", "none", "none") => true,
             ("template_self_action", "r_movediscardcardtodrawtop", "none", "none") => true,
