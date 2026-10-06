@@ -1,4 +1,6 @@
+using System.Reflection;
 using AutoAnthony;
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Models;
 using HarmonyLib;
 using AutoAnthonyCombatSolverBridge.AutoAnthony;
@@ -11,27 +13,39 @@ namespace AutoAnthonyCombatSolverBridge.Patches;
 /// <summary>
 /// 里程碑 ③ + ④：证明桥能在真实战斗中识别 AutoAnthony 生成牌，并打印每个操作的结构化
 /// OperationRuntimeSpec（绝不打印本地化文本）。设计上只读：本 postfix 观察
-/// AfterCardEnteredCombat，绝不修改游戏状态，因此不可能造成任何失步。
+/// CombatState.AddCard，绝不修改游戏状态，因此不可能造成任何失步。
 ///
-/// 为什么选这个钩子：卡牌进入战斗牌堆时，游戏会把 AfterCardEnteredCombat(card) 广播给战斗中的
-/// 卡牌，因此战斗开始时每张牌组卡（包括每张生成牌）都会以 card == 接收者的形态经过这里恰好一次。
-/// AutoAnthony 自己也重写这个方法（并跳过克隆），说明这是一个稳定、经过实战检验的接缝。
+/// 为什么选这个钩子（实机验证的结论）：CombatState.AddCard 是每张进入战斗的卡必经的注册入口
+/// ——包括开局时牌组克隆进战斗（CloneCard → AddCard）和战斗中生成的卡。最初尝试的
+/// ChaosCardModel.AfterCardEnteredCombat 只在"战斗中从战斗外进入牌堆"时触发（如战斗中生成牌），
+/// 开局牌组建战斗不经过它——实机日志证实该路径零触发。AutoAnthony 的伴侣 Mod CardTinkering
+/// 也同时补丁这两个接缝，AddCard 是覆盖面完整的那一个。
 /// </summary>
-[HarmonyPatch(typeof(ChaosCardModel), nameof(ChaosCardModel.AfterCardEnteredCombat))]
+[HarmonyPatch]
 public static class RuntimeSpecDumpPatch
 {
-    // CardModel 实例存活整局；每个实例每次会话转储一次足以验证管线，也让日志保持可读。
+    /// <summary>
+    /// 目标：CombatState 上所有第一个参数为 CardModel 的 AddCard 重载
+    /// （private AddCard(CardModel) 与 public AddCard(CardModel, Player)）。
+    /// </summary>
+    private static IEnumerable<MethodBase> TargetMethods() => typeof(CombatState)
+        .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+        .Where(method => method.Name == "AddCard"
+                         && method.GetParameters().FirstOrDefault()?.ParameterType == typeof(CardModel));
+
+    // 每场战斗的牌组都是新的可变克隆实例（引用不同），因此每个战斗实例转储一次；
+    // 真正的复制牌（CloneOf != null，如 Shiv 类）跳过——它们的定义与源牌相同。
     private static readonly HashSet<CardModel> Dumped = [];
 
-    public static void Postfix(ChaosCardModel __instance, CardModel card)
+    public static void Postfix(CardModel card)
     {
         try
         {
-            if (!ReferenceEquals(card, __instance) || __instance.IsClone)
+            if (card is not ChaosCardModel chaos || chaos.IsClone)
                 return;
-            if (!Dumped.Add(__instance))
+            if (!Dumped.Add(chaos))
                 return;
-            Dump(__instance);
+            Dump(chaos);
         }
         catch (Exception exception)
         {

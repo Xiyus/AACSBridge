@@ -108,6 +108,7 @@ public static class CompatibilityGuard
 
         aa = VerifyAutoAnthonyVersions(aaAssembly, aa, failures, notes);
         VerifyCombatSolverVersions(csAssembly, cs, failures, notes);
+        VerifyGameContract(failures, notes);
         AuditChaosCardOnPlayPatches(aaAssembly, notes);
 
         return new CompatibilityReport(failures.Count == 0, aa, cs, failures, notes);
@@ -236,6 +237,41 @@ public static class CompatibilityGuard
             notes.Add($"{displayName}：版本 {facts.ManifestVersion} 新于已测试的 {tested}——契约检查已通过，但信任预测前应重跑 strict-diff 夹具。");
         else
             notes.Add($"{displayName}：版本 {facts.ManifestVersion} 与锁定的测试版本一致。");
+    }
+
+    // --- 游戏侧契约 ------------------------------------------------------------------------------
+
+    /// <summary>
+    /// 桥的转储补丁目标是游戏自己的 CombatState.AddCard（每张进入战斗的卡必经，含开局牌组建战斗）。
+    /// 游戏更新可能移动或重载它——这里按成员签名核对，失败即禁用桥（fail-closed）。
+    /// </summary>
+    private static void VerifyGameContract(List<string> failures, List<string> notes)
+    {
+        var game = FindLoadedAssembly("sts2");
+        if (game is null)
+        {
+            failures.Add("游戏程序集 sts2 未加载（这不应该发生——桥正运行在游戏进程里）。");
+            return;
+        }
+
+        var combatState = game.GetType("MegaCrit.Sts2.Core.Combat.CombatState", throwOnError: false);
+        if (combatState is null)
+        {
+            failures.Add("游戏：类型缺失：MegaCrit.Sts2.Core.Combat.CombatState。");
+            return;
+        }
+
+        var cardModelType = game.GetType("MegaCrit.Sts2.Core.Models.CardModel", throwOnError: false);
+        var addCard = combatState.GetMethods(AllMembers)
+            .Where(method => method.Name == "AddCard")
+            .FirstOrDefault(method => method.GetParameters().FirstOrDefault()?.ParameterType == cardModelType);
+        if (addCard is null)
+        {
+            failures.Add("游戏：CombatState.AddCard(CardModel) 重载缺失——转储补丁目标不存在。");
+            return;
+        }
+
+        notes.Add($"游戏 CombatState.AddCard 目标核验通过（{(addCard.IsPrivate ? "private" : "public")} 重载）。");
     }
 
     // --- Harmony 补丁审计 ---------------------------------------------------------------------

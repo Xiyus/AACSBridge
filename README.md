@@ -58,7 +58,7 @@ AutoAnthonyCombatSolverBridge/
     │   ├── RuntimeSpecTranslator.cs          # spec → handler（无 handler 即抛异常）
     │   └── UnsupportedRuntimeSpecException.cs
     ├── Patches/
-    │   └── RuntimeSpecDumpPatch.cs           # 里程碑③④：AfterCardEnteredCombat 只读转储
+    │   └── RuntimeSpecDumpPatch.cs           # 里程碑③④：CombatState.AddCard 只读转储（开局牌组+战斗中生成牌全覆盖）
     └── Diagnostics/
         └── BridgeLog.cs                      # 游戏 Logger + 独立 spec-dump.log 文件
 ```
