@@ -82,6 +82,9 @@ public static class HandlerCatalog
                      "n_keepblocknextturn", "n_nextturnblock",
                      "d_createdazedindiscard", "d_createtwowoundsindiscard",
                      "d_createburnindiscard", "d_createslimeindiscard", "d_createvoidindiscard",
+                     // 更多球激发/简单变体
+                     "d_evokeleftmostorb", "d_evokealltwice", "n_createinkshiv",
+                     "n_blockequalallpoison", "d_exhaustallstatuses", "d_shuffleallunexhaustedintodraw",
                  })
             registry.Register(new OperationKey("template_self_action", variant), templateSelf);
 

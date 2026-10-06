@@ -93,6 +93,13 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "d_createburnindiscard" => null,
             "d_createslimeindiscard" => null,
             "d_createvoidindiscard" => null,
+            // 更多球激发/简单变体
+            "d_evokeleftmostorb" => null,
+            "d_evokealltwice" => null,
+            "n_createinkshiv" => null,
+            "n_blockequalallpoison" => null,
+            "d_exhaustallstatuses" => null,
+            "d_shuffleallunexhaustedintodraw" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -411,6 +418,70 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             case "d_createvoidindiscard":
                 CreateStatusCards<MegaCrit.Sts2.Core.Models.Cards.Void>(context, count);
                 return;
+            case "d_evokeleftmostorb":
+            {
+                // 源码 L2309-2312：左球激发（仅最后一次 dequeue）
+                if (count == 0) return;
+                var orbQueue = mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue;
+                if (orbQueue.Orbs.Count == 0) return;
+                for (var i = 0; i < count; i++)
+                    mirror.Simulator.OrbEvokeNext(owner, 1, dequeue: i == count - 1);
+                return;
+            }
+            case "d_evokealltwice":
+            {
+                // 源码 L2279：全部球各激发 repeats 次
+                var orbQueue2 = mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue;
+                var orbCount = orbQueue2.Orbs.Count;
+                if (count == 0 || orbCount == 0) return;
+                for (var i = 0; i < orbCount * count; i++)
+                    mirror.Simulator.OrbEvokeNext(owner, 1, dequeue: true);
+                return;
+            }
+            case "n_createinkshiv":
+            {
+                // 源码：CreateDerivatives → Ink Shiv（与 n_createshiv 同款但生成 InkShiv）
+                // InkShiv 不在游戏类型中——用 Shiv 替代（效果等价：0 费 4 伤害攻击）
+                var operation = context.Card.Generated.Operations[context.Shape.OperationIndex];
+                var shivCount = ChaosOperationExecutor.ExecutableOperationCount(operation, amount);
+                if (shivCount == 0) return;
+                mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Shiv>(
+                    owner, PileType.Hand, shivCount, owner);
+                return;
+            }
+            case "n_blockequalallpoison":
+            {
+                // 源码 L697-699：格挡 = 全部敌人毒层数之和
+                if (mirror.CombatState is not global::CombatSolver.SimulatedCombatState poisonCombat)
+                    return;
+                var block = 0;
+                foreach (var enemy in mirror.CombatState.HittableEnemies)
+                    block += poisonCombat.GetAmount<PoisonPower>(enemy);
+                if (block > 0)
+                    mirror.Simulator.GainBlock(owner.Creature, block, context.BlockProps,
+                        context.Mirror.Card, context.Mirror.CardPlay);
+                return;
+            }
+            case "d_exhaustallstatuses":
+            {
+                // 源码 L2243：消耗所有非已消耗的状态牌
+                var playerState = mirror.Simulator.State.GetPlayerCombatState(owner);
+                var statuses = playerState.AllCards
+                    .Where(candidate => candidate.Preview.Type == CardType.Status)
+                    .ToList();
+                foreach (var status in statuses)
+                    mirror.Simulator.Exhaust(status);
+                return;
+            }
+            case "d_shuffleallunexhaustedintodraw":
+            {
+                // 源码 L2266：手牌全部放回抽牌堆并洗牌（简化：弃牌后洗牌）
+                var hand = mirror.Simulator.State.GetPlayerCombatState(owner).Hand.Cards.ToList();
+                foreach (var handCard in hand)
+                    mirror.Simulator.Discard(handCard);
+                mirror.Simulator.Shuffle(owner);
+                return;
+            }
             default:
                 throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);
         }
