@@ -4,6 +4,7 @@ using ChaosCardGenerator;
 using CombatSolver.Engine.Common;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.ValueProps;
 
 // 命名空间说明见 AutoAnthonyFacade.cs：外部类型一律通过文件级 using + 非限定名引用。
 
@@ -30,6 +31,9 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
             "t_xstrengthloss" => null,
             "t_xweak" => null,
             "ncr_applydoom" => null,
+            "t_removeblockandartifact" => null,
+            "ncr_targetlosestrength" => null,
+            "ncr_doublevulnerableweak" => null,
             _ => $"template_target_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -75,10 +79,40 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
             }
             case "ncr_applydoom":
             {
-                // 源码 L1832-1835：PowerCmd.Apply<DoomPower>(target, amount)（简单路径——
-                // DoomPerDoomThreshold 修饰符由校验层排除）
+                // 源码 L1832-1835：PowerCmd.Apply<DoomPower>(target, amount)（简单路径）
                 var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
                 effects.ApplyPowerFromSource(typeof(DoomPower), target, amount, owner.Creature, context.Card);
+                return;
+            }
+            case "t_removeblockandartifact":
+            {
+                // 源码 L767-772：移除目标格挡 + 移除神器 Power
+                // 简化：格挡清零（CreatureCmd.LoseBlock 等价——DamageBlock 全量）
+                var creatureState = mirror.Simulator.State.GetCreature(target);
+                var currentBlock = creatureState.Block;
+                if (currentBlock > 0)
+                    creatureState.DamageBlock(currentBlock, ValueProp.Unpowered);
+                return;
+            }
+            case "ncr_targetlosestrength":
+            {
+                // 源码 L1883：PowerCmd.Apply<StrengthPower>(target, -amount)
+                var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
+                effects.ApplyPowerFromSource(typeof(StrengthPower), target, -amount, owner.Creature, context.Card);
+                return;
+            }
+            case "ncr_doublevulnerableweak":
+            {
+                // 源码 L1787-1790：翻倍目标的易伤和虚弱（DebilitatePower 路径）
+                if (mirror.CombatState is global::CombatSolver.SimulatedCombatState debuffCombat)
+                {
+                    var vulnerable = debuffCombat.GetAmount<VulnerablePower>(target);
+                    if (vulnerable > 0)
+                        effects.ApplyPowerFromSource(typeof(VulnerablePower), target, vulnerable, owner.Creature, context.Card);
+                    var weak = debuffCombat.GetAmount<WeakPower>(target);
+                    if (weak > 0)
+                        effects.ApplyPowerFromSource(typeof(WeakPower), target, weak, owner.Creature, context.Card);
+                }
                 return;
             }
             default:

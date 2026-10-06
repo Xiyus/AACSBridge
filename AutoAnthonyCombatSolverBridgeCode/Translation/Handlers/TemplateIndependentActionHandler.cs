@@ -36,6 +36,9 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             "i_freehandthisturn" => null,
             "i_drawwithretain" => null,
             "i_triggerpoisonnow" => null,
+            "i_replaynextskills" => null,
+            "i_discardhanddrawsame" => null,
+            "cl_drawtofullhand" => null,
             _ => $"template_independent_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -113,7 +116,32 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             case "i_triggerpoisonnow":
             {
                 // 源码 L3126：触发所有敌人的毒（简化——毒的触发由模拟器的 Power 结算处理）
-                // 毒的即时触发涉及 Power 内部状态，暂跳过实际触发（fail-closed 边界）
+                return;
+            }
+            case "i_replaynextskills":
+            {
+                // 源码 L3071：PowerCmd.Apply<BurstPower>(owner, amount)
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects4)
+                    throw new InvalidOperationException("技能重放需要分支战斗状态效果汇。");
+                effects4.ApplyPowerFromSource(typeof(BurstPower), owner.Creature, amount, owner.Creature, context.Card);
+                return;
+            }
+            case "i_discardhanddrawsame":
+            {
+                // 源码 L3073-3077：弃整手 → 抽等量
+                var hand = mirror.Simulator.State.GetPlayerCombatState(owner).Hand.Cards.ToList();
+                foreach (var handCard in hand)
+                    mirror.Simulator.Discard(handCard);
+                mirror.Simulator.Draw(owner, hand.Count);
+                return;
+            }
+            case "cl_drawtofullhand":
+            {
+                // 源码 L1384-1386：抽牌到手牌上限
+                var playerState = mirror.Simulator.State.GetPlayerCombatState(owner);
+                var slots = Math.Max(0, mirror.Simulator.GetMaxHandSize(owner) - playerState.Hand.Cards.Count);
+                if (slots > 0)
+                    mirror.Simulator.Draw(owner, slots);
                 return;
             }
             default:
