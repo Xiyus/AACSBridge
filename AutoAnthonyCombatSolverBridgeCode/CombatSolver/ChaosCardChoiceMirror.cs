@@ -127,6 +127,32 @@ internal static class ChaosCardChoiceMirror
                             op.Template == "I:ProxyAtomic_Dredge")));
                     return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Discard, dredgeCount, discard);
                 }
+                case ("choose_generated_card", "random_current_character", "current_character_pool", "hand"):
+                case ("choose_generated_card", "random_colorless", "colorless_pool", "hand"):
+                case ("choose_generated_card", "random_other_character_attack", "other_character_pools", "hand"):
+                {
+                    // 源码 L2471-2500：生成 N 张随机卡 → 玩家选 1 张入手
+                    // 镜像：分支 RNG 生成候选 → GenerateToHand 选择
+                    var candidateCount = Math.Max(1, Math.Min(3, amount));
+                    var constraint = card.Owner.RunState.CardMultiplayerConstraint;
+                    IEnumerable<PredictedCard> generated = spec.Variant switch
+                    {
+                        "random_colorless" => global::CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions
+                            .GetDistinctUnlockedColorlessForCombat(simulator, card.Owner, candidateCount,
+                                simulator.Rng.CombatCardGeneration, constraint),
+                        "random_other_character_attack" => global::CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions
+                            .GetDistinctUnlockedCharacterCardsForCombat(simulator, card.Owner, candidateCount,
+                                simulator.Rng.CombatCardGeneration, constraint,
+                                candidate => candidate.Type == CardType.Attack),
+                        _ => global::CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions
+                            .GetDistinctUnlockedCharacterCardsForCombat(simulator, card.Owner, candidateCount,
+                                simulator.Rng.CombatCardGeneration, constraint),
+                    };
+                    var options = generated.ToList();
+                    if (options.Count == 0) return null;
+                    return new CardChoiceSpec(PlanChoiceEffect.GenerateToHand, PileType.None, 1, 1,
+                        options, options, ReplacementValue: 0d);
+                }
                 case ("template_self_action", "cl_choosefromrandomdrawcards", "none", "none"):
                 {
                     // 源码 L1398-1408：从随机抽牌堆卡中选 1 张入手
@@ -164,6 +190,9 @@ internal static class ChaosCardChoiceMirror
             ("template_self_action", "r_movediscardcardtodrawtop", "none", "none") => true,
             ("template_self_action", "r_putselectedhandcardondraw", "none", "none") => true,
             ("template_independent_action", "i_proxyatomic_dredge", "none", "none") => true,
+            ("choose_generated_card", "random_current_character", "current_character_pool", "hand") => true,
+            ("choose_generated_card", "random_colorless", "colorless_pool", "hand") => true,
+            ("choose_generated_card", "random_other_character_attack", "other_character_pools", "hand") => true,
             ("template_self_action", "cl_choosefromrandomdrawcards", "none", "none") => true,
             _ => false,
         };
