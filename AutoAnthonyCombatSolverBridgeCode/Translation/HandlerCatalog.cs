@@ -41,5 +41,9 @@ public static class HandlerCatalog
         registry.Register(new OperationKey("discard_card", "all"), new Handlers.DiscardHandler());
         registry.Register(new OperationKey("create_copy", "this_card"), new Handlers.CreateCopyHandler());
         registry.Register(new OperationKey("draw_and_discard", "nonzero_cost"), new Handlers.DrawAndDiscardHandler());
+
+        // 0.6.x：代理模板（解决 Imbued 附魔自动施放矩阵外卡导致的 TURN_SETUP_FAILURE）
+        registry.Register(new OperationKey("template_independent_action", "cl_proxyatomic_hiddengem"),
+            new Handlers.HiddenGemHandler());
     }
 }

@@ -87,6 +87,19 @@ internal static class ChaosCardChoiceMirror
                     var discard = owner.DiscardPile.Cards;
                     return NativeSpec(PlanChoiceEffect.MoveToDrawTop, PileType.Discard, 1, discard);
                 }
+                case ("template_independent_action", "cl_moveselectedattackdrawtohand", "none", "none"):
+                case ("template_independent_action", "cl_moveselectedskilldrawtohand", "none", "none"):
+                {
+                    // 源码 L1388-1396：从抽牌堆选 1 张指定类型牌入手
+                    // （原生 SecretWeapon/SecretTechnique 同款形状）
+                    var type = spec.Variant == "cl_moveselectedattackdrawtohand"
+                        ? CardType.Attack
+                        : CardType.Skill;
+                    var drawAttacks = owner.DrawPile.Cards
+                        .Where(candidate => candidate.Preview.Type == type)
+                        .ToList();
+                    return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Draw, 1, drawAttacks);
+                }
             }
         }
 
@@ -110,6 +123,8 @@ internal static class ChaosCardChoiceMirror
             ("discard_card", "selected", "hand", "none") => true,
             ("move_card", "selected", "discard", "hand") => true,
             ("move_card", "selected", "discard", "draw") => true,
+            ("template_independent_action", "cl_moveselectedattackdrawtohand", "none", "none") => true,
+            ("template_independent_action", "cl_moveselectedskilldrawtohand", "none", "none") => true,
             _ => false,
         };
 
