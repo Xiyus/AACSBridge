@@ -17,15 +17,13 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 
 ---
 
-## 当前状态：v0.1.0（翻译层生效）——里程碑①–④已实机验证
+## 当前状态：v0.2.0（Power/Debuff 翻译生效）——里程碑①–④已实机验证
 
 | 里程碑 | 内容 | 状态 |
 |---|---|---|
-| ① | 空模板 Mod 能编译并被游戏加载 | ✅ 实机验证 |
-| ② | 同时引用 AutoAnthony.dll + CombatSolver.dll | ✅ 实机验证（守卫全绿，MVID/SHA256 与锁定值一致） |
-| ③ | 识别 `ChaosCardModel`（AutoAnthony 生成牌） | ✅ 实机验证 |
-| ④ | 把生成卡的全部 `OperationRuntimeSpec` 打进日志 | ✅ 实机验证（12 卡 / 24 操作 / 24 spec 零缺失） |
-| 0.1.0 | Damage/Block/Draw/Energy 翻译 + 镜像注册 | ✅ 编译通过，待实机验证 |
+| ①–④ | 模板 / 双 DLL 引用 / 守卫 / 识别 / 转储 | ✅ 实机验证 |
+| 0.1.0 | Damage/Block/Draw/Energy 翻译 + 镜像注册 | ✅ 实机验证（镜像调用/fail-closed 全链路实证） |
+| 0.2.0 | apply_power(20 variant) + Power 卡伤害 + strength_scaled 修饰符 | ✅ 编译通过，待实机验证 |
 
 实测样例（spec-dump.log）：
 
@@ -35,24 +33,26 @@ CHAOS_CARD id=CARD.CHAOS_CARD000 title="岿然防御" type=Skill cost=1 ... oper
     spec schema=1 opcode=gain_block variant=immediate target=self zones=none->none filter=any flags=[block_reference,...] values=[block=4 src=fixed off=0 up] condition=- trigger=-
 ```
 
-### 0.1.0 支持矩阵（与 AutoAnthony 组件目录逐形状核对）
+### 支持矩阵（与 AutoAnthony 组件目录逐形状核对）
 
 | Opcode | 支持形状 | 目录条目数 |
 |---|---|---|
-| `deal_damage` | (selected, selected_enemy) / (all, all_enemies)，fixed 值 + 可选 fixed hits | 131 + 32 |
-| `gain_block` | (immediate, self)，fixed 值 | 78 |
+| `deal_damage` | (selected, selected_enemy) / (all, all_enemies)，fixed 值 + 可选 fixed hits；含 Power 卡 Unpowered 逐 hit 路径 | 131 + 32 |
+| `gain_block` | (immediate, self)，fixed 值；含 M:base/strength_scaled 修饰符数学 | 78 |
 | `draw_cards` | (immediate, self)，fixed 值 | 50 |
 | `gain_energy` | (immediate, self)，fixed 值 | 30 |
 | `lose_hp` | (immediate, self) / (immediate, selected_enemy)，fixed 值 | 8 + 2 |
 | `heal` | (immediate, self)，fixed 值 | 1 |
+| `apply_power` | 20 个 variant（0.2.0）：vulnerable/weak/strength_loss(_this_turn)/strength_gain（selected_enemy+all_enemies）、vulnerable_double、strength/dexterity_gain(_loss/_this_turn)/doom/focus_loss/thorns/intangible/blur/plating/strength_this_turn/vigor/strength_loss(_this_turn)/retain_hand_this_turn/strength_per_target_vulnerable（self） | 76 |
 
 **卡级生效条件**：卡上全部操作都在矩阵内，且不触发以下任一排除项（fail-closed，逐项对应后续里程碑）：
 
 - X 费卡（`CostsX`/`HasStarCostX`）与 X 值源槽（`energy_x`/`star_x`/`special_x`）→ 0.4.0；
-- Modifier / AbilityTrigger / ConditionalTrigger / AbilityRule scope 操作（修饰符数学、触发器、复合 Power）→ 0.2.0/0.6.0；
+- Modifier scope 操作，**唯一例外**：`M:base/strength_scaled`（0.2.0 已建模，整数除法后乘）；
+  其余修饰符（modify_damage/modify_hits 家族）→ 后续版本；
+- AbilityTrigger / ConditionalTrigger / AbilityRule scope 操作（触发器、复合 Power）→ 0.6.0；
 - 玩家选牌（选择器模板 / `CardTargetSlot`）→ 0.5.0；
 - 随机目标引用（`random_enemy_reference`）、事件目标、历史计数、阈值翻倍 → 0.4.0；
-- Power 类型卡上的 `deal_damage`（Unpowered 逐 hit 路径）→ 0.2.0；
 - 结构性升级（RepeatOperation / ExecuteOperationOnPlay / ChooseExhaust / 衍生卡升级等）。
 
 **支持矩阵外的卡打出时：整场搜索中止**（`IncompatibleGameplayModException`，玩家看到"内容性 Mod 暂未适配"）——绝不静默当空操作给出错误预测。这是 CombatSolver 官方适配纪律（"部分适配比完全不适配更危险"）与本桥设计红线的直接体现。
@@ -188,8 +188,9 @@ dotnet build -c Debug
 | 版本 | 内容 |
 |---|---|
 | 0.0.1–0.0.4 | ✅ 模板 / 双 DLL 引用 / 守卫 / ChaosCard 识别 / RuntimeSpec 转储（全部实机验证） |
-| 0.1.0 | ✅ Damage / Block / Draw / Energy(+lose_hp/heal) handler + 逐具体类镜像注册 + fail-closed 校验 |
-| 0.2.0 | Power / Debuff（`SimulatedCombatState.Apply`）+ Power 卡 Unpowered 伤害路径 + 修饰符数学 |
+| 0.1.0 | ✅ Damage / Block / Draw / Energy(+lose_hp/heal) handler + 逐具体类镜像注册 + fail-closed 校验（实机验证） |
+| 0.2.0 | ✅ apply_power 20 variant + Power 卡 Unpowered 伤害 + strength_scaled 格挡修饰符 |
+| 0.2.x | 其余伤害修饰符（vulnerable_scaled / strike_count_scaled / current_block 等 DamageAndHits 数学） |
 | 0.3.0 | 牌堆移动（Discard / Exhaust / Create / Shuffle） |
 | 0.4.0 | Target 展开 / X 费 / 模拟 RNG（随机目标引用、事件目标、历史计数、阈值翻倍） |
 | 0.5.0 | Player Choice（选牌分支） |
