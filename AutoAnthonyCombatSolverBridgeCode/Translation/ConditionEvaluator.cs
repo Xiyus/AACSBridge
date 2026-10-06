@@ -1,6 +1,7 @@
 using AutoAnthony;
 using ChaosCardGenerator;
 using CombatSolver.Engine.InCombat.Mirrors.Cards.OnPlay;
+using MegaCrit.Sts2.Core.Models.Orbs;
 using MegaCrit.Sts2.Core.Models.Powers;
 
 namespace AutoAnthonyCombatSolverBridge.Translation;
@@ -12,7 +13,9 @@ internal static class ConditionEvaluator
         "exhaust_pile_minimum" or "card_exhausted_this_turn" or "owner_lost_hp_this_turn"
         or "target_has_vulnerable" or "target_has_poison" or "draw_pile_empty"
         or "last_drawn_card_is_skill" or "enemy_intends_attack" or "osty_alive"
-        or "doom_applied_this_turn" or "osty_attacked_this_turn" or "no_attacks_in_hand" or "hand_empty";
+        or "doom_applied_this_turn" or "osty_attacked_this_turn" or "no_attacks_in_hand" or "hand_empty"
+        // Batch AP：第三批条件
+        or "has_frost_orb" or "fatal" or "cards_played_this_turn_at_least";
 
     internal static bool Evaluate(ChaosCardModel card, GeneratorOperation conditionOp,
         CardOnPlayMirrorContext mirror, OperationResolutionState resolution)
@@ -45,6 +48,10 @@ internal static class ConditionEvaluator
             "doom_applied_this_turn" => combat.WasDoomAppliedThisTurn(owner.Creature),
             "osty_attacked_this_turn" => mirror.Simulator.State.GetOsty(owner) is { } actor
                 && combat.GetCreatureAttacksThisTurn(actor) > 0,
+            // Batch AP：第三批条件
+            "has_frost_orb" => playerState.OrbQueue.Orbs.Any(orb => orb is FrostOrb),
+            "fatal" => resolution.LastAttackKilled,
+            "cards_played_this_turn_at_least" => combat.GetCardsPlayedThisTurn(owner.Creature) >= threshold,
             _ => throw new UnsupportedRuntimeSpecException(spec.Opcode, kind!),
         };
     }

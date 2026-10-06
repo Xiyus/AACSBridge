@@ -62,8 +62,8 @@ public sealed class DamageHandler : IOperationHandler
             if (spec.Variant == "all")
             {
                 for (var hit = 0; hit < hits; hit++)
-                    mirror.Simulator.Damage(mirror.CombatState.HittableEnemies.ToArray(), finalDamage,
-                        props, dealer, mirror.Card, mirror.CardPlay);
+                    RecordKills(mirror.Simulator.Damage(mirror.CombatState.HittableEnemies.ToArray(), finalDamage,
+                        props, dealer, mirror.Card, mirror.CardPlay), context);
                 return;
             }
 
@@ -75,8 +75,8 @@ public sealed class DamageHandler : IOperationHandler
                     var randomTarget = mirror.Rng.CombatTargets.NextItem(mirror.CombatState.HittableEnemies);
                     if (randomTarget is null)
                         continue;
-                    mirror.Simulator.Damage([randomTarget], finalDamage,
-                        props, dealer, mirror.Card, mirror.CardPlay);
+                    RecordKills(mirror.Simulator.Damage([randomTarget], finalDamage,
+                        props, dealer, mirror.Card, mirror.CardPlay), context);
                 }
                 return;
             }
@@ -85,8 +85,8 @@ public sealed class DamageHandler : IOperationHandler
             if (powerTarget is null)
                 return;    // 源码语义：无目标 = 成功 no-op
             for (var hit = 0; hit < hits; hit++)
-                mirror.Simulator.Damage([powerTarget], finalDamage,
-                    props, dealer, mirror.Card, mirror.CardPlay);
+                RecordKills(mirror.Simulator.Damage([powerTarget], finalDamage,
+                    props, dealer, mirror.Card, mirror.CardPlay), context);
             return;
         }
 
@@ -104,15 +104,22 @@ public sealed class DamageHandler : IOperationHandler
                     .FromCard(card, mirror.CardPlay)
                     .Targeting(target)
                     .Simulate(mirror.Simulator);
+                if (context.Resolution is { } res)
+                    res.LastAttackKilled |= !target.IsAlive;
                 return;
             }
             case "all":
+            {
+                var enemies = mirror.CombatState.HittableEnemies.ToArray();
                 DamageCmd.Attack(finalDamage)
                     .WithHitCount(hits)
                     .FromCard(card, mirror.CardPlay)
                     .TargetingAllOpponents(mirror.CombatState)
                     .Simulate(mirror.Simulator);
+                if (context.Resolution is { } resAll)
+                    resAll.LastAttackKilled |= enemies.Any(enemy => !enemy.IsAlive);
                 return;
+            }
             case "random":
                 // 镜像层已按源码复刻 ExecuteWithResolvedTarget 的显式随机目标抽取
                 // （消耗一次 CombatTargets，结果不影响本路径）；命令自身的逐 hit 随机
@@ -126,5 +133,13 @@ public sealed class DamageHandler : IOperationHandler
             default:
                 throw new UnsupportedRuntimeSpecException(spec.Opcode, spec.Variant);
         }
+    }
+
+    /// <summary>源码 L1171：state.LastAttackKilled |= results.Any(r => r.WasTargetKilled)。</summary>
+    private static void RecordKills(IReadOnlyList<global::MegaCrit.Sts2.Core.Entities.Creatures.DamageResult> results,
+        OperationExecutionContext context)
+    {
+        if (context.Resolution is { } resolution)
+            resolution.LastAttackKilled |= results.Any(result => result.WasTargetKilled);
     }
 }
