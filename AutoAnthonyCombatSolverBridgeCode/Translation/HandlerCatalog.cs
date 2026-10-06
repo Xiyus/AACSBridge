@@ -102,6 +102,10 @@ public static class HandlerCatalog
                      "ncr_ostyalldamage", "ncr_healosty", "ncr_killosty",
                      // Osty 召唤（模拟器原生 SummonOsty API）
                      "ncr_summon", "ncr_summonx", "ncr_createsoulindrawx",
+                     // 更多简单变体
+                     "ncr_blocktripleostymaxhp", "ncr_addsweepinggazetohand",
+                     "ncr_upgraderandomdiscardcards", "cl_gainblockequaldamage",
+                     "cl_damageotherenemiesequal", "d_triggerdarkpassives", "cl_playtopdrawcard",
                  })
             registry.Register(new OperationKey("template_self_action", variant), templateSelf);
 

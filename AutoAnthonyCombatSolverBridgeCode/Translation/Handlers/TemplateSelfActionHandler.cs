@@ -134,6 +134,14 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "ncr_summon" => null,
             "ncr_summonx" => null,
             "ncr_createsoulindrawx" => null,
+            // 更多简单变体
+            "ncr_blocktripleostymaxhp" => null,
+            "ncr_addsweepinggazetohand" => null,
+            "ncr_upgraderandomdiscardcards" => null,
+            "cl_gainblockequaldamage" => null,
+            "cl_damageotherenemiesequal" => null,
+            "d_triggerdarkpassives" => null,
+            "cl_playtopdrawcard" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -752,6 +760,67 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 if (soulCount <= 0) return;
                 mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Soul>(
                     owner, PileType.Draw, soulCount, owner);
+                return;
+            }
+            case "ncr_blocktripleostymaxhp":
+            {
+                // 源码 L1866-1870：格挡 = Osty 最大生命 × multiplier
+                var osty = mirror.Simulator.State.GetOsty(owner);
+                if (osty is null) return;
+                var ostyMaxHp = mirror.Simulator.State.GetCreature(osty).MaxHp;
+                if (ostyMaxHp > 0)
+                    mirror.Simulator.GainBlock(owner.Creature, ostyMaxHp * 3,
+                        context.BlockProps, context.Mirror.Card, context.Mirror.CardPlay);
+                return;
+            }
+            case "ncr_addsweepinggazetohand":
+            {
+                // 源码：SweepingGaze 入手（SimpleHandDerivativeProducerTemplates）
+                mirror.Simulator.CreateAndAddGeneratedCardsToCombat<SweepingGaze>(
+                    owner, PileType.Hand, 1, owner);
+                return;
+            }
+            case "ncr_upgraderandomdiscardcards":
+            {
+                // 源码 L1797：升级弃牌堆中的随机卡（简化：升级第一张可升级卡）
+                var discard = mirror.Simulator.State.GetPlayerCombatState(owner).DiscardPile.Cards;
+                var upgradable = discard.FirstOrDefault(c => c.Preview.IsUpgradable);
+                if (upgradable is not null)
+                    global::CombatSolver.Engine.Common.PredictionUtils.UpgradeCard(upgradable.MutablePreview);
+                return;
+            }
+            case "cl_gainblockequaldamage":
+            {
+                // 源码 L1276-1279：格挡 = 本次伤害量（state.LastDamageDealt）
+                // 简化：格挡 = OperationAmount（直接打出时近似）
+                if (count > 0)
+                    mirror.Simulator.GainBlock(owner.Creature, count,
+                        context.BlockProps, context.Mirror.Card, context.Mirror.CardPlay);
+                return;
+            }
+            case "cl_damageotherenemiesequal":
+            {
+                // 源码 L1339-1343：对其他敌人造成等量伤害
+                var target = context.Mirror.CardPlay.Target;
+                if (target is null) return;
+                var others = mirror.CombatState.HittableEnemies
+                    .Where(e => !ReferenceEquals(e, target)).ToArray();
+                if (others.Length > 0 && count > 0)
+                    mirror.Simulator.Damage(others, count,
+                        context.DamageProps, owner.Creature, context.Mirror.Card, context.Mirror.CardPlay);
+                return;
+            }
+            case "d_triggerdarkpassives":
+            {
+                // 源码 L2237-2240：触发所有暗球的被动
+                var orbQueue = mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue;
+                foreach (var orb in orbQueue.Orbs.OfType<DarkOrb>().ToList())
+                    mirror.Simulator.OrbPassive(orb);
+                return;
+            }
+            case "cl_playtopdrawcard":
+            {
+                // 源码 L1328-1331：自动打出抽牌堆顶 1 张（no-op——嵌套出牌边界）
                 return;
             }
             default:
