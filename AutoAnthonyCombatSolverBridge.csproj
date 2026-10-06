@@ -47,13 +47,15 @@
         </Reference>
     </ItemGroup>
 
-    <!-- 仅编译期的 CombatSolver internal 适配 API publicize
-         （镜像注册表、AdaptedCardOnPlayMirrors、KnownPreRootSubscriberTypeNames 等）。
-         游戏运行时仍加载原版 CombatSolver.dll；这里只放宽编译期可见性——CombatSolver 自己的
-         第三方文档就是如此要求外部适配程序集接入这些入口的。 -->
+    <!-- 仅编译期的 publicize（运行时游戏加载原版 DLL，只放宽编译期可见性）：
+         1) CombatSolver：镜像注册表等 internal 适配 API（其第三方文档指定的接入方式）；
+         2) AutoAnthony：ChaosOperationExecutor.EffectiveRuntimeSpec 等 internal 执行投影——
+            数值解析直接复用 AutoAnthony 自己的逻辑，保证与真实执行一致；
+            守卫已逐成员核验这些 internal 入口存在，版本漂移时 fail-closed。 -->
     <ItemGroup>
         <PackageReference Include="Krafs.Publicizer" Version="2.3.0" PrivateAssets="All"/>
         <Publicize Include="CombatSolver" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
+        <Publicize Include="AutoAnthony" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
     </ItemGroup>
 
     <ItemGroup>

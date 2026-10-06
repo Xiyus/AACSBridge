@@ -46,11 +46,13 @@ public static class CompatibilityGuard
     // --- AutoAnthony 契约：桥依赖的类型与成员 -----------------------------------------------
     private static readonly (string Type, string[] Members)[] AutoAnthonyContract =
     [
-        ("AutoAnthony.ChaosCardModel", ["Generated", "Definition", "AfterCardEnteredCombat", "OnPlay", "IsClone"]),
+        ("AutoAnthony.ChaosCardModel", ["Generated", "Definition", "AfterCardEnteredCombat", "OnPlay", "IsClone",
+            "OperationAmount", "CapturedExternalDamageBonus", "ExtraDamage", "ExtraBlock", "IsUpgraded", "HasStarCostX", "EnergyCost"]),
         ("AutoAnthony.ChaosCardDefinition", ["Slot", "Card", "RuntimeSpecs", "UpgradeValueSlots"]),
         ("AutoAnthony.ChaosCardRegistry", ["IsGeneratedCardId", "TryGetGeneratedCardSlot", "Types", "TypesFor"]),
         ("AutoAnthony.ChaosRunDefinitions", ["ForSlot", "GetCards", "GetAllCards"]),
-        ("AutoAnthony.ChaosOperationExecutor", ["Play", "EffectiveRuntimeSpec", "RequiresCompositePower"]),
+        ("AutoAnthony.ChaosOperationExecutor", ["Play", "EffectiveRuntimeSpec", "RequiresCompositePower",
+            "RuntimeSpecValue", "DamagePropsForCardEffect", "BlockPropsForCardEffect"]),
         ("AutoAnthony.ChaosCompositePower", ["Definition", "Configure", "FireTriggers"]),
         ("AutoAnthony.ComponentRuntimeApi", ["Register", "RegisterPackage", "ApiVersion"]),
         ("ChaosCardGenerator.GeneratedCard", ["Operations", "Cost", "Type", "Target", "Rarity", "Character", "StarCost", "HasStarCostX", "Tags"]),
@@ -82,6 +84,7 @@ public static class CompatibilityGuard
         ("CombatSolver.Engine.InCombat.Mirrors.Cards.OnPlay.CardOnPlayMirrors", ["Registry"]),
         ("CombatSolver.Engine.InCombat.Mirrors.Cards.OnPlay.CardOnPlayMirrorContext", ["CardPlay", "Target", "OwnerState"]),
         ("CombatSolver.Engine.InCombat.Mirrors.Cards.CardIsPlayableMirrors", ["Registry"]),
+        ("CombatSolver.Engine.InCombat.Mirrors.Cards.CardIsPlayableMirrorContext", []),
         ("CombatSolver.Engine.InCombat.Simulation.CombatPredictionSimulator",
             ["Damage", "GainBlock", "GainEnergy", "LoseEnergy", "GainStars", "Draw", "Shuffle", "Discard", "Exhaust", "Heal", "Kill", "Upgrade"]),
         ("CombatSolver.Engine.InCombat.Simulation.CombatPredictionRngSet", []),

@@ -17,14 +17,15 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 
 ---
 
-## 当前状态：v0.0.4（观察模式）——里程碑①–④已全部实机验证
+## 当前状态：v0.1.0（翻译层生效）——里程碑①–④已实机验证
 
 | 里程碑 | 内容 | 状态 |
 |---|---|---|
-| ① | 空模板 Mod 能编译并被游戏加载 | ✅ 实机验证（游戏日志：DLL 加载 + 初始化器调用） |
-| ② | 同时引用 AutoAnthony.dll + CombatSolver.dll | ✅ 实机验证（守卫全绿：版本/MVID/SHA256 与锁定值一致） |
-| ③ | 识别 `ChaosCardModel`（AutoAnthony 生成牌） | ✅ 实机验证（战斗开始即逐卡识别） |
-| ④ | 把生成卡的全部 `OperationRuntimeSpec` 打进日志 | ✅ 实机验证（12 卡 / 24 操作 / 24 spec 全转储，零缺失零不一致） |
+| ① | 空模板 Mod 能编译并被游戏加载 | ✅ 实机验证 |
+| ② | 同时引用 AutoAnthony.dll + CombatSolver.dll | ✅ 实机验证（守卫全绿，MVID/SHA256 与锁定值一致） |
+| ③ | 识别 `ChaosCardModel`（AutoAnthony 生成牌） | ✅ 实机验证 |
+| ④ | 把生成卡的全部 `OperationRuntimeSpec` 打进日志 | ✅ 实机验证（12 卡 / 24 操作 / 24 spec 零缺失） |
+| 0.1.0 | Damage/Block/Draw/Energy 翻译 + 镜像注册 | ✅ 编译通过，待实机验证 |
 
 实测样例（spec-dump.log）：
 
@@ -34,12 +35,35 @@ CHAOS_CARD id=CARD.CHAOS_CARD000 title="岿然防御" type=Skill cost=1 ... oper
     spec schema=1 opcode=gain_block variant=immediate target=self zones=none->none filter=any flags=[block_reference,...] values=[block=4 src=fixed off=0 up] condition=- trigger=-
 ```
 
-实测覆盖的 opcode：`deal_damage` / `apply_power` / `gain_block` / `template_independent_action` /
-`trigger` / `upgrade_card` / `exhaust_card` / `modify_block` / `modify_hits`。
+### 0.1.0 支持矩阵（与 AutoAnthony 组件目录逐形状核对）
 
-0.0.4 **不向 CombatSolver 注册任何镜像**（fail-closed：部分适配比完全不适配更危险）。
-进入战斗后桥只做两件事：识别生成牌、转储 RuntimeSpec。CombatSolver 对 AutoAnthony 内容
-的既有行为不变。
+| Opcode | 支持形状 | 目录条目数 |
+|---|---|---|
+| `deal_damage` | (selected, selected_enemy) / (all, all_enemies)，fixed 值 + 可选 fixed hits | 131 + 32 |
+| `gain_block` | (immediate, self)，fixed 值 | 78 |
+| `draw_cards` | (immediate, self)，fixed 值 | 50 |
+| `gain_energy` | (immediate, self)，fixed 值 | 30 |
+| `lose_hp` | (immediate, self) / (immediate, selected_enemy)，fixed 值 | 8 + 2 |
+| `heal` | (immediate, self)，fixed 值 | 1 |
+
+**卡级生效条件**：卡上全部操作都在矩阵内，且不触发以下任一排除项（fail-closed，逐项对应后续里程碑）：
+
+- X 费卡（`CostsX`/`HasStarCostX`）与 X 值源槽（`energy_x`/`star_x`/`special_x`）→ 0.4.0；
+- Modifier / AbilityTrigger / ConditionalTrigger / AbilityRule scope 操作（修饰符数学、触发器、复合 Power）→ 0.2.0/0.6.0；
+- 玩家选牌（选择器模板 / `CardTargetSlot`）→ 0.5.0；
+- 随机目标引用（`random_enemy_reference`）、事件目标、历史计数、阈值翻倍 → 0.4.0；
+- Power 类型卡上的 `deal_damage`（Unpowered 逐 hit 路径）→ 0.2.0；
+- 结构性升级（RepeatOperation / ExecuteOperationOnPlay / ChooseExhaust / 衍生卡升级等）。
+
+**支持矩阵外的卡打出时：整场搜索中止**（`IncompatibleGameplayModException`，玩家看到"内容性 Mod 暂未适配"）——绝不静默当空操作给出错误预测。这是 CombatSolver 官方适配纪律（"部分适配比完全不适配更危险"）与本桥设计红线的直接体现。
+
+### 0.1.0 架构要点
+
+- **一个通用镜像解释全部 500+ 具体卡类**：镜像派发按精确运行时类型匹配（receiver 是保持运行时类型的 MutablePreview 克隆），注册器反射枚举 AutoAnthony 六个家族 + 其他已加载程序集的全部具体 `ChaosCardModel` 子类逐个登记 `CardOnPlayMirrors`/`CardIsPlayableMirrors`；
+- **数值解析复用 AutoAnthony 自己的 internal 投影**（publicized 编译期引用）：`OperationAmount`（live DynamicVar 优先）、`EffectiveRuntimeSpec`（升级 delta）、`RuntimeSpecValue`（按槽解析）、`DamagePropsForCardEffect`/`BlockPropsForCardEffect`（ValueProp 语义）——与真实执行逐位一致；
+- **预校验-后执行**：`ChaosCardOnPlayMirror` 先整卡校验（上面全部排除项），任何不支持 → `PredictionUnsupportedException.ForContent` → 整场搜索中止；
+- **命令级精确镜像**：伤害走 `DamageCmd.Attack(...).WithHitCount(hits).FromCard(card, cardPlay).Targeting(...).Simulate(simulator)`（与 CombatSolver 内置镜像同款），格挡/抽牌/能量/失血/治疗走 simulator 对应入口，props 与 dealer 语义逐一对齐源码（含 lose_hp 6 参重载内部 `dealer = cardSource?.Owner.Creature` 的反编译核实）；
+- **IsPlayable 镜像**复刻混沌卡唯一的重写子句（`C:playableIfDrawPileEmpty` → 模拟分支抽牌堆为空），读分支状态。
 
 ### 目录结构
 
@@ -61,13 +85,25 @@ AutoAnthonyCombatSolverBridge/
     │   ├── ChaosCardResolver.cs              # CardModel → 完整结构化定义（一次解析）
     │   └── RuntimeSpecReader.cs              # RuntimeSpec → 稳定格式的日志行
     ├── CombatSolver/
-    │   └── CombatSolverRegistrar.cs          # 注册器（0.0.4 刻意零注册，0.1.0 填充）
+    │   ├── CombatSolverRegistrar.cs          # 镜像注册器：反射枚举全部具体卡类逐个登记（精确类型派发）
+    │   ├── ChaosCardOnPlayMirror.cs          # 通用 OnPlay 镜像：整卡预校验 → 逐操作翻译执行
+    │   └── ChaosCardIsPlayableMirror.cs      # IsPlayable 镜像：抽牌堆为空子句
     ├── Translation/
     │   ├── OperationKey.cs                   # (Opcode, Variant) 路由键
-    │   ├── IOperationHandler.cs              # 翻译器接口（0.1.0 起承载执行）
-    │   ├── OperationHandlerRegistry.cs       # 处理器注册表
+    │   ├── OperationShape.cs                 # 操作形状（索引/scope/生效 spec）
+    │   ├── OperationExecutionContext.cs      # 执行上下文（镜像上下文 + 数值解析复用 AA internal 投影）
+    │   ├── IOperationHandler.cs              # 翻译器接口（ValidateSupport + Execute）
+    │   ├── OperationHandlerRegistry.cs       # 处理器注册表（显式键）
+    │   ├── HandlerCatalog.cs                 # 0.1.0 支持矩阵登记
     │   ├── RuntimeSpecTranslator.cs          # spec → handler（无 handler 即抛异常）
-    │   └── UnsupportedRuntimeSpecException.cs
+    │   ├── UnsupportedRuntimeSpecException.cs
+    │   └── Handlers/
+    │       ├── DamageHandler.cs              # deal_damage(selected/all)
+    │       ├── BlockHandler.cs               # gain_block(immediate)
+    │       ├── DrawHandler.cs                # draw_cards(immediate)
+    │       ├── EnergyHandler.cs              # gain_energy(immediate)
+    │       ├── LoseHpHandler.cs              # lose_hp(immediate, self/selected_enemy)
+    │       └── HealHandler.cs                # heal(immediate)
     ├── Patches/
     │   └── RuntimeSpecDumpPatch.cs           # 里程碑③④：CombatState.AddCard 只读转储（开局牌组+战斗中生成牌全覆盖）
     └── Diagnostics/
@@ -151,23 +187,41 @@ dotnet build -c Debug
 
 | 版本 | 内容 |
 |---|---|
-| 0.0.1–0.0.4 | ✅ 模板 / 双 DLL 引用 / 守卫 / ChaosCard 识别 / RuntimeSpec 转储 |
-| 0.1.0 | Damage / Block / Draw / Energy 四个 handler + `CardOnPlayMirrors`/`CardIsPlayableMirrors` 注册 |
-| 0.2.0 | Power / Debuff（`SimulatedCombatState.Apply`） |
+| 0.0.1–0.0.4 | ✅ 模板 / 双 DLL 引用 / 守卫 / ChaosCard 识别 / RuntimeSpec 转储（全部实机验证） |
+| 0.1.0 | ✅ Damage / Block / Draw / Energy(+lose_hp/heal) handler + 逐具体类镜像注册 + fail-closed 校验 |
+| 0.2.0 | Power / Debuff（`SimulatedCombatState.Apply`）+ Power 卡 Unpowered 伤害路径 + 修饰符数学 |
 | 0.3.0 | 牌堆移动（Discard / Exhaust / Create / Shuffle） |
-| 0.4.0 | Target 展开 / X 费 / 模拟 RNG |
+| 0.4.0 | Target 展开 / X 费 / 模拟 RNG（随机目标引用、事件目标、历史计数、阈值翻倍） |
 | 0.5.0 | Player Choice（选牌分支） |
 | 0.6.0 | Trigger / `ChaosCompositePower` 跨回合（含 `PowerHiddenStateMirrors`） |
 | 0.7.0 | 生成牌递归模拟 |
 | 0.8.0 | 全 Component Catalog 审计（931 条 spec 逐条核对） |
 | 1.0.0 | strict diff 全通过 + PredictionGaps = 0 → 发布 |
 
-## 已知边界（0.0.4）
+## 0.1.0 实机验证指引
 
-- 桥对 CombatSolver 的适配 API **只做反射验证，尚未调用**——publicizer 已在 csproj 配好，
-  0.1.0 直接可用；运行时游戏加载的仍是原版 `CombatSolver.dll`。
-- AutoAnthony 侧只用公共 API（`Generated` / `Definition` / `Operations` / `RuntimeSpec`）。
-  `ChaosOperationExecutor.EffectiveRuntimeSpec`（含升级 delta 的执行视角）是 internal，
-  0.1.0 需要时再评估：走 publicizer 或自算升级投影。
+1. 启动游戏（AutoAnthony + CombatSolver + 本桥），日志确认：
+   `[AA-CS Bridge] 翻译表就绪：7 个 (Opcode, Variant) 形状。`
+   `[AA-CS Bridge] 已登记 N 个具体 Chaos 卡类型的 OnPlay/IsPlayable 镜像。`（N ≈ 514）
+2. 开一局进入战斗，让 CombatSolver 执行搜索（自动或手动）：
+   - 手牌里有**矩阵内的简单牌**（纯 deal_damage / gain_block / draw / energy 组合，参考
+     spec-dump.log 里 `opcode=deal_damage variant=selected` 这类行）→ 搜索应正常完成，
+     路线里打出该牌的预测应与实际一致；
+   - 手牌里有**矩阵外的牌**（带 Modifier/触发器/选牌等）→ 搜索中止，CombatSolver 面板
+     显示失败，日志出现 `IncompatibleGameplayModException` + 桥的中文原因（指明卡牌、
+     操作索引、排除原因）——这是设计行为（fail-closed），不是 bug。
+3. 验收口径（CombatSolver 官方标准）：预测状态与真实执行状态严格 diff 零差异 +
+   PredictionGaps 非补偿项为空；反向对照——把某张矩阵内的牌打出前后的预测/实际对比。
+
+## 已知边界（0.1.0）
+
+- 支持矩阵覆盖目录 931 条中的约 332 条形状（四类 opcode 家族），但**卡级生效**要求整卡
+  全部操作在矩阵内——实测开局牌组约 1–2/10 张卡满足；其余卡打出时搜索中止。这是
+  fail-closed 的代价，随 0.2.0+ 逐里程碑扩大覆盖。
+- 晚于本桥加载的外部角色 Mod（`ExternalChaosCardModel` 子类）无法被枚举登记——这类 Mod
+  需声明对本桥的 manifest 依赖以保证加载顺序。
+- 数值解析复用 AutoAnthony 的 internal 投影（`OperationAmount`/`EffectiveRuntimeSpec`/
+  `RuntimeSpecValue` 等，publicized 编译期引用 + 守卫成员级核验）——AutoAnthony 更新
+  改动这些 internal 时守卫会 fail-closed 禁用桥，而不是给出错误预测。
 - 仓库源码研究基于 AutoAnthony 0.3.119，编译与运行时锁定针对已安装的 0.3.137；
   守卫的成员级自检就是为这个版本差准备的。

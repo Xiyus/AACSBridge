@@ -27,8 +27,7 @@ public static class BridgeBootstrap
 
         CombatSolverRegistrar.Initialize(report);
 
-        BridgeLog.Info("观察模式（v0.0.4）：AutoAnthony 卡牌识别与 RuntimeSpec 转储已激活。" +
-                       "进入任意带生成牌的战斗，留意 CHAOS_CARD 日志行（同时写入 " +
-                       "<用户数据>/AutoAnthonyCombatSolverBridge/spec-dump.log）。");
+        BridgeLog.Info("0.1.0 生效：ChaosCard 的 OnPlay/IsPlayable 镜像已登记，简单即时牌（伤害/格挡/抽牌/能量/失血/治疗）可被精确预测。" +
+                       "支持矩阵外的卡打出时整场搜索中止（fail-closed）。进入战斗后留意 CHAOS_CARD 转储行与 CombatSolver 的搜索行为。");
     }
 }
