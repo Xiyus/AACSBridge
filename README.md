@@ -17,7 +17,7 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 
 ---
 
-## 当前状态：v0.3.0（牌堆移动翻译生效）——里程碑①–④已实机验证
+## 当前状态：v0.6.0（触发器 / 复合 Power 实现，离线验证通过，待实机严格 diff）
 
 | 里程碑 | 内容 | 状态 |
 |---|---|---|
@@ -28,6 +28,54 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 | 0.3.0 | 牌堆移动：exhaust/discard(all) + create_copy + draw_and_discard | ✅ 实机验证（严格 diff 零差异 + **生成牌递归**） |
 | 0.4.0 | X 费卡（OnPlay X 解析复刻）+ 随机目标（分支 RNG 消耗对齐） | ✅ 编译+注册就绪（本局未抽到 X 费/随机卡，待自然验证） |
 | 0.5.0 | 玩家选牌：exhaust/discard/move(selected) | ✅ 实机验证（**选牌分支 5551 展开 + 计划选择部署 + 严格 diff 零差异**） |
+| 0.6.0 | 受限 Trigger / ChaosCompositePower + 根捕获 / Fork / 指纹 / 续接核对 | ✅ 编译与离线契约验证；**尚未实机验收** |
+
+### 0.6.0 实现范围与验证（2026-10-06）
+
+初始化时登记复合 Power 的事件镜像和 `PowerHiddenStateMirrors`，并预热规范 Power 的
+DynamicVars。OnPlay 先校验整卡，只执行即时操作；挂靠 `triggerIndex` 的收益被跳过，
+最后按 AutoAnthony 的配置路径武装一个独立的、可实例化的模拟 Power。
+
+| 触发器 Kind | Lifetime | 行为 |
+|---|---|---|
+| `next_turn_start` | `next_turn` | 下一次己方回合开始触发一次，随后清理无存活效果的容器 |
+| `next_turns_start` | `next_n_turns` | 每次己方回合开始触发，递减捕获的次数 |
+| `turn_start` | `combat` | 永久 Power 每次己方回合开始触发 |
+| `turn_end` | `combat` | 己方 AutoPostPlay 阶段触发 |
+| `card_played` / `attack_played` / `skill_played` / `power_played` | `combat` | 按事件和卡类型触发；跳过武装该 Power 的第一次出牌回调 |
+| `card_drawn` / `card_exhausted` | `combat` | 仅响应 Owner 的抽牌 / 消耗事件 |
+
+**触发收益**只放行 fixed 数值的 `gain_block/immediate/self`、`gain_energy/immediate/self`、
+`heal/immediate/self`、`deal_damage/all/all_enemies` 和 `deal_damage/random/random_enemy`。
+复刻脱离牌堆的来源代理：保存原定义、升级态、捕获值与 X 值；格挡使用 Unpowered，
+伤害按来源类型使用 Unpowered 或 Unpowered|Move，随机目标消费模拟分支 RNG。
+触发收益中的抽牌、选牌、牌堆移动、Power、事件目标、X 值源、Modifier、AbilityRule、
+结构升级、外部角色 Profile 及其余触发器继续拒绝。
+
+隐藏状态由独立的 `ChaosCompositePredictionState` 保存。根捕获从实机 Power 复制，Fork
+深复制 Power、捕获值数组与触发计数；AA checksum schema 5 的固定字段和变长定义 / 捕获值
+进入搜索指纹。由于 Solver 的 `PowerHiddenStateMirrors` 尚未提供续接追加入口，本桥还对
+**Solver 的 `ContinuationStamp.AppendPowers`** 增补精确状态文本，两侧均包含完整捕获值和
+定义 payload，隐藏次数失配会使续用失效；不只比较 Power.Amount。
+
+**生命周期接缝限制**：当前 Solver 未提供有序 `AfterSideTurnStart` 第三方入口。本桥只补丁
+Solver 的模拟生命周期，不修改真实游戏或 AutoAnthony；发现其他同阶段覆写监听者时，
+回合开始收益明确拒绝，避免近似监听顺序。触发链采用直接重入抑制和 64 层深度保护；
+模拟输入 / 回合边界间每个触发器最多验证 20 次，无法精确区分的怪物 / 选择续接时间点
+若超过预算则硬失败，收益出现 pending choice 同样拒绝，绝不丢弃后续收益。
+
+选牌仍只支持单个、位于最后的选择型操作。选牌后还有操作的卡被保守排除，避免 OwnChoice
+把选牌移到末尾后改变 `card_exhausted` 等新接入事件的执行顺序。
+
+离线检查使用**实际安装的原版 DLL**验证支持矩阵、目录原子形状、错误 hash 拒绝、
+私有接缝签名、Power 隐藏状态 / hook 注册、Harmony 补丁目标、隐藏计数续接差异、兄弟分支
+隔离及触发结算中的 Fork 拒绝，见 `tests/BridgeChecks`。这些检查不代表实机严格 diff 已通过。
+本机结果：**35 项检查通过**，目录中 21 个触发原子、27 个收益原子落在受限形状内；
+原子数不等于可打卡数，仍须逐卡校验全部操作与挂靠关系。
+
+实机验收仍需：单次 / 多次延迟、永久回合开始 / 结束、出牌 / 抽牌 / 消耗事件各提供 fixture，
+逐动作严格 diff 零差异且 PredictionGaps 非补偿项为空；增加从已有 Power 中途捕获根、两个
+同槽但不同定义的实例、升级态、RNG 消耗及移除登记后的反向对照。
 
 ### 0.5.0 实机验证记录（2026-10-06 铁甲局）
 
@@ -96,7 +144,7 @@ CHAOS_CARD id=CARD.CHAOS_CARD000 title="岿然防御" type=Skill cost=1 ... oper
 - ~~玩家选牌（exhaust/discard/move 的 selected）~~ → **0.5.0 已支持**（`CardChoiceMirrors` 登记原生 Effect，求解器在 OwnChoice 阶段展开分支并施加效果；单选卡限制——多选卡仍拒绝）；
 - Modifier scope 操作，**唯一例外**：`M:base/strength_scaled`（0.2.0 已建模，整数除法后乘）；
   其余修饰符（modify_damage/modify_hits 家族）→ 后续版本；
-- AbilityTrigger / ConditionalTrigger / AbilityRule scope 操作（触发器、复合 Power）→ 0.6.0；
+- AbilityTrigger / ConditionalTrigger 的受限复合 Power 形状 → **0.6.0 已实现**（范围与限制见上）；AbilityRule 与其余触发组合继续排除；
 - 玩家选牌（选择器模板 / `CardTargetSlot`）→ 0.5.0；
 - 事件目标（event_enemy）、历史计数（cards_played_combat）、阈值翻倍（selected_energy_x_threshold）→ 后续版本；
 - 结构性升级（RepeatOperation / ExecuteOperationOnPlay / ChooseExhaust / 衍生卡升级等）。
@@ -145,7 +193,10 @@ AutoAnthonyCombatSolverBridge/
     ├── CombatSolver/
     │   ├── CombatSolverRegistrar.cs          # 镜像注册器：反射枚举全部具体卡类逐个登记（精确类型派发）
     │   ├── ChaosCardOnPlayMirror.cs          # 通用 OnPlay 镜像：整卡预校验 → 逐操作翻译执行
-    │   └── ChaosCardIsPlayableMirror.cs      # IsPlayable 镜像：抽牌堆为空子句
+    │   ├── ChaosCardIsPlayableMirror.cs      # IsPlayable 镜像：抽牌堆为空子句
+    │   ├── ChaosTriggerPolicy.cs             # 0.6.0 受限触发器/收益支持矩阵
+    │   ├── ChaosCompositePowerMirror.cs      # 武装、事件派发、延迟次数、移除、根校验
+    │   └── ChaosCompositePredictionState.cs  # 脱离实机的隐藏状态、深 Fork、指纹
     ├── Translation/
     │   ├── OperationKey.cs                   # (Opcode, Variant) 路由键
     │   ├── OperationShape.cs                 # 操作形状（索引/scope/生效 spec）
@@ -176,15 +227,15 @@ AutoAnthonyCombatSolverBridge/
 |---|---|---|
 | Slay the Spire 2 | 0.111.0 | — |
 | AutoAnthony | 0.3.137 | `ad004f42f18ed86ccc7f66317823cf77fb40195b6466872bbd7038b3d8952965` |
-| CombatSolver | 0.50.0 | `304699188c544c34795d5409e8811d2f4901412903da5bc4ba4b8043d5b5d2bd` |
+| CombatSolver | 0.50.1 | `832060172aa5eae8d79546f120a10e4571c324b7c0d6ab2c6abc2bcad24323cd` |
 
 `CompatibilityGuard` 在 Mod 初始化时做运行时自检（CombatSolver 第三方适配文档的要求）：
 
-- 两个程序集已加载、manifest 版本 ≥ 锁定最低版（AutoAnthony 0.3.137 / CombatSolver 0.50.0）；
+- 两个程序集已加载、manifest 版本 ≥ 锁定最低版（AutoAnthony 0.3.137 / CombatSolver 0.50.1）；
 - 关键类型/成员签名逐个存在（`ChaosCardModel.Generated`、`CardOnPlayMirrors.Registry`、
   `AdaptedCardOnPlayMirrors.Register`、`KnownPreRootSubscriberTypeNames` 等，全反射、零硬引用）；
 - `OperationRuntimeSpec.CurrentSchemaVersion == 1`（schema 变了 = 拒绝启用）；
-- 记录两个 DLL 的 MVID + SHA256 到日志；
+- 记录两个 DLL 的 MVID + SHA256 到日志；**0.6.0 私有生命周期接缝要求上表的精确 SHA256**，不匹配时整体禁用；
 - 审计 `ChaosCardModel.OnPlay` 上的 Harmony 补丁（决定 0.1.0 走普通注册表还是 `AdaptedCardOnPlayMirrors`）。
 
 **任何一项失败 → 桥整体禁用，一个补丁都不打、一个镜像都不注册**（日志会列出全部失败原因）。
@@ -217,7 +268,7 @@ dotnet build -c Debug
 ## 验证里程碑 ①–④
 
 1. 启动游戏（装着 AutoAnthony + CombatSolver + 本桥），主菜单不报错 → ①；
-2. 日志出现 `[AA-CS Bridge] 桥已启用：AutoAnthony 0.3.137（MVID ...）+ CombatSolver 0.50.0（MVID ...）`（含 MVID/SHA256）→ ②；
+2. 日志出现 `[AA-CS Bridge] 桥已启用：AutoAnthony 0.3.137（MVID ...）+ CombatSolver 0.50.1（MVID ...）`（含 MVID/SHA256）→ ②；
 3. 开一局带生成牌的战斗，日志出现 `CHAOS_CARD id=... operations=N specs_present=N` → ③；
 4. 每张牌下面逐条 `op[i] template=... scope=...` 与 `spec schema=1 opcode=... variant=... target=... zones=... flags=... values=...` → ④。
 
@@ -252,7 +303,7 @@ dotnet build -c Debug
 | 0.3.0 | ✅ 牌堆移动：exhaust_card/discard_card(all) + create_copy(this_card) + draw_and_discard(nonzero_cost)（严格 diff + 生成牌递归实机验证） |
 | 0.4.0 | ✅ X 费卡（OnPlay X 解析复刻）+ 随机目标（分支 RNG 消耗对齐） |
 | 0.5.0 | ✅ 玩家选牌：exhaust/discard/move(selected)——CardChoiceMirrors 原生 Effect 登记（**选牌分支 5551 展开 + 计划选择部署 + 严格 diff 零差异**实机验证） |
-| 0.6.0 | Trigger / `ChaosCompositePower` 跨回合（含 `PowerHiddenStateMirrors`） |
+| 0.6.0 | ✅ 受限 Trigger / `ChaosCompositePower` 跨回合，隐藏状态根捕获 / Fork / 指纹 / 续接（编译和离线检查通过，待实机严格 diff） |
 | 0.7.0 | 生成牌递归模拟 |
 | 0.8.0 | 全 Component Catalog 审计（931 条 spec 逐条核对） |
 | 1.0.0 | strict diff 全通过 + PredictionGaps = 0 → 发布 |

@@ -36,6 +36,7 @@ public static class CombatSolverRegistrar
         // 1. 翻译表
         HandlerCatalog.RegisterAll(OperationHandlerRegistry.Instance);
         BridgeLog.Info($"翻译表就绪：{OperationHandlerRegistry.Instance.Count} 个 (Opcode, Variant) 形状。");
+        ChaosCompositePowerMirror.Register();
 
         // 2. 镜像登记（逐具体类型）
         var registered = 0;
@@ -58,11 +59,11 @@ public static class CombatSolverRegistrar
         foreach (var failure in failures)
             BridgeLog.Warn($"镜像登记失败：{failure}");
         if (failures.Count > 0)
-            BridgeLog.Warn("存在登记失败的类型：这些卡在预测中会按未适配处理（fail-closed）。");
+            throw new InvalidOperationException("存在镜像登记失败，桥的预测执行门禁不会开启：" + string.Join("; ", failures));
 
         var cs = report.CombatSolver;
         BridgeLog.Info($"CombatSolver 适配面核验：缺失类型 {cs.MissingTypes.Count} 个、缺失成员 {cs.MissingMembers.Count} 个。");
-        BridgeLog.Info("0.5.0 生效范围：即时牌 + apply_power(20 variant) + Power 卡伤害 + strength_scaled 修饰符 + " +
+        BridgeLog.Info("0.6.0 生效范围：受限 Trigger/ChaosCompositePower + 隐藏状态捕获/分支指纹/续接核对；即时牌 + apply_power(20 variant) + Power 卡伤害 + strength_scaled 修饰符 + " +
                        "牌堆移动 + X 费卡 + 随机目标 + 玩家选牌（exhaust/discard/move 的 selected——" +
                        "CardChoiceMirrors 登记原生 Effect，求解器展开分支并施加）。" +
                        "矩阵外的卡（触发器等）保守排除（模拟中不可打），绝不给出错误预测。");

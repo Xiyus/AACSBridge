@@ -68,6 +68,8 @@
         <Compile Remove="materials/**" />
         <Compile Remove="shaders/**" />
         <Compile Remove="images/**" />
+        <Compile Remove=".research/**" />
+        <Compile Remove="tests/**" />
         <EmbeddedResource Remove="AutoAnthonyCombatSolverBridge/**" />
         <EmbeddedResource Remove="materials/**" />
         <EmbeddedResource Remove="shaders/**" />
@@ -97,7 +99,7 @@
                 Condition="'$(CombatSolverDllDir)' == '' or !Exists('$(CombatSolverDllDir)/CombatSolver.dll')" />
     </Target>
 
-    <Target Name="CopyToModsFolderOnBuild" AfterTargets="PostBuildEvent">
+    <Target Name="CopyToModsFolderOnBuild" AfterTargets="PostBuildEvent" Condition="'$(SkipModDeploy)' != 'true'">
         <Message Text="正在复制 .dll .pdb 和 .json 到游戏 mods 目录。" Importance="high" />
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
         <Copy SourceFiles="$(AssemblyName).json" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />

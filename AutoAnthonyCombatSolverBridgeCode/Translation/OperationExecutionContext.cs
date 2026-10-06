@@ -23,7 +23,8 @@ public sealed record OperationExecutionContext(
     CardOnPlayMirrorContext Mirror,
     ChaosCardModel Card,
     OperationShape Shape,
-    Creature? ResolvedTarget = null)
+    Creature? ResolvedTarget = null,
+    bool IsTriggered = false)
 {
     /// <summary>
     /// 主数值：OperationAmount（live DynamicVar 优先，含升级/成长）+ 非卡牌的外部伤害加成。
@@ -45,8 +46,8 @@ public sealed record OperationExecutionContext(
         => ChaosOperationExecutor.RuntimeSpecValue(Card, Shape.OperationIndex, slotId, fallback);
 
     /// <summary>伤害命令的 props（与 DamagePropsForCardEffect 一致：Power 卡 Unpowered，否则 Move）。</summary>
-    public ValueProp DamageProps => ChaosOperationExecutor.DamagePropsForCardEffect(Card.Type);
+    public ValueProp DamageProps => ChaosOperationExecutor.DamagePropsForCardEffect(Card.Type, IsTriggered, !IsTriggered);
 
     /// <summary>格挡命令的 props（与 BlockPropsForCardEffect 一致）。</summary>
-    public ValueProp BlockProps => ChaosOperationExecutor.BlockPropsForCardEffect(Card.Type);
+    public ValueProp BlockProps => ChaosOperationExecutor.BlockPropsForCardEffect(Card.Type, IsTriggered);
 }

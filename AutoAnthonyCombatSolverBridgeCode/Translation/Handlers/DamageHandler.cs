@@ -54,7 +54,7 @@ public sealed class DamageHandler : IOperationHandler
         var mirror = context.Mirror;
 
         // Power 卡：Unpowered 逐 hit 路径（源码 L1119-1153）
-        if (card.Type == CardType.Power)
+        if (card.Type == CardType.Power || context.IsTriggered)
         {
             var props = context.DamageProps;    // Power → ValueProp.Unpowered
             var dealer = card.Owner.Creature;

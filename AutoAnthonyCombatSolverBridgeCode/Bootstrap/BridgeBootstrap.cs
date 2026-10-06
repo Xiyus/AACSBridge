@@ -14,6 +14,9 @@ namespace AutoAnthonyCombatSolverBridge.Bootstrap;
 /// </summary>
 public static class BridgeBootstrap
 {
+    public static bool IsReady { get; private set; }
+    internal static void MarkReady() => IsReady = true;
+
     public static void Initialize(CompatibilityReport report)
     {
         var aa = report.AutoAnthony;
@@ -27,7 +30,7 @@ public static class BridgeBootstrap
 
         CombatSolverRegistrar.Initialize(report);
 
-        BridgeLog.Info("0.5.0 生效：即时牌 + apply_power + 牌堆移动 + X 费 + 随机目标 + 玩家选牌（分支展开）可被精确预测。" +
+        BridgeLog.Info("0.6.0 生效：受限触发器 + ChaosCompositePower（隐藏状态分支隔离、指纹与续接核对）；即时牌 + apply_power + 牌堆移动 + X 费 + 随机目标 + 玩家选牌（分支展开）。" +
                        "矩阵外的卡保守排除（模拟中不可打）。进入战斗后留意 CHAOS_CARD 转储行与 CombatSolver 的搜索行为。");
     }
 }

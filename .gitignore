@@ -1,5 +1,6 @@
 .godot/
 bin/
+obj/
 /android/
 .git/
 .idea/
@@ -11,3 +12,4 @@ packages/
 *.user
 Directory.Build.props
 LocalDependencies.props
+.research/

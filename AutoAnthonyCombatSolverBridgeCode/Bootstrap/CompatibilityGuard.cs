@@ -27,8 +27,8 @@ public sealed record CompatibilityReport(
 {
     public const string MinimumAutoAnthonyVersion = "0.3.137";
     public const string TestedAutoAnthonyVersion = "0.3.137";
-    public const string MinimumCombatSolverVersion = "0.50.0";
-    public const string TestedCombatSolverVersion = "0.50.0";
+    public const string MinimumCombatSolverVersion = "0.50.1";
+    public const string TestedCombatSolverVersion = "0.50.1";
 }
 
 /// <summary>
@@ -54,7 +54,9 @@ public static class CompatibilityGuard
         ("AutoAnthony.ChaosRunDefinitions", ["ForSlot", "GetCards", "GetAllCards"]),
         ("AutoAnthony.ChaosOperationExecutor", ["Play", "EffectiveRuntimeSpec", "RequiresCompositePower",
             "RuntimeSpecValue", "DamagePropsForCardEffect", "BlockPropsForCardEffect", "ExecutableOperationCount"]),
-        ("AutoAnthony.ChaosCompositePower", ["Definition", "Configure", "FireTriggers"]),
+        ("AutoAnthony.ChaosCompositePower", ["Definition", "Configure", "FireTriggers", "ConfigureTinkered",
+            "CaptureMultiplayerState", "HasLiveEffects", "CapturedOperationValues", "WaitForNextTurn", "RemainingTurnTriggers",
+            "IgnoreArmingCardPlay", "SourceTinkeredDefinitionPayload", "SourceUpgraded", "Permanent"]),
         ("AutoAnthony.ComponentRuntimeApi", ["Register", "RegisterPackage", "ApiVersion"]),
         ("ChaosCardGenerator.GeneratedCard", ["Operations", "Cost", "Type", "Target", "Rarity", "Character", "StarCost", "HasStarCostX", "Tags"]),
         ("ChaosCardGenerator.GeneratorOperation", ["Template", "Scope", "Parameters", "RuntimeSpec", "CardTargetSlot", "RequiresSingleTarget"]),
@@ -80,6 +82,9 @@ public static class CompatibilityGuard
         ("CombatSolver.Engine.Common.ICombatPredictionEffectSink", ["ApplyPower", "ApplyPowerFromSource"]),
         ("CombatSolver.StrategicEffectMirrors", ["Register"]),
         ("CombatSolver.PowerHiddenStateMirrors", ["Register", "RegisterRootCapture"]),
+        ("CombatSolver.PersistentPowerSupport", ["TriggerAfterSideTurnStart"]),
+        ("CombatSolver.EndTurnPowerSupport", ["TriggerRegular"]),
+        ("CombatSolver.ContinuationStamp", ["AppendPowers"]),
         ("CombatSolver.CardChoiceMirrors", ["Register"]),
         ("CombatSolver.PowerDynamicVarWarmup", ["RegisterAdaptedCanonicalPower"]),
         ("CombatSolver.IncompatibleGameplayModException", []),
@@ -121,8 +126,32 @@ public static class CompatibilityGuard
         VerifyCombatSolverVersions(csAssembly, cs, failures, notes);
         VerifyGameContract(failures, notes);
         AuditChaosCardOnPlayPatches(aaAssembly, notes);
+        VerifyCompositeSeams(aa, cs, csAssembly, failures);
 
         return new CompatibilityReport(failures.Count == 0, aa, cs, failures, notes);
+    }
+
+    private static void VerifyCompositeSeams(BridgeModFacts aa, BridgeModFacts cs, Assembly? solver, List<string> failures)
+    {
+        // These private lifecycle seams require the exact audited binary, not just a member with the same name.
+        if (!string.Equals(aa.Sha256, "ad004f42f18ed86ccc7f66317823cf77fb40195b6466872bbd7038b3d8952965", StringComparison.OrdinalIgnoreCase))
+            failures.Add("0.6.0 触发器适配要求锁定的 AutoAnthony 0.3.137 DLL SHA256。");
+        if (!string.Equals(cs.Sha256, "832060172aa5eae8d79546f120a10e4571c324b7c0d6ab2c6abc2bcad24323cd", StringComparison.OrdinalIgnoreCase))
+            failures.Add("0.6.0 模拟生命周期接缝要求锁定的 CombatSolver 0.50.1 DLL SHA256。");
+        if (solver is null) return;
+        var seams = new[]
+        {
+            ("CombatSolver.PersistentPowerSupport", "TriggerAfterSideTurnStart", "System.Boolean", 5),
+            ("CombatSolver.EndTurnPowerSupport", "TriggerRegular", "System.Boolean", 5),
+            ("CombatSolver.ContinuationStamp", "AppendPowers", "System.Void", 3)
+        };
+        foreach (var (typeName, name, returns, count) in seams)
+        {
+            var methods = solver.GetType(typeName)?.GetMethods(AllMembers)
+                .Where(m => m.Name == name && m.IsStatic && m.ReturnType.FullName == returns
+                            && m.GetParameters().Length == count).ToArray();
+            if (methods?.Length != 1) failures.Add($"0.6.0 接缝签名不匹配：{typeName}.{name}。");
+        }
     }
 
     // --- 程序集发现 --------------------------------------------------------------------------

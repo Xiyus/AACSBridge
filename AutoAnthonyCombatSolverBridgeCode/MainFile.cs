@@ -42,15 +42,16 @@ public partial class MainFile : Node
         try
         {
             // 到这里才安全触碰 AutoAnthony 类型：守卫已证明两个程序集均已加载且契约完好。
-            // PatchAll 会应用本程序集内全部 [HarmonyPatch] 类（当前只有只读的 RuntimeSpecDumpPatch）。
+            // PatchAll 包含只读转储与锁定版本 Solver 的模拟生命周期 / 续接接缝。
             var harmony = new Harmony(ModId);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
 
             BridgeBootstrap.Initialize(report);
+            BridgeBootstrap.MarkReady();
         }
         catch (Exception exception)
         {
-            BridgeLog.Error($"守卫通过后桥初始化失败；转储补丁可能已部分应用。{exception}");
+            BridgeLog.Error($"守卫通过后桥初始化失败；预测执行门禁保持关闭，混沌卡/Power 会拒绝预测。{exception}");
         }
     }
 }

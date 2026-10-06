@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Hooks;
 using AutoAnthonyCombatSolverBridge.Diagnostics;
 using AutoAnthonyCombatSolverBridge.Translation;
+using AutoAnthonyCombatSolverBridge.Bootstrap;
 
 // 命名空间说明见 AutoAnthonyFacade.cs：外部类型一律通过文件级 using + 非限定名引用。
 
@@ -36,6 +37,8 @@ internal static class ChaosCardOnPlayMirror
 {
     public static void Execute(ChaosCardModel card, CardOnPlayMirrorContext context)
     {
+        if (!BridgeBootstrap.IsReady)
+            throw PredictionUnsupportedException.ForContent("桥未完成全部初始化，拒绝部分适配预测。", typeof(ChaosCardModel));
         // 硬失败兜底：正常情况下保守可打性已让矩阵外卡不进入候选；强制打出
         // （auto-play 类效果绕过 CanPlay）落到这里时仍按 fail-closed 中止整场搜索。
         var reason = ChaosCardSupport.GetUnsupportedReason(card, context.Card.Original);
@@ -68,6 +71,8 @@ internal static class ChaosCardOnPlayMirror
                 continue;
             if (operation.Template is "N_SELECT_HAND_CARD" or "N_SELECT_HAND_ATTACK")
                 continue;
+            if (operation.Parameters.ContainsKey("triggerIndex"))
+                continue; // Linked payload runs when its composite Power fires, never while arming.
 
             var spec = ChaosOperationExecutor.EffectiveRuntimeSpec(card, index);
 
@@ -91,6 +96,7 @@ internal static class ChaosCardOnPlayMirror
             handler.Execute(new OperationExecutionContext(context, card,
                 new OperationShape(index, operation.Scope, spec), resolvedRandomTarget));
         }
+        ChaosCompositePowerMirror.Arm(card, context);
     }
 
     // --- 整卡预校验（fail-closed；结果由 ChaosCardSupport 按 (根实例, 升级态) 缓存）----------------
@@ -102,6 +108,7 @@ internal static class ChaosCardOnPlayMirror
         // OwnChoice 阶段解析（求解器展开分支 + 原生 Effect 施加）——校验放行、执行循环跳过。
         // 只支持恰好一个选择型操作（多个时第二个会被静默丢弃，故拒绝）。
         var selectionCount = 0;
+        var selectionIndex = -1;
         for (var index = 0; index < operations.Count; index++)
         {
             var operation = operations[index];
@@ -110,13 +117,25 @@ internal static class ChaosCardOnPlayMirror
                 return reason;
             var spec = TryEffectiveSpec(card, index);
             if (spec is not null && ChaosCardChoiceMirror.IsSupportedSelection(spec))
+            {
                 selectionCount++;
+                selectionIndex = index;
+            }
         }
         if (selectionCount > 1)
             return Describe(card, null, "含多个选择型操作（0.5.0 只支持单选卡）");
+        if (selectionIndex >= 0 && operations.Skip(selectionIndex + 1).Any(op => op.Scope != OperationScope.Modifier))
+            return Describe(card, selectionIndex, "选牌后还有操作；OwnChoice 的末尾结算会改变触发事件顺序");
 
         if (operations.Any(ChaosOperationExecutor.RequiresCompositePower))
-            return Describe(card, null, "需要武装 ChaosCompositePower（触发器），0.6.0 解锁");
+        {
+            if (card.RuntimeProfileId.Length != 0)
+                return Describe(card, null, "外部角色 Profile 的触发器尚未适配");
+            if (operations.Any(op => op.Scope == OperationScope.Modifier))
+                return Describe(card, null, "带触发器的卡暂不支持 Modifier");
+            if (selectionCount > 0)
+                return Describe(card, null, "带触发器的卡暂不支持选牌，避免 OwnChoice 重排武装时机");
+        }
 
         if (card.IsUpgraded && card.Generated.Upgrade is { } upgrade)
         {
@@ -153,12 +172,29 @@ internal static class ChaosCardOnPlayMirror
         }
 
         if (operation.Scope is OperationScope.AbilityTrigger or OperationScope.ConditionalTrigger)
-            return Describe(card, index, $"触发类操作（scope={operation.Scope}，0.6.0 解锁）");
+        {
+            var triggerSpec = TryEffectiveSpec(card, index);
+            if (triggerSpec is null) return Describe(card, index, "触发器缺少结构化 spec");
+            var triggerReason = ChaosTriggerPolicy.ValidateTrigger(operation, triggerSpec);
+            return triggerReason is null ? null : Describe(card, index, triggerReason);
+        }
         if (operation.Scope is OperationScope.AbilityRule)
             return Describe(card, index, "AbilityRule 操作不在支持矩阵");
 
         if (operation.Parameters.ContainsKey("triggerIndex"))
-            return Describe(card, index, "挂靠触发器条件的操作（0.6.0 解锁）");
+        {
+            var owner = operation.Parameters["triggerIndex"];
+            if (owner < 0 || owner >= index || owner >= card.Generated.Operations.Count)
+                return Describe(card, index, "触发器引用不是前序有效操作");
+            var trigger = card.Generated.Operations[owner];
+            var triggerSpec = TryEffectiveSpec(card, owner);
+            if (triggerSpec is null || ChaosTriggerPolicy.ValidateTrigger(trigger, triggerSpec) is not null)
+                return Describe(card, index, "收益引用了未适配触发器");
+            var payloadSpec = TryEffectiveSpec(card, index);
+            if (payloadSpec is null) return Describe(card, index, "触发收益缺少 spec");
+            var payloadReason = ChaosTriggerPolicy.ValidatePayload(payloadSpec);
+            if (payloadReason is not null) return Describe(card, index, payloadReason);
+        }
 
         if (operation.CardTargetSlot is not null)
             return Describe(card, index, "含玩家选牌槽位（0.5.0 解锁）");

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../LocalDependencies.props" Condition="Exists('../../LocalDependencies.props')" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Sts2DataDir>$(Sts2Path)/data_sts2_windows_x86_64</Sts2DataDir>
+    <NoWarn>$(NoWarn);MSB3270</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../AutoAnthonyCombatSolverBridge.csproj" AdditionalProperties="SkipModDeploy=true" />
+    <Reference Include="AutoAnthony"><HintPath>$(AutoAnthonyDllDir)/AutoAnthony.dll</HintPath></Reference>
+    <Reference Include="sts2"><HintPath>$(Sts2DataDir)/sts2.dll</HintPath></Reference>
+    <Reference Include="GodotSharp"><HintPath>$(Sts2DataDir)/GodotSharp.dll</HintPath></Reference>
+    <Reference Include="0Harmony"><HintPath>$(Sts2DataDir)/0Harmony.dll</HintPath></Reference>
+    <Reference Include="CombatSolver"><HintPath>$(CombatSolverDllDir)/CombatSolver.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>
