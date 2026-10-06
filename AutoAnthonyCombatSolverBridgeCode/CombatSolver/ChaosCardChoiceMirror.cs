@@ -106,6 +106,20 @@ internal static class ChaosCardChoiceMirror
                     var discard = owner.DiscardPile.Cards;
                     return NativeSpec(PlanChoiceEffect.MoveToDrawTop, PileType.Discard, 1, discard);
                 }
+                case ("template_self_action", "r_putselectedhandcardondraw", "none", "none"):
+                {
+                    // 源码：从手牌选 1 张放到抽牌堆顶
+                    var hand = owner.Hand.Cards;
+                    return NativeSpec(PlanChoiceEffect.MoveToDrawTop, PileType.Hand, 1, hand);
+                }
+                case ("template_self_action", "cl_choosefromrandomdrawcards", "none", "none"):
+                {
+                    // 源码 L1398-1408：从随机抽牌堆卡中选 1 张入手
+                    var draw = owner.DrawPile.Cards;
+                    if (draw.Count == 0) return null;
+                    // 简化：全部抽牌堆卡作为候选（精确版需要 StableShuffle + Take(4)）
+                    return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Draw, 1, draw);
+                }
             }
         }
 
@@ -132,6 +146,8 @@ internal static class ChaosCardChoiceMirror
             ("template_independent_action", "cl_moveselectedattackdrawtohand", "none", "none") => true,
             ("template_independent_action", "cl_moveselectedskilldrawtohand", "none", "none") => true,
             ("template_self_action", "r_movediscardcardtodrawtop", "none", "none") => true,
+            ("template_self_action", "r_putselectedhandcardondraw", "none", "none") => true,
+            ("template_self_action", "cl_choosefromrandomdrawcards", "none", "none") => true,
             _ => false,
         };
 
