@@ -107,6 +107,12 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "d_addrandompowertohand" => null,
             "cl_addrandomattacktohand" => null,
             "d_returnzerocostdiscardtohand" => null,
+            // 更多卡牌创建/简单变体
+            "r_adddebristohand" => null,
+            "d_createzerocostcopyindiscard" => null,
+            "ncr_createsoulindiscard" => null,
+            "ncr_createsoulindraw" => null,
+            "ncr_createsoulinhand" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -550,6 +556,46 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             case "d_returnzerocostdiscardtohand":
             {
                 // 源码 L2152-2158：从弃牌堆返回零费牌到手（选择型——走选牌机制）
+                return;
+            }
+            case "r_adddebristohand":
+            {
+                // 源码：SimpleHandDerivativeProducerTemplates → CreateDerivatives → Debris 入手
+                if (count <= 0) return;
+                mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Debris>(
+                    owner, PileType.Hand, count, owner);
+                return;
+            }
+            case "d_createzerocostcopyindiscard":
+            {
+                // 源码 L2145-2150：本卡克隆 + 零费 → 弃牌堆
+                var clone = context.Mirror.Card.CreateClone();
+                clone.MutablePreview.SetToFreeThisCombat();
+                mirror.Simulator.AddGeneratedCardToCombat(clone, PileType.Discard, owner);
+                return;
+            }
+            case "ncr_createsoulindiscard":
+            {
+                // 源码：CreateDerivatives → Soul → 弃牌堆
+                if (count <= 0) return;
+                mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Soul>(
+                    owner, PileType.Discard, count, owner);
+                return;
+            }
+            case "ncr_createsoulindraw":
+            {
+                // 源码：CreateDerivatives → Soul → 抽牌堆
+                if (count <= 0) return;
+                mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Soul>(
+                    owner, PileType.Draw, count, owner);
+                return;
+            }
+            case "ncr_createsoulinhand":
+            {
+                // 源码：CreateDerivatives → Soul → 手牌
+                if (count <= 0) return;
+                mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Soul>(
+                    owner, PileType.Hand, count, owner);
                 return;
             }
             default:

@@ -88,6 +88,9 @@ public static class HandlerCatalog
                      // 卡牌创建/生成/返回
                      "r_putkingsswordinhand", "d_addrandompowertohand",
                      "cl_addrandomattacktohand", "d_returnzerocostdiscardtohand",
+                     // 更多卡牌创建
+                     "r_adddebristohand", "d_createzerocostcopyindiscard",
+                     "ncr_createsoulindiscard", "ncr_createsoulindraw", "ncr_createsoulinhand",
                  })
             registry.Register(new OperationKey("template_self_action", variant), templateSelf);
 
