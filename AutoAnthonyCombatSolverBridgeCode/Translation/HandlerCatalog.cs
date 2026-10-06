@@ -66,5 +66,10 @@ public static class HandlerCatalog
                      "r_forge", "n_allpoison",
                  })
             registry.Register(new OperationKey("template_self_action", variant), templateSelf);
+
+        // 0.8.x：template_target_action 目标模板（毒/X 力量损失/X 虚弱，7 条）
+        var templateTarget = new Handlers.TemplateTargetActionHandler();
+        foreach (var variant in new[] { "t_poison", "t_xstrengthloss", "t_xweak" })
+            registry.Register(new OperationKey("template_target_action", variant), templateTarget);
     }
 }
