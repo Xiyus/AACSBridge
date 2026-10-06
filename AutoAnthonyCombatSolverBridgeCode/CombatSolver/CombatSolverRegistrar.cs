@@ -1,5 +1,6 @@
 using System.Reflection;
 using AutoAnthony;
+using CombatSolver;
 using CombatSolver.Engine.InCombat.Mirrors.Cards;
 using CombatSolver.Engine.InCombat.Mirrors.Cards.OnPlay;
 using MegaCrit.Sts2.Core.Models;
@@ -7,6 +8,8 @@ using AutoAnthonyCombatSolverBridge.Bootstrap;
 using AutoAnthonyCombatSolverBridge.Diagnostics;
 using AutoAnthonyCombatSolverBridge.Translation;
 
+// 命名空间说明见 AutoAnthonyFacade.cs：文件级 using 从全局解析，外部 CombatSolver 命名空间
+// （CardChoiceMirrors 等）不受本文件所在子命名空间遮蔽。
 // 命名空间说明见 AutoAnthonyFacade.cs：本文件位于 AutoAnthonyCombatSolverBridge.CombatSolver 之下，
 // 桥根命名空间内部裸标识符 "CombatSolver" 会绑定到我们自己的子命名空间。外部 CombatSolver 类型
 // 一律通过文件级 using + 非限定名引用（如下所示），本代码库内永远不要写限定名 CombatSolver.Xxx。
@@ -59,10 +62,10 @@ public static class CombatSolverRegistrar
 
         var cs = report.CombatSolver;
         BridgeLog.Info($"CombatSolver 适配面核验：缺失类型 {cs.MissingTypes.Count} 个、缺失成员 {cs.MissingMembers.Count} 个。");
-        BridgeLog.Info("0.4.0 生效范围：即时牌 + apply_power(20 variant) + Power 卡伤害 + strength_scaled 修饰符 + " +
-                       "牌堆移动 + X 费卡（OnPlay X 解析复刻：Hook.ModifyXValue 分支状态 + SetResolvedXValues）+ " +
-                       "随机目标（显式抽取消耗分支 CombatTargets 流，与真实 RNG 消耗一致）。" +
-                       "矩阵外的卡（选牌、触发器等）保守排除（模拟中不可打），绝不给出错误预测。");
+        BridgeLog.Info("0.5.0 生效范围：即时牌 + apply_power(20 variant) + Power 卡伤害 + strength_scaled 修饰符 + " +
+                       "牌堆移动 + X 费卡 + 随机目标 + 玩家选牌（exhaust/discard/move 的 selected——" +
+                       "CardChoiceMirrors 登记原生 Effect，求解器展开分支并施加）。" +
+                       "矩阵外的卡（触发器等）保守排除（模拟中不可打），绝不给出错误预测。");
     }
 
     // --- 具体卡类型枚举 -------------------------------------------------------------------------
@@ -112,6 +115,8 @@ public static class CombatSolverRegistrar
     {
         CardOnPlayMirrors.Registry.Register<TCard>(ChaosCardOnPlayMirror.Execute);
         CardIsPlayableMirrors.Registry.Register<TCard>(ChaosCardIsPlayableMirror.Evaluate);
+        // 0.5.0：玩家选牌登记（spec 按卡实例的操作动态构造；无选择型操作返回 null = 没有选择）
+        CardChoiceMirrors.Register<TCard>(ChaosCardChoiceMirror.BuildSpec, ChaosCardChoiceMirror.Apply);
     }
 
     // 注意：反射查找必须按 IsGenericMethodDefinition 消歧——本类同时存在泛型与非泛型的同名

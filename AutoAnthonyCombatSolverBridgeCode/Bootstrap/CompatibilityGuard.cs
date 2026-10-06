@@ -93,6 +93,8 @@ public static class CompatibilityGuard
         // CreateClone / Simulate 是扩展方法（不在类型成员上），必须挂在其静态类的契约条目里检查
         ("CombatSolver.Engine.InCombat.Simulation.CombatPredictedCardExtensions", ["CreateClone"]),
         ("CombatSolver.Engine.InCombat.Simulation.CombatPredictionSimulatorExtensions", ["Simulate"]),
+        ("CombatSolver.CardChoiceMirrors", ["Register", "TryGetSpec", "TryApply"]),
+        ("CombatSolver.CardChoiceSpec", ["Effect", "SourcePile", "MinCount", "MaxCount", "Options"]),
         ("CombatSolver.Engine.InCombat.Simulation.CombatPredictionRngSet", []),
         ("CombatSolver.Engine.Common.Mirrors.MethodMirrorRegistry`2", ["Register", "RegisterIgnored", "RegisterInferrer", "TryInvokeRegistered", "Invoke"]),
         ("CombatSolver.Engine.Common.Mirrors.MethodMirrorRegistry`3", ["Register", "TryInvokeRegistered", "Invoke"]),

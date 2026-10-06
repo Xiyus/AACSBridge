@@ -70,6 +70,12 @@ internal static class ChaosCardOnPlayMirror
                 continue;
 
             var spec = ChaosOperationExecutor.EffectiveRuntimeSpec(card, index);
+
+            // 0.5.0：选择型操作跳过——由 CardChoiceMirrors 在 OwnChoice 阶段解析
+            // （求解器展开分支 + 原生 Effect 施加，与源码 CardCmd/CardPileCmd 语义一致）
+            if (ChaosCardChoiceMirror.IsSupportedSelection(spec))
+                continue;
+
             var handler = OperationHandlerRegistry.Instance.TryGet(OperationKey.FromSpec(spec));
             if (handler is null)
                 throw PredictionUnsupportedException.ForContent(
@@ -92,13 +98,22 @@ internal static class ChaosCardOnPlayMirror
     internal static string? ValidateCard(ChaosCardModel card)
     {
         var operations = card.Generated.Operations;
+        // 0.5.0：选择型操作（exhaust/discard/move 的 selected）由 CardChoiceMirrors 在
+        // OwnChoice 阶段解析（求解器展开分支 + 原生 Effect 施加）——校验放行、执行循环跳过。
+        // 只支持恰好一个选择型操作（多个时第二个会被静默丢弃，故拒绝）。
+        var selectionCount = 0;
         for (var index = 0; index < operations.Count; index++)
         {
             var operation = operations[index];
             var reason = ValidateOperation(card, index, operation);
             if (reason is not null)
                 return reason;
+            var spec = TryEffectiveSpec(card, index);
+            if (spec is not null && ChaosCardChoiceMirror.IsSupportedSelection(spec))
+                selectionCount++;
         }
+        if (selectionCount > 1)
+            return Describe(card, null, "含多个选择型操作（0.5.0 只支持单选卡）");
 
         if (operations.Any(ChaosOperationExecutor.RequiresCompositePower))
             return Describe(card, null, "需要武装 ChaosCompositePower（触发器），0.6.0 解锁");
@@ -154,6 +169,10 @@ internal static class ChaosCardOnPlayMirror
         var spec = TryEffectiveSpec(card, index);
         if (spec is null)
             return Describe(card, index, "无法解析执行视角 spec");
+
+        // 0.5.0：选择型操作放行（CardChoiceMirrors 在 OwnChoice 阶段解析；执行循环跳过）
+        if (ChaosCardChoiceMirror.IsSupportedSelection(spec))
+            return ValidateSpecShape(card, index, spec);
 
         var shapeReason = ValidateSpecShape(card, index, spec);
         if (shapeReason is not null)

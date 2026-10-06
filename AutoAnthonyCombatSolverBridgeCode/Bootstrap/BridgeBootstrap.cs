@@ -27,7 +27,7 @@ public static class BridgeBootstrap
 
         CombatSolverRegistrar.Initialize(report);
 
-        BridgeLog.Info("0.4.0 生效：即时牌 + apply_power + 牌堆移动 + X 费卡（energy_x/star_x）+ 随机目标（分支 RNG）可被精确预测。" +
+        BridgeLog.Info("0.5.0 生效：即时牌 + apply_power + 牌堆移动 + X 费 + 随机目标 + 玩家选牌（分支展开）可被精确预测。" +
                        "矩阵外的卡保守排除（模拟中不可打）。进入战斗后留意 CHAOS_CARD 转储行与 CombatSolver 的搜索行为。");
     }
 }
