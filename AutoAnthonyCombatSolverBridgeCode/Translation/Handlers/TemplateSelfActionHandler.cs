@@ -49,35 +49,42 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
         var mirror = context.Mirror;
         var owner = context.Card.Owner;
         var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
+        // 源码门控：ExecutableOrbRepeatCount(amount) = Math.Max(0, amount)，== 0 时跳过
+        var count = Math.Max(0, amount);
 
         switch (context.Shape.Spec.Variant)
         {
             case "d_channelfrost":
-                mirror.Simulator.OrbChannel<FrostOrb>(owner, Math.Max(1, amount));
+                if (count == 0) return;
+                mirror.Simulator.OrbChannel<FrostOrb>(owner, count);
                 return;
             case "d_channeldark":
-                mirror.Simulator.OrbChannel<DarkOrb>(owner, Math.Max(1, amount));
+                if (count == 0) return;
+                mirror.Simulator.OrbChannel<DarkOrb>(owner, count);
                 return;
             case "d_channellightning":
-                mirror.Simulator.OrbChannel<LightningOrb>(owner, Math.Max(1, amount));
+                if (count == 0) return;
+                mirror.Simulator.OrbChannel<LightningOrb>(owner, count);
                 return;
             case "d_channelglass":
-                mirror.Simulator.OrbChannel<GlassOrb>(owner, Math.Max(1, amount));
+                if (count == 0) return;
+                mirror.Simulator.OrbChannel<GlassOrb>(owner, count);
                 return;
             case "d_channelplasma":
-                mirror.Simulator.OrbChannel<PlasmaOrb>(owner, Math.Max(1, amount));
+                if (count == 0) return;
+                mirror.Simulator.OrbChannel<PlasmaOrb>(owner, count);
                 return;
             case "d_channelrandom":
             {
-                // 源码：OrbModel.GetRandomOrb(Rng.CombatOrbGeneration)——分支 RNG 同流
-                var count = Math.Max(1, amount);
+                // 源码：OrbModel.GetRandomOrb(Rng.CombatOrbGeneration)——分支 RNG 同流。
+                // 真实代码的 for 循环不因 Channel 失败而中断——RNG 消耗必须与实际严格一致
+                //（每次迭代消耗 1 次 GetRandomOrb，无论入队是否成功）。
                 for (var index = 0; index < count; index++)
                 {
                     var orb = OrbModel.GetRandomOrb(mirror.Rng.CombatOrbGeneration).ToMutable();
-                    if (!mirror.Simulator.OrbChannel(owner, orb))
-                        return;
+                    mirror.Simulator.OrbChannel(owner, orb);
                     if (mirror.Simulator.HasPendingChoice)
-                        return;
+                        return;    // 选择挂起是合法边界（续接戳会抓到 RNG 差异）
                 }
                 return;
             }
@@ -91,7 +98,8 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 return;
             }
             case "d_gainorbslots":
-                mirror.Simulator.AddOrbSlots(owner, Math.Max(1, amount));
+                if (count == 0) return;
+                mirror.Simulator.AddOrbSlots(owner, count);
                 return;
             case "n_createshiv":
             {
