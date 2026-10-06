@@ -72,6 +72,19 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "ncr_nextvoidcostszero" => null,
             "d_nextpowercostszero" => null,
             "n_allweak" => null,
+            // 简单 Power 模板（N: 族）
+            "n_thorns" => null,
+            "n_intangible" => null,
+            "n_tempdex" => null,
+            "n_nextturndraw" => null,
+            "n_keepblocknextturn" => null,
+            "n_nextturnblock" => null,
+            // 状态牌创建（D:CreateXxxInDiscard 族）
+            "d_createdazedindiscard" => null,
+            "d_createtwowoundsindiscard" => null,
+            "d_createburnindiscard" => null,
+            "d_createslimeindiscard" => null,
+            "d_createvoidindiscard" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -324,6 +337,46 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             case "d_nextpowercostszero":
                 ApplySelf(context, typeof(FreePowerPower), 1);
                 return;
+            // ===== N: 族简单 Power 模板 =====
+            case "n_thorns":
+                if (count == 0) return;
+                ApplySelf(context, typeof(ThornsPower), count);
+                return;
+            case "n_intangible":
+                if (count == 0) return;
+                ApplySelf(context, typeof(IntangiblePower), count);
+                return;
+            case "n_tempdex":
+                if (count == 0) return;
+                ApplySelf(context, typeof(AnticipatePower), count);
+                return;
+            case "n_nextturndraw":
+                if (count == 0) return;
+                ApplySelf(context, typeof(DrawCardsNextTurnPower), count);
+                return;
+            case "n_keepblocknextturn":
+                ApplySelf(context, typeof(BlurPower), 1);
+                return;
+            case "n_nextturnblock":
+                if (count == 0) return;
+                ApplySelf(context, typeof(BlockNextTurnPower), count);
+                return;
+            // ===== 状态牌创建（D:CreateXxxInDiscard 族）=====
+            case "d_createdazedindiscard":
+                CreateStatusCards<Dazed>(context, count);
+                return;
+            case "d_createtwowoundsindiscard":
+                CreateStatusCards<Wound>(context, count);
+                return;
+            case "d_createburnindiscard":
+                CreateStatusCards<Burn>(context, count);
+                return;
+            case "d_createslimeindiscard":
+                CreateStatusCards<Slimed>(context, count);
+                return;
+            case "d_createvoidindiscard":
+                CreateStatusCards<MegaCrit.Sts2.Core.Models.Cards.Void>(context, count);
+                return;
             default:
                 throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);
         }
@@ -349,5 +402,15 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
         foreach (var enemy in mirror.CombatState.HittableEnemies)
             effects.ApplyPowerFromSource(powerType, enemy, amount,
                 context.Card.Owner.Creature, context.Card);
+    }
+
+    /// <summary>创建状态牌到弃牌堆（与源码 CreateDerivatives → AddGeneratedCardToCombat 等价）。</summary>
+    private static void CreateStatusCards<TStatus>(OperationExecutionContext context, int count) where TStatus : CardModel
+    {
+        if (count <= 0) return;
+        var mirror = context.Mirror;
+        var owner = context.Card.Owner;
+        mirror.Simulator.CreateAndAddGeneratedCardsToCombat<TStatus>(
+            owner, PileType.Discard, count, owner);
     }
 }

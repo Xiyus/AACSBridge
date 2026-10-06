@@ -77,6 +77,11 @@ public static class HandlerCatalog
                      "r_enemieslosestrength", "r_kingsswordhitsallenemies",
                      "ncr_nextturnenergy", "ncr_losestrength", "ncr_nextvoidcostszero",
                      "d_nextpowercostszero",
+                     // N: 族简单 Power + 状态牌创建
+                     "n_thorns", "n_intangible", "n_tempdex", "n_nextturndraw",
+                     "n_keepblocknextturn", "n_nextturnblock",
+                     "d_createdazedindiscard", "d_createtwowoundsindiscard",
+                     "d_createburnindiscard", "d_createslimeindiscard", "d_createvoidindiscard",
                  })
             registry.Register(new OperationKey("template_self_action", variant), templateSelf);
 
