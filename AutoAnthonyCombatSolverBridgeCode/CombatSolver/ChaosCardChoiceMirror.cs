@@ -179,6 +179,20 @@ internal static class ChaosCardChoiceMirror
                     var hand = owner.Hand.Cards;
                     return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Hand, 1, hand);
                 }
+                case ("template_independent_action", "i_proxyatomic_begone", "none", "none"):
+                case ("template_independent_action", "i_proxyatomic_guards", "none", "none"):
+                {
+                    // 源码 L2794-2825：从手牌选 N 张变形（Begone/Guards 代理）
+                    var hand = owner.Hand.Cards.Where(candidate => candidate.Preview.IsTransformable).ToList();
+                    return NativeSpec(PlanChoiceEffect.Transform, PileType.Hand, 1, hand);
+                }
+                case ("template_independent_action", "i_proxyatomic_charge", "none", "none"):
+                case ("template_independent_action", "i_proxyatomic_seance", "none", "none"):
+                {
+                    // 源码 L2807-2835：从抽牌堆选 N 张变形（Charge/Seance 代理）
+                    var draw = owner.DrawPile.Cards.Where(candidate => candidate.Preview.IsTransformable).ToList();
+                    return NativeSpec(PlanChoiceEffect.Transform, PileType.Draw, 1, draw);
+                }
             }
         }
 
@@ -215,6 +229,10 @@ internal static class ChaosCardChoiceMirror
             ("template_self_action", "r_putselectedhandcardsondraw", "none", "none") => true,
             ("template_self_action", "r_copyselectedcolorlesscard", "none", "none") => true,
             ("template_self_action", "cl_transformselectedhandcards", "none", "none") => true,
+            ("template_independent_action", "i_proxyatomic_begone", "none", "none") => true,
+            ("template_independent_action", "i_proxyatomic_guards", "none", "none") => true,
+            ("template_independent_action", "i_proxyatomic_charge", "none", "none") => true,
+            ("template_independent_action", "i_proxyatomic_seance", "none", "none") => true,
             _ => false,
         };
 
