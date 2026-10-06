@@ -26,7 +26,18 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 | 0.2.0 | apply_power(20 variant) + Power 卡伤害 + strength_scaled 修饰符 | ✅ 实机验证（**严格 diff 零差异**，见下） |
 | 0.2.0+ | 保守可打性模式（矩阵外卡模拟中不可打） | ✅ 实机验证（搜索从必然失败变为完整完成） |
 | 0.3.0 | 牌堆移动：exhaust/discard(all) + create_copy + draw_and_discard | ✅ 实机验证（严格 diff 零差异 + **生成牌递归**） |
-| 0.4.0 | X 费卡（OnPlay X 解析复刻）+ 随机目标（分支 RNG 消耗对齐） | ✅ 编译通过，待实机验证 |
+| 0.4.0 | X 费卡（OnPlay X 解析复刻）+ 随机目标（分支 RNG 消耗对齐） | ✅ 编译+注册就绪（本局未抽到 X 费/随机卡，待自然验证） |
+| 0.5.0 | 玩家选牌：exhaust/discard/move(selected) | ✅ 实机验证（**选牌分支 5551 展开 + 计划选择部署 + 严格 diff 零差异**） |
+
+### 0.5.0 实机验证记录（2026-10-06 铁甲局）
+
+- 铁甲局牌组 **10/14 张矩阵内**；搜索 SEARCH_FAILURE = 0，战斗获胜；
+- **选牌分支展开**：`choice_branches=5551`——CARD001（格挡+选牌消耗）的选择被
+  按手牌候选展开成搜索分支；
+- **计划选择**：路线包含 `PlanCardChoice`（turn 2 计划消耗"余烬拳"、turn 6 计划
+  消耗"打击祭品"）——求解器自主决定消耗哪张，部署时照计划应答原生选牌页面；
+- **严格 diff 零差异**：2 条路线 28/28 与 25/25 步全部完成——含选牌部署；
+- 路线 38 次出牌覆盖 8 种矩阵内卡（含 create_copy 卡 ×12——生成牌递归持续工作）。
 
 ### 0.3.0 实机验证记录（2026-10-06）
 
@@ -240,8 +251,7 @@ dotnet build -c Debug
 | 0.2.0+ | ✅ 保守可打性模式（矩阵外卡模拟中不可打，搜索可完成） |
 | 0.3.0 | ✅ 牌堆移动：exhaust_card/discard_card(all) + create_copy(this_card) + draw_and_discard(nonzero_cost)（严格 diff + 生成牌递归实机验证） |
 | 0.4.0 | ✅ X 费卡（OnPlay X 解析复刻）+ 随机目标（分支 RNG 消耗对齐） |
-| 0.5.0 | ✅ 玩家选牌：exhaust/discard/move(selected)——CardChoiceMirrors 原生 Effect 登记，求解器展开分支 |
-| 0.5.0 | Player Choice（选牌分支） |
+| 0.5.0 | ✅ 玩家选牌：exhaust/discard/move(selected)——CardChoiceMirrors 原生 Effect 登记（**选牌分支 5551 展开 + 计划选择部署 + 严格 diff 零差异**实机验证） |
 | 0.6.0 | Trigger / `ChaosCompositePower` 跨回合（含 `PowerHiddenStateMirrors`） |
 | 0.7.0 | 生成牌递归模拟 |
 | 0.8.0 | 全 Component Catalog 审计（931 条 spec 逐条核对） |
