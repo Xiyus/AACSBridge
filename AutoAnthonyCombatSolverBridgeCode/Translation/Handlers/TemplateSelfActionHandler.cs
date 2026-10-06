@@ -40,6 +40,8 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "d_gainfocus" or "d_gaintemporaryfocus" => null,
             "d_gainorbslots" => null,
             "n_createshiv" => null,
+            "r_forge" => null,
+            "n_allpoison" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -111,6 +113,25 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                     return;
                 mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Shiv>(
                     owner, PileType.Hand, shivCount, owner);
+                return;
+            }
+            case "r_forge":
+            {
+                // 源码 L1471：ForgeCmd.Forge(amount, owner, card)
+                // 镜像：与原生 PersistentPowerSupport.Forge 同款（创建/强化君王之刃）
+                if (count == 0) return;
+                global::CombatSolver.PersistentPowerSupport.Forge(mirror.Simulator, owner, count);
+                return;
+            }
+            case "n_allpoison":
+            {
+                // 源码 L678：PowerCmd.Apply<PoisonPower>(ctx, HittableEnemies, amount, owner, card)
+                if (count == 0) return;
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects)
+                    throw new InvalidOperationException("全体毒需要分支战斗状态效果汇。");
+                foreach (var enemy in mirror.CombatState.HittableEnemies)
+                    effects.ApplyPowerFromSource(typeof(PoisonPower),
+                        enemy, count, owner.Creature, context.Card);
                 return;
             }
             default:
