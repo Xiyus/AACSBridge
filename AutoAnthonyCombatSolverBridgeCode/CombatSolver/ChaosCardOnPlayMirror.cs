@@ -62,17 +62,43 @@ internal static class ChaosCardOnPlayMirror
         card.SetResolvedXValues(resolvedEnergyX, resolvedStarX);
 
         var operations = card.Generated.Operations;
+        // 0.9.0：条件结果缓存（EvaluateConditionOnce 语义——按索引一次评估）
+        var conditionResults = new Dictionary<int, bool>();
         for (var index = 0; index < operations.Count; index++)
         {
             var operation = operations[index];
+            // 0.9.0：条件操作——评估并缓存，不执行（复刻源码 L178-190）
+            if (operation.Scope == OperationScope.ConditionalTrigger)
+            {
+                var conditionSpec = TryEffectiveSpec(card, index);
+                if (conditionSpec?.Condition is { } condition
+                    && ConditionEvaluator.IsSupportedCondition(condition.Kind))
+                {
+                    if (!conditionResults.TryGetValue(index, out var cached))
+                        conditionResults[index] = ConditionEvaluator.Evaluate(card, operation, context, conditionResults);
+                }
+                continue;
+            }
             // 校验层已保证只剩可执行操作；这里防御性地重复 Play 的元数据跳过规则
             if (operation.Scope is OperationScope.Modifier or OperationScope.AbilityTrigger
-                or OperationScope.ConditionalTrigger or OperationScope.AbilityRule)
+                or OperationScope.AbilityRule)
                 continue;
             if (operation.Template is "N_SELECT_HAND_CARD" or "N_SELECT_HAND_ATTACK")
                 continue;
-            if (operation.Parameters.ContainsKey("triggerIndex"))
-                continue; // Linked payload runs when its composite Power fires, never while arming.
+            // 0.9.0：payoff 的条件门控（复刻源码 L192-200）——triggerIndex 指向条件操作
+            if (operation.Parameters.TryGetValue("triggerIndex", out var gateIndex)
+                && gateIndex >= 0 && gateIndex < operations.Count)
+            {
+                var gate = operations[gateIndex];
+                // 只门控普通条件（AbilityTrigger/持久触发器仍跳过——武装为 Power）
+                if (gate.Scope == OperationScope.ConditionalTrigger)
+                {
+                    if (!conditionResults.TryGetValue(gateIndex, out var gateResult) || !gateResult)
+                        continue;    // 条件 false → 跳过 payoff
+                }
+                else if (gate.Scope is OperationScope.AbilityTrigger)
+                    continue;    // 持久触发器的 payoff 不在本场执行
+            }
 
             var spec = ChaosOperationExecutor.EffectiveRuntimeSpec(card, index);
 
@@ -183,6 +209,13 @@ internal static class ChaosCardOnPlayMirror
         {
             var triggerSpec = TryEffectiveSpec(card, index);
             if (triggerSpec is null) return Describe(card, index, "触发器缺少结构化 spec");
+            // 0.9.0：条件操作（opcode=condition）走 ConditionEvaluator 校验
+            if (triggerSpec.Opcode == "condition" && triggerSpec.Condition is { } condition)
+            {
+                if (AutoAnthonyCombatSolverBridge.Translation.ConditionEvaluator.IsSupportedCondition(condition.Kind))
+                    return null;    // 放行（执行循环中评估并门控 payoff）
+                return Describe(card, index, $"条件 kind={condition.Kind} 不在支持矩阵");
+            }
             var triggerReason = ChaosTriggerPolicy.ValidateTrigger(operation, triggerSpec);
             return triggerReason is null ? null : Describe(card, index, triggerReason);
         }
@@ -196,7 +229,15 @@ internal static class ChaosCardOnPlayMirror
                 return Describe(card, index, "触发器引用不是前序有效操作");
             var trigger = card.Generated.Operations[owner];
             var triggerSpec = TryEffectiveSpec(card, owner);
-            if (triggerSpec is null || ChaosTriggerPolicy.ValidateTrigger(trigger, triggerSpec) is not null)
+            if (triggerSpec is null) return Describe(card, index, "触发器缺少 spec");
+            // 0.9.0：条件门控的 payoff——条件已校验通过，payoff 走正常 handler 校验
+            if (trigger.Scope == OperationScope.ConditionalTrigger
+                && triggerSpec.Opcode == "condition"
+                && triggerSpec.Condition is { } condition
+                && AutoAnthonyCombatSolverBridge.Translation.ConditionEvaluator.IsSupportedCondition(condition.Kind))
+                return null;    // 条件门控 payoff 放行（执行时按条件结果跳过）
+            // 触发器门控的 payoff——走触发器校验
+            if (ChaosTriggerPolicy.ValidateTrigger(trigger, triggerSpec) is not null)
                 return Describe(card, index, "收益引用了未适配触发器");
             var payloadSpec = TryEffectiveSpec(card, index);
             if (payloadSpec is null) return Describe(card, index, "触发收益缺少 spec");
