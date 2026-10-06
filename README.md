@@ -23,7 +23,20 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 |---|---|---|
 | ①–④ | 模板 / 双 DLL 引用 / 守卫 / 识别 / 转储 | ✅ 实机验证 |
 | 0.1.0 | Damage/Block/Draw/Energy 翻译 + 镜像注册 | ✅ 实机验证（镜像调用/fail-closed 全链路实证） |
-| 0.2.0 | apply_power(20 variant) + Power 卡伤害 + strength_scaled 修饰符 | ✅ 编译通过，待实机验证 |
+| 0.2.0 | apply_power(20 variant) + Power 卡伤害 + strength_scaled 修饰符 | ✅ 实机验证（**严格 diff 零差异**，见下） |
+| 0.2.0+ | 保守可打性模式（矩阵外卡模拟中不可打） | ✅ 实机验证（搜索从必然失败变为完整完成） |
+
+### 0.2.0 实机验证记录（2026-10-06）
+
+- **搜索完整完成并部署**：CombatSolver 对混沌牌组完成整场搜索（expanded=4452），路线被
+  自动部署执行，战斗获胜；
+- **路线构成**（26 次出牌，全部为矩阵内卡）：CARD003（易伤+伤害）×8、CARD008（伤害）×6、
+  CARD001/005（格挡）×8、CARD002（格挡+力量缩放修饰符）×4——0.2.0 的 apply_power 与
+  strength_scaled 特性均在被验证路线内；
+- **严格 diff 零差异**（CombatSolver 官方验收标准第一条）：两条选定路线的 ROUTE_REPLAY
+  回放比对（HP/格挡/能量/星能/手牌数逐动作）`firstScalarDifference = null`，20/21 步全部
+  完成——**预测状态与真实执行完全一致**；
+- 保守可打性生效：矩阵外的卡（move_card/create_copy/i_upgrade 等）不再触发搜索中止。
 
 实测样例（spec-dump.log）：
 
