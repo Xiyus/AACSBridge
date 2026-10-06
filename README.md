@@ -55,7 +55,19 @@ CHAOS_CARD id=CARD.CHAOS_CARD000 title="岿然防御" type=Skill cost=1 ... oper
 - 随机目标引用（`random_enemy_reference`）、事件目标、历史计数、阈值翻倍 → 0.4.0；
 - 结构性升级（RepeatOperation / ExecuteOperationOnPlay / ChooseExhaust / 衍生卡升级等）。
 
-**支持矩阵外的卡打出时：整场搜索中止**（`IncompatibleGameplayModException`，玩家看到"内容性 Mod 暂未适配"）——绝不静默当空操作给出错误预测。这是 CombatSolver 官方适配纪律（"部分适配比完全不适配更危险"）与本桥设计红线的直接体现。
+**支持矩阵外的卡的处理——保守可打性模式（默认开启）**：
+
+- 矩阵外的卡在**模拟中按"不可打"处理**（IsPlayable 镜像返回 false）——搜索只探索可精确
+  预测的路线，部署的每个动作都被精确预测；这些卡留在手里不被求解器主动打出，**真实游戏
+  完全不受影响**（玩家仍可手动打出）。
+- 强制打出（Havoc/Cascade 类 auto-play 效果绕过 CanPlay）仍由 OnPlay 镜像**硬失败兜底**：
+  `IncompatibleGameplayModException` → 整场搜索中止。
+- 代价：路线可能次优（避开了一张本可制胜的矩阵外卡）——但预测永远精确，这是
+  "宁可次优、不可错误预测"红线的保守实现。
+- 设环境变量 `AA_BRIDGE_STRICT=1` 关闭本模式，回到纯硬失败语义（任何矩阵外卡进入
+  候选即中止整场搜索——实测表明该语义下搜索几乎总是失败，因为搜索会探索抽牌堆里
+  未来回合的全部候选）。
+- 判定结果按（根卡实例, 升级态）缓存，避免搜索每个节点重复做升级投影。
 
 ### 0.1.0 架构要点
 

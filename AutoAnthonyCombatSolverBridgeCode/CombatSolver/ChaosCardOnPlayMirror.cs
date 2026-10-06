@@ -34,7 +34,9 @@ internal static class ChaosCardOnPlayMirror
 {
     public static void Execute(ChaosCardModel card, CardOnPlayMirrorContext context)
     {
-        var reason = ValidateCard(card);
+        // 硬失败兜底：正常情况下保守可打性已让矩阵外卡不进入候选；强制打出
+        // （auto-play 类效果绕过 CanPlay）落到这里时仍按 fail-closed 中止整场搜索。
+        var reason = ChaosCardSupport.GetUnsupportedReason(card, context.Card.Original);
         if (reason is not null)
             throw PredictionUnsupportedException.ForContent(reason, typeof(ChaosCardModel));
 
@@ -60,9 +62,9 @@ internal static class ChaosCardOnPlayMirror
         }
     }
 
-    // --- 整卡预校验（fail-closed）--------------------------------------------------------------
+    // --- 整卡预校验（fail-closed；结果由 ChaosCardSupport 按 (根实例, 升级态) 缓存）----------------
 
-    private static string? ValidateCard(ChaosCardModel card)
+    internal static string? ValidateCard(ChaosCardModel card)
     {
         if (card.EnergyCost.CostsX || card.HasStarCostX)
             return Describe(card, null, "X 费卡不在支持矩阵（0.4.0 解锁）");
