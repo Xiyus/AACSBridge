@@ -200,11 +200,27 @@ dotnet build -c Debug
 
 ## 0.1.0 实机验证指引
 
+**已实机验证（2026-10-06 第四/五次测试）**：
+
+- `已登记 514 个具体 Chaos 卡类型的 OnPlay/IsPlayable 镜像。`（首次测试曾因反射查找撞同名重载
+  全部失败——`AmbiguousMatchException`，已修复：`GetMethods + IsGenericMethodDefinition` 消歧）；
+- CombatSolver 搜索尝试打出矩阵外的卡（如 `create_copy`/`apply_power` 组合）时，桥的镜像被
+  实际调用（CombatSolver 日志堆栈：`ChaosCardOnPlayMirror.Execute → MethodMirrorRegistry.Invoke →
+  CardOnPlayMirrors.Invoke`），校验给出精确中文原因（卡牌、操作索引、模板、opcode/variant），
+  `IncompatibleGameplayModException` → 整场搜索中止——**fail-closed 全链路按设计工作**；
+- 游戏全程稳定，战斗可正常进行/获胜；
+- 实测牌组 3/11 张卡在矩阵内（纯 gain_block ×2 + 纯 deal_damage）。**注意**：搜索会评估手牌中
+  每张可打的卡作为候选——只要手牌里有任何矩阵外的卡，搜索就会中止。因此 0.1.0 覆盖下搜索
+  大概率失败（诚实失败，优于错误预测）；要看到"矩阵内卡被成功预测"需要运气（手牌恰好全是
+  矩阵内卡+原生卡）或等 0.2.0 扩大覆盖。
+
+后续验证：
+
 1. 启动游戏（AutoAnthony + CombatSolver + 本桥），日志确认：
    `[AA-CS Bridge] 翻译表就绪：7 个 (Opcode, Variant) 形状。`
-   `[AA-CS Bridge] 已登记 N 个具体 Chaos 卡类型的 OnPlay/IsPlayable 镜像。`（N ≈ 514）
+   `[AA-CS Bridge] 已登记 514 个具体 Chaos 卡类型的 OnPlay/IsPlayable 镜像。`
 2. 开一局进入战斗，让 CombatSolver 执行搜索（自动或手动）：
-   - 手牌里有**矩阵内的简单牌**（纯 deal_damage / gain_block / draw / energy 组合，参考
+   - 手牌里有**矩阵内的简单牌**（纯 deal_damage / gain_block 组合，参考
      spec-dump.log 里 `opcode=deal_damage variant=selected` 这类行）→ 搜索应正常完成，
      路线里打出该牌的预测应与实际一致；
    - 手牌里有**矩阵外的牌**（带 Modifier/触发器/选牌等）→ 搜索中止，CombatSolver 面板
