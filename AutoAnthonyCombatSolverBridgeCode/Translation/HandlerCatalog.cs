@@ -112,6 +112,7 @@ public static class HandlerCatalog
                      "i_doubleblockthisturn", "i_doubleattackdamagenextturn",
                      "i_freehandthisturn", "i_drawwithretain", "i_triggerpoisonnow",
                      "i_replaynextskills", "i_discardhanddrawsame", "cl_drawtofullhand",
+                     "i_nextskillcostszero", "i_setthiscardcostzero",
                  })
             registry.Register(new OperationKey("template_independent_action", variant), templateIndependent);
     }

@@ -39,6 +39,8 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             "i_replaynextskills" => null,
             "i_discardhanddrawsame" => null,
             "cl_drawtofullhand" => null,
+            "i_nextskillcostszero" => null,
+            "i_setthiscardcostzero" => null,
             _ => $"template_independent_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -142,6 +144,20 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 var slots = Math.Max(0, mirror.Simulator.GetMaxHandSize(owner) - playerState.Hand.Cards.Count);
                 if (slots > 0)
                     mirror.Simulator.Draw(owner, slots);
+                return;
+            }
+            case "i_nextskillcostszero":
+            {
+                // 源码 L3131：下一张技能牌免费（FreePowerPower 等效——简化为通用免费 Power）
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects5)
+                    throw new InvalidOperationException("技能免费需要分支战斗状态效果汇。");
+                effects5.ApplyPowerFromSource(typeof(FreePowerPower), owner.Creature, 1, owner.Creature, context.Card);
+                return;
+            }
+            case "i_setthiscardcostzero":
+            {
+                // 源码：本卡费用设为 0（本战斗）——SetToFreeThisCombat
+                context.Card.SetToFreeThisCombat();
                 return;
             }
             default:
