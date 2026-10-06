@@ -34,6 +34,8 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
             "t_removeblockandartifact" => null,
             "ncr_targetlosestrength" => null,
             "ncr_doublevulnerableweak" => null,
+            "r_kingssworddoubledamagethisturn" => null,
+            "ncr_doomscaleddamage" => null,
             _ => $"template_target_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -112,6 +114,28 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
                     var weak = debuffCombat.GetAmount<WeakPower>(target);
                     if (weak > 0)
                         effects.ApplyPowerFromSource(typeof(WeakPower), target, weak, owner.Creature, context.Card);
+                }
+                return;
+            }
+            case "r_kingssworddoubledamagethisturn":
+            {
+                // 源码 L1604：PowerCmd.Apply<ConquerorPower>(target, 1)
+                effects.ApplyPowerFromSource(typeof(ConquerorPower), target, 1, owner.Creature, context.Card);
+                return;
+            }
+            case "ncr_doomscaleddamage":
+            {
+                // 源码 L1893-1897：伤害 = 目标 Doom 层数（经 DamageAndHits）
+                if (mirror.CombatState is global::CombatSolver.SimulatedCombatState doomCombat)
+                {
+                    var doom = doomCombat.GetAmount<DoomPower>(target);
+                    if (doom > 0)
+                    {
+                        var (resolvedDamage, resolvedHits) = DamageModifierResolver.Resolve(context, doom, 1);
+                        if (resolvedHits > 0)
+                            mirror.Simulator.Damage([target], resolvedDamage,
+                                context.DamageProps, owner.Creature, context.Mirror.Card, context.Mirror.CardPlay);
+                    }
                 }
                 return;
             }

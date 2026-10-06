@@ -107,7 +107,8 @@ public static class HandlerCatalog
         // 0.8.x：template_target_action 目标模板（毒/X 力量损失/X 虚弱/末日，11 条）
         var templateTarget = new Handlers.TemplateTargetActionHandler();
         foreach (var variant in new[] { "t_poison", "t_xstrengthloss", "t_xweak", "ncr_applydoom",
-                                          "t_removeblockandartifact", "ncr_targetlosestrength", "ncr_doublevulnerableweak" })
+                                          "t_removeblockandartifact", "ncr_targetlosestrength", "ncr_doublevulnerableweak",
+                                          "r_kingssworddoubledamagethisturn", "ncr_doomscaleddamage" })
             registry.Register(new OperationKey("template_target_action", variant), templateTarget);
 
         // 0.8.x：template_independent_action 简单独立模板（禁抽/临时力量/全体易伤/最大生命/本卡成长，8 条）
