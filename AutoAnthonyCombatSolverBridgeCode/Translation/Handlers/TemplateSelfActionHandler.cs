@@ -125,6 +125,8 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "r_fillhandwithdebris" => null,
             "ncr_increaseallcardcoststhisturn" => null,
             "ncr_addrandometherealcardtohand" => null,
+            // Osty 伤害（模拟器已追踪 Osty creature）
+            "ncr_ostyalldamage" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -685,6 +687,17 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                         candidate => ChaosOperationExecutor.CanBeRandomlyGeneratedInCombat(candidate)
                             && candidate.Keywords.Contains(CardKeyword.Ethereal));
                 mirror.Simulator.AddGeneratedCardsToCombat(generated.ToList(), PileType.Hand, owner);
+                return;
+            }
+            case "ncr_ostyalldamage":
+            {
+                // 源码：Osty 对全体敌人造成伤害（经 DamageAndHits——Osty 为攻击者）
+                var osty = mirror.Simulator.State.GetOsty(owner);
+                if (osty is null) return;    // Osty 不存在 = no-op
+                var (ostyDamage, ostyHits) = DamageModifierResolver.Resolve(context, count, 1);
+                if (ostyHits > 0)
+                    mirror.Simulator.Damage(mirror.CombatState.HittableEnemies.ToArray(), ostyDamage,
+                        context.DamageProps, osty, context.Mirror.Card, context.Mirror.CardPlay);
                 return;
             }
             default:

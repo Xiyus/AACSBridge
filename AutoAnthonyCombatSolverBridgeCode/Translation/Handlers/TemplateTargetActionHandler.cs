@@ -36,6 +36,7 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
             "ncr_doublevulnerableweak" => null,
             "r_kingssworddoubledamagethisturn" => null,
             "ncr_doomscaleddamage" => null,
+            "ncr_ostydamage" => null,
             _ => $"template_target_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -137,6 +138,18 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
                                 context.DamageProps, owner.Creature, context.Mirror.Card, context.Mirror.CardPlay);
                     }
                 }
+                return;
+            }
+            case "ncr_ostydamage":
+            {
+                // 源码：Osty 对目标造成伤害（经 DamageAndHits——Osty 为攻击者）
+                var osty = mirror.Simulator.State.GetOsty(owner);
+                if (osty is null) return;    // Osty 不存在 = no-op
+                var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
+                var (ostyDamage, ostyHits) = DamageModifierResolver.Resolve(context, amount, 1);
+                if (ostyHits > 0)
+                    mirror.Simulator.Damage([target], ostyDamage,
+                        context.DamageProps, osty, context.Mirror.Card, context.Mirror.CardPlay);
                 return;
             }
             default:

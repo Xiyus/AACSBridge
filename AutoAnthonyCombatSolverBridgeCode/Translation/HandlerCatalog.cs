@@ -96,6 +96,8 @@ public static class HandlerCatalog
                      "ncr_increasethiscarddamagerun", "ncr_allenemiesloseeventhp", "ncr_killenemiesatdoomthreshold",
                      // 更多非 Osty 简单变体
                      "r_fillhandwithdebris", "ncr_increaseallcardcoststhisturn", "ncr_addrandometherealcardtohand",
+                     // Osty 伤害（模拟器已追踪 Osty creature）
+                     "ncr_ostyalldamage",
                  })
             registry.Register(new OperationKey("template_self_action", variant), templateSelf);
 
@@ -116,7 +118,7 @@ public static class HandlerCatalog
         var templateTarget = new Handlers.TemplateTargetActionHandler();
         foreach (var variant in new[] { "t_poison", "t_xstrengthloss", "t_xweak", "ncr_applydoom",
                                           "t_removeblockandartifact", "ncr_targetlosestrength", "ncr_doublevulnerableweak",
-                                          "r_kingssworddoubledamagethisturn", "ncr_doomscaleddamage" })
+                                          "r_kingssworddoubledamagethisturn", "ncr_doomscaleddamage", "ncr_ostydamage" })
             registry.Register(new OperationKey("template_target_action", variant), templateTarget);
 
         // 0.8.x：template_independent_action 简单独立模板（禁抽/临时力量/全体易伤/最大生命/本卡成长，8 条）
