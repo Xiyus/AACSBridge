@@ -55,5 +55,15 @@ public static class HandlerCatalog
 
         // 0.8.0：目录审计补遗——gain_stars 是唯一"简单但未做"的即时效果（13 条）
         registry.Register(new OperationKey("gain_stars", "immediate"), new Handlers.GainStarsHandler());
+
+        // 0.8.x：template_self_action 高频子族（球引导/聚焦/球位/Shiv，37 条目录形状）
+        var templateSelf = new Handlers.TemplateSelfActionHandler();
+        foreach (var variant in new[]
+                 {
+                     "d_channelfrost", "d_channeldark", "d_channellightning",
+                     "d_channelglass", "d_channelplasma", "d_channelrandom",
+                     "d_gainfocus", "d_gaintemporaryfocus", "d_gainorbslots", "n_createshiv",
+                 })
+            registry.Register(new OperationKey("template_self_action", variant), templateSelf);
     }
 }
