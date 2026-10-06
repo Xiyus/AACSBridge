@@ -130,6 +130,10 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             // Osty 生命管理（模拟器追踪 Osty HP）
             "ncr_healosty" => null,
             "ncr_killosty" => null,
+            // Osty 召唤（模拟器原生 SummonOsty API）
+            "ncr_summon" => null,
+            "ncr_summonx" => null,
+            "ncr_createsoulindrawx" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -719,6 +723,35 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 var osty = mirror.Simulator.State.GetOsty(owner);
                 if (osty is null) return;
                 mirror.Simulator.Kill(osty);
+                return;
+            }
+            case "ncr_summon":
+            {
+                // 源码：OstyCmd.Summon(ctx, owner, amount, card)
+                // 镜像：模拟器原生 SummonOsty（创建 Osty 或增加已有 Osty 的最大生命）
+                if (count <= 0) return;
+                if (mirror.CombatState is global::CombatSolver.SimulatedCombatState summonCombat)
+                    summonCombat.SummonOsty(mirror.Simulator, owner, count);
+                return;
+            }
+            case "ncr_summonx":
+            {
+                // 源码：X 次召唤，每次 summonAmount HP
+                var summonAmount = context.RuntimeValue("amount", Math.Max(1, count));
+                var x = context.RuntimeValue("hits", context.Card.ResolveEffectEnergyXValue());
+                if (mirror.CombatState is global::CombatSolver.SimulatedCombatState summonXCombat)
+                    for (var i = 0; i < x; i++)
+                        summonXCombat.SummonOsty(mirror.Simulator, owner, summonAmount);
+                return;
+            }
+            case "ncr_createsoulindrawx":
+            {
+                // 源码：X 张 Soul → 抽牌堆（随机位置）
+                var soulCount = context.RuntimeValue("amount",
+                    context.Card.ResolveEffectEnergyXValue());
+                if (soulCount <= 0) return;
+                mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Soul>(
+                    owner, PileType.Draw, soulCount, owner);
                 return;
             }
             default:
