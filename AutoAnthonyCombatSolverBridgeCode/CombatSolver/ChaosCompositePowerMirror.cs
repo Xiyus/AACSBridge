@@ -262,6 +262,8 @@ internal static class ChaosCompositePowerMirror
             }
             else state.Snapshot.DefensiveTurnEffectsExpired = true;
             state.Refresh();
+            // Batch AQ-2：this_turn 触发器回合结束过期（源码 TurnLimitedTriggerExpired → RemoveIfNoLiveEffects）
+            RemoveIfFinished(power, simulator, state.Snapshot);
         }
     }
 

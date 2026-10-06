@@ -18,6 +18,8 @@ internal static class ChaosTriggerPolicy
             ("next_turns_start", "next_n_turns") => true,
             ("turn_start" or "turn_end" or "card_played" or "attack_played" or "skill_played"
                 or "power_played" or "card_drawn" or "card_exhausted", "combat") => true,
+            // Batch AQ-2：this_turn lifetime（回合结束过期——TurnLimitedTriggerExpired 机制已有）
+            ("attack_played", "this_turn") => true,
             ("strike_card_drawn" or "ethereal_card_drawn" or "card_drawn_during_turn"
                 or "first_status_drawn_each_turn", "combat") => true,
             _ => false
