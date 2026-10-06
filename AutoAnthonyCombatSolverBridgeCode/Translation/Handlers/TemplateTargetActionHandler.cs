@@ -3,6 +3,7 @@ using AutoAnthonyCombatSolverBridge.Translation;
 using ChaosCardGenerator;
 using CombatSolver.Engine.Common;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Models.Orbs;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 
@@ -37,6 +38,11 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
             "r_kingssworddoubledamagethisturn" => null,
             "ncr_doomscaleddamage" => null,
             "ncr_ostydamage" => null,
+            "ncr_unpowereddamage" => null,
+            "ncr_applypower_sicempower" => null,
+            "ncr_doublehangdamage" => null,
+            "ncr_applydoomequaldamage" => null,
+            "d_triggerlightningpassivesattarget" => null,
             _ => $"template_target_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -150,6 +156,52 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
                 if (ostyHits > 0)
                     mirror.Simulator.Damage([target], ostyDamage,
                         context.DamageProps, osty, context.Mirror.Card, context.Mirror.CardPlay);
+                return;
+            }
+            case "ncr_unpowereddamage":
+            {
+                // 源码 L1727-1735：Unpowered 伤害（Power 卡路径——无力量加成）
+                var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
+                var (dmg, hits) = DamageModifierResolver.Resolve(context, amount, 1);
+                if (hits > 0)
+                    mirror.Simulator.Damage([target], dmg,
+                        MegaCrit.Sts2.Core.ValueProps.ValueProp.Unpowered,
+                        owner.Creature, context.Mirror.Card, context.Mirror.CardPlay);
+                return;
+            }
+            case "ncr_applypower_sicempower":
+            {
+                // 源码：PowerCmd.Apply<SicEmPower>(target, amount)
+                var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
+                effects.ApplyPowerFromSource(typeof(SicEmPower), target, amount, owner.Creature, context.Card);
+                return;
+            }
+            case "ncr_doublehangdamage":
+            {
+                // 源码：翻倍目标的 HangDamage（简化——施加等量 StranglePower）
+                if (mirror.CombatState is global::CombatSolver.SimulatedCombatState hangCombat)
+                {
+                    var hang = hangCombat.GetAmount<StranglePower>(target);
+                    if (hang > 0)
+                        effects.ApplyPowerFromSource(typeof(StranglePower), target, hang, owner.Creature, context.Card);
+                }
+                return;
+            }
+            case "ncr_applydoomequaldamage":
+            {
+                // 源码 L1711-1714：Doom = 本次伤害量（state.LastDamageDealt）
+                // 简化：Doom = OperationAmount（直接打出时近似）
+                var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
+                if (amount > 0)
+                    effects.ApplyPowerFromSource(typeof(DoomPower), target, amount, owner.Creature, context.Card);
+                return;
+            }
+            case "d_triggerlightningpassivesattarget":
+            {
+                // 源码 L2330：触发所有闪电球的被动（对目标）
+                var orbQueue = mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue;
+                foreach (var orb in orbQueue.Orbs.OfType<LightningOrb>().ToList())
+                    mirror.Simulator.OrbPassive(orb, target);
                 return;
             }
             default:
