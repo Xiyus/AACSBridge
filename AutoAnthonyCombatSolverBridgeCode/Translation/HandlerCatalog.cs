@@ -63,7 +63,8 @@ public static class HandlerCatalog
                      "d_channelfrost", "d_channeldark", "d_channellightning",
                      "d_channelglass", "d_channelplasma", "d_channelrandom",
                      "d_gainfocus", "d_gaintemporaryfocus", "d_gainorbslots", "n_createshiv",
-                     "r_forge", "n_allpoison",
+                     "r_forge", "n_allpoison", "d_evokerightmostorb", "d_loseorbslots",
+                     "d_nextturnenergy", "d_losefocus", "d_gainstrength", "d_gaindexterity",
                  })
             registry.Register(new OperationKey("template_self_action", variant), templateSelf);
 

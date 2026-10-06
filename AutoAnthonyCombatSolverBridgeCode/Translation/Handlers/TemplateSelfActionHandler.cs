@@ -42,6 +42,12 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "n_createshiv" => null,
             "r_forge" => null,
             "n_allpoison" => null,
+            "d_evokerightmostorb" => null,
+            "d_loseorbslots" => null,
+            "d_nextturnenergy" => null,
+            "d_losefocus" => null,
+            "d_gainstrength" => null,
+            "d_gaindexterity" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -134,6 +140,49 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                         enemy, count, owner.Creature, context.Card);
                 return;
             }
+            case "d_evokerightmostorb":
+            {
+                // 源码 L2296-2307：evokeCount 次 EvokeNext，仅最后一次 dequeue（Dualcast 式）
+                if (count == 0) return;
+                var orbQueue = mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue;
+                if (orbQueue.Orbs.Count == 0) return;
+                for (var i = 0; i < count; i++)
+                    mirror.Simulator.OrbEvokeNext(owner, 1, dequeue: i == count - 1);
+                return;
+            }
+            case "d_loseorbslots":
+                // 源码 L2190：OrbCmd.RemoveSlots(owner, amount)
+                if (count == 0) return;
+                mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue.RemoveCapacity(count);
+                return;
+            case "d_nextturnenergy":
+                // 源码 L2198-2199：PowerCmd.Apply<EnergyNextTurnPower>(owner, amount)
+                if (count == 0) return;
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects2)
+                    throw new InvalidOperationException("下回合能量需要分支战斗状态效果汇。");
+                effects2.ApplyPowerFromSource(typeof(EnergyNextTurnPower), owner.Creature, count, owner.Creature, context.Card);
+                return;
+            case "d_losefocus":
+                // 源码 L2187-2188：PowerCmd.Apply<FocusPower>(owner, -amount)
+                if (count == 0) return;
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects3)
+                    throw new InvalidOperationException("失焦需要分支战斗状态效果汇。");
+                effects3.ApplyPowerFromSource(typeof(FocusPower), owner.Creature, -count, owner.Creature, context.Card);
+                return;
+            case "d_gainstrength":
+                // 源码 L2192-2193：PowerCmd.Apply<StrengthPower>(owner, amount)
+                if (count == 0) return;
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects4)
+                    throw new InvalidOperationException("力量需要分支战斗状态效果汇。");
+                effects4.ApplyPowerFromSource(typeof(StrengthPower), owner.Creature, count, owner.Creature, context.Card);
+                return;
+            case "d_gaindexterity":
+                // 源码 L2195-2196：PowerCmd.Apply<DexterityPower>(owner, amount)
+                if (count == 0) return;
+                if (mirror.CombatState is not ICombatPredictionEffectSink effects5)
+                    throw new InvalidOperationException("敏捷需要分支战斗状态效果汇。");
+                effects5.ApplyPowerFromSource(typeof(DexterityPower), owner.Creature, count, owner.Creature, context.Card);
+                return;
             default:
                 throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);
         }
