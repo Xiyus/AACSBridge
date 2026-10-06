@@ -23,9 +23,12 @@ and actual Harmony patch targets. They do not certify strict predicted/live comb
 The independent-template regression checks reject incomplete upgrade / autoplay / optional-exhaust
 effects, verify that a supported condition cannot bypass payoff validation, and check the installed
 Tempest output-slot contract (five fixed orb types, random, and the legacy default).
-The latest 2026-10-06 run passed 113 checks, including exact-one-skill draw-state transitions,
+The latest 2026-10-07 run passed 117 checks, including exact-one-skill draw-state transitions,
 draw-event ordering/filtering, unwired-trigger and approximation rejection, standalone proxy-rule
-admission, and first-status flag fork/fingerprint/continuation isolation.
+admission, and first-status flag fork/fingerprint/continuation isolation. Batch AR adds resolved-cost
+trigger admission, lifetime/slot/dynamic-value rejection, captured-threshold fork isolation and an
+executable BeforeCardPlayed registration check. Batch AO/AP admission assertions now reflect the
+current implementation; these assertions do not certify those effects' combat equivalence.
 Immediate poison, retain, free-skill and proxy combat behavior
 still need live strict-diff fixtures; support/slot checks are not combat equivalence tests.
 

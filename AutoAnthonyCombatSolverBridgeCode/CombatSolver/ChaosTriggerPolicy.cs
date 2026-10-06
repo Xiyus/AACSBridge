@@ -20,11 +20,13 @@ internal static class ChaosTriggerPolicy
                 or "power_played" or "card_drawn" or "card_exhausted", "combat") => true,
             // Batch AQ-2：this_turn lifetime（回合结束过期——TurnLimitedTriggerExpired 机制已有）
             ("attack_played", "this_turn") => true,
+            ("energy_cost_at_least_card_played", "combat") => true,
             ("strike_card_drawn" or "ethereal_card_drawn" or "card_drawn_during_turn"
                 or "first_status_drawn_each_turn", "combat") => true,
             _ => false
         };
-        if (!supported || trigger.ThresholdSlot is not null
+        if (!supported || (trigger.ThresholdSlot is not null
+                && (trigger.Kind != "energy_cost_at_least_card_played" || trigger.ThresholdSlot != "threshold"))
             || (trigger.DurationSlot is not null && trigger.Kind != "next_turns_start"))
             return $"触发器 {trigger.Kind}/{trigger.Lifetime} 不在 0.6.0 支持矩阵";
         if (spec.Values.Any(value => value.Source != "fixed"))

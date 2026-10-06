@@ -17,10 +17,10 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 
 ---
 
-## 当前开发状态（2026-10-06，1.1.0 开发树验收纠偏）
+## 当前开发状态（2026-10-07，Batch AR）
 
-当前源码已超过历史 1.0.0：**147 个注册键，113 项离线检查通过**。本机已安装 DLL 枚举到
-467 个目录原子，235 个通过单操作校验；这是单操作准入统计，**不是整卡覆盖率或实机等价率**，
+当前源码已超过历史 1.0.0：**212 个注册键，117 项离线检查通过**。本机已安装 DLL 枚举到
+467 个目录原子，331 个通过单操作校验；这是单操作准入统计，**不是整卡覆盖率或实机等价率**，
 不能与历史 587/931 直接比较。逐条结果及二进制 hash 见 [目录审计](docs/catalog-audit.json)，
 本轮结论与剩余工作见 [验收与后续清单](docs/acceptance-and-backlog.md)。
 
@@ -30,6 +30,18 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 整卡执行遇到 pending choice 而没有续接时硬失败，不再继续执行后续操作。
 
 **本轮新增行为尚未进行实机严格 diff，不据此宣布发布验收完成。** 以下为上一批和历史记录。
+
+### Batch AR：高费用出牌触发器
+
+| 触发器 | lifetime | 派发与阈值 | 收益边界 |
+|---|---|---|---|
+| `energy_cost_at_least_card_played` | `combat` | `BeforeCardPlayed`；逐操作比较当前 `EnergyCost.GetResolved()` 与复合 Power 的 `EffectiveOperationAmount(index, 2)` | 自身格挡/能量/治疗、全体或随机伤害；fixed 数值 |
+
+阈值读取模拟分支捕获的操作数值，沿用 AutoAnthony 的升级/槽位回退逻辑，并纳入成员守卫。
+该事件不使用实际消耗能量，也不套用 `AfterCardPlayed` 的武装牌跳过标记；多条阈值分别判断。
+其他 lifetime、未知阈值槽、动态阈值和未支持收益仍拒绝。
+本轮修正 Batch AO/AP 后过时的拒绝断言，验证真实 `BeforeCardPlayed` handler 登记和阈值 Fork 隔离。
+Release 构建及 117 项离线检查通过；高费用触发器的实机严格 diff 尚待验证。
 
 ### Batch M 与独立模板纠偏
 

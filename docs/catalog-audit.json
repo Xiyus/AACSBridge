@@ -2,9 +2,9 @@
   "schema": 1,
   "autoAnthonySha256": "ad004f42f18ed86ccc7f66317823cf77fb40195b6466872bbd7038b3d8952965",
   "combatSolverSha256": "832060172aa5eae8d79546f120a10e4571c324b7c0d6ab2c6abc2bcad24323cd",
-  "registeredKeys": 147,
+  "registeredKeys": 212,
   "catalogAtoms": 467,
-  "acceptedAtoms": 235,
+  "acceptedAtoms": 331,
   "note": "Singleton operation validation only. Whole-card dependencies, upgrades and live strict diff remain required.",
   "rows": [
     {
@@ -20,16 +20,16 @@
       "scope": "NonTargeted",
       "opcode": "move_card",
       "variant": "random",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=N:Move\uFF1Aopcode=move_card variant=random \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:UpgradeThatCard",
       "scope": "Independent",
       "opcode": "upgrade_card",
       "variant": "referenced",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:UpgradeThatCard\uFF1Aopcode=upgrade_card variant=referenced \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "T:D",
@@ -124,8 +124,8 @@
       "scope": "Modifier",
       "opcode": "modify_damage",
       "variant": "current_block",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=M:value\uFF1AModifier \u64CD\u4F5C\uFF08M:value\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:Exhaust",
@@ -172,8 +172,8 @@
       "scope": "NonTargeted",
       "opcode": "exhaust_card",
       "variant": "random",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=N:Exhaust\uFF1Aopcode=exhaust_card variant=random \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "C:VulnerableEnemyDamageReductionThisTurn",
@@ -284,16 +284,16 @@
       "scope": "ConditionalTrigger",
       "opcode": "condition",
       "variant": "fatal",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:ifFatal\uFF1A\u6761\u4EF6 kind=fatal \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:GainMaxHp",
       "scope": "Independent",
       "opcode": "gain_max_hp",
       "variant": "immediate",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:GainMaxHp\uFF1Aopcode=gain_max_hp variant=immediate \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:Exhaust",
@@ -309,7 +309,7 @@
       "opcode": "trigger",
       "variant": "event",
       "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:forEachExhaustedCard\uFF1A\u4E0D\u662F\u5DF2\u5EFA\u6A21\u7684\u590D\u5408 Power \u89E6\u53D1\u5668\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:forEachExhaustedCard\uFF1AForEach \u89E6\u53D1\u5668\u6CA1\u6709\u6536\u76CA\u64CD\u4F5C\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
     },
     {
       "template": "T:D",
@@ -492,8 +492,8 @@
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "i_drawuntilnonattack",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:DrawUntilNonAttack\uFF1Aopcode=template_independent_action variant=i_drawuntilnonattack \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:Transform",
@@ -508,8 +508,8 @@
       "scope": "ConditionalTrigger",
       "opcode": "trigger",
       "variant": "event",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:untilTurnEndAttackPlayed\uFF1A\u89E6\u53D1\u5668 attack_played/this_turn \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:IncreaseDamageThisCombat",
@@ -533,7 +533,7 @@
       "opcode": "trigger",
       "variant": "event",
       "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:forEachExhaustedNonAttack\uFF1A\u4E0D\u662F\u5DF2\u5EFA\u6A21\u7684\u590D\u5408 Power \u89E6\u53D1\u5668\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:forEachExhaustedNonAttack\uFF1AForEach \u89E6\u53D1\u5668\u6CA1\u6709\u6536\u76CA\u64CD\u4F5C\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
     },
     {
       "template": "N:TempStrength",
@@ -604,8 +604,8 @@
       "scope": "Modifier",
       "opcode": "modify_hits",
       "variant": "hp_loss_scaled",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=M:repeat\uFF1AModifier \u64CD\u4F5C\uFF08M:repeat\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:ExhaustRandomAttack",
@@ -652,8 +652,8 @@
       "scope": "Independent",
       "opcode": "modify_cost",
       "variant": "set_zero",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:SetCostZero\uFF1Aopcode=modify_cost variant=set_zero \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "T:Apply",
@@ -1108,8 +1108,8 @@
       "scope": "Independent",
       "opcode": "modify_cost",
       "variant": "set_zero",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:NextSkillCostsZero\uFF1Aopcode=modify_cost variant=set_zero \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "M:DamageMinusPerCardInHand",
@@ -1204,8 +1204,8 @@
       "scope": "ConditionalTrigger",
       "opcode": "condition",
       "variant": "fatal",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:ifFatal\uFF1A\u6761\u4EF6 kind=fatal \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:AddCardReward",
@@ -1228,8 +1228,8 @@
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "i_reducethiscardcostcombat",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ReduceThisCardCostCombat\uFF1Aopcode=template_independent_action variant=i_reducethiscardcostcombat \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "A:ruleRetainHand",
@@ -1268,8 +1268,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "d_createzerocostcopyindiscard",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:CreateZeroCostCopyInDiscard\uFF1Aopcode=template_self_action variant=d_createzerocostcopyindiscard \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "D:ReturnZeroCostDiscardToHand",
@@ -1292,8 +1292,8 @@
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "d_foreachorb",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:ForEachOrb\uFF1AModifier \u64CD\u4F5C\uFF08D:ForEachOrb\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "D:RepeatPerOrb",
@@ -1436,8 +1436,8 @@
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "d_increaseallclaws",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:IncreaseAllClaws\uFF1Aopcode=template_independent_action variant=d_increaseallclaws \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "D:TransformStatusesToFuel",
@@ -1452,8 +1452,8 @@
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "d_foreachuniqueorb",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:ForEachUniqueOrb\uFF1AModifier \u64CD\u4F5C\uFF08D:ForEachUniqueOrb\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:Draw",
@@ -1500,16 +1500,16 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "d_triggerdarkpassives",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:TriggerDarkPassives\uFF1Aopcode=template_self_action variant=d_triggerdarkpassives \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:ProxyAtomic_DoubleEnergy",
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "i_proxyatomic_doubleenergy",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_DoubleEnergy\uFF1Aopcode=template_independent_action variant=i_proxyatomic_doubleenergy \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "D:EvokeRightmostOrb",
@@ -1573,7 +1573,7 @@
       "opcode": "trigger",
       "variant": "event",
       "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:ForEachExhaustedStatus\uFF1A\u4E0D\u662F\u5DF2\u5EFA\u6A21\u7684\u590D\u5408 Power \u89E6\u53D1\u5668\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:ForEachExhaustedStatus\uFF1AForEach \u89E6\u53D1\u5668\u6CA1\u6709\u6536\u76CA\u64CD\u4F5C\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
     },
     {
       "template": "N:RandomD",
@@ -1692,8 +1692,8 @@
       "scope": "NonTargeted",
       "opcode": "apply_power",
       "variant": "focus_loss_this_turn",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:LoseTemporaryFocus\uFF1Aopcode=apply_power variant=focus_loss_this_turn \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "A:whenFirstStatusDrawn",
@@ -1732,8 +1732,8 @@
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "d_setthiscardcostzero",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:SetThisCardCostZero\uFF1Aopcode=template_independent_action variant=d_setthiscardcostzero \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:ProxyAtomic_MultiCast",
@@ -1804,8 +1804,8 @@
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "i_proxyatomic_signalboost",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_SignalBoost\uFF1Aopcode=template_independent_action variant=i_proxyatomic_signalboost \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "A:whenStatusGenerated",
@@ -1828,16 +1828,16 @@
       "scope": "ConditionalTrigger",
       "opcode": "condition",
       "variant": "fatal",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:ifFatal\uFF1A\u6761\u4EF6 kind=fatal \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "D:NextPowerCostsZero",
       "scope": "NonTargeted",
       "opcode": "modify_cost",
       "variant": "set_zero",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:NextPowerCostsZero\uFF1Aopcode=modify_cost variant=set_zero \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:ProxyAtomic_Tempest",
@@ -1852,8 +1852,8 @@
       "scope": "SingleEnemyOnly",
       "opcode": "template_target_action",
       "variant": "d_triggerlightningpassivesattarget",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=D:TriggerLightningPassivesAtTarget\uFF1Aopcode=template_target_action variant=d_triggerlightningpassivesattarget \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "A:whenLightningEvoked",
@@ -1892,24 +1892,24 @@
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "i_proxyatomic_voltaic",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Voltaic\uFF1Aopcode=template_independent_action variant=i_proxyatomic_voltaic \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:ProxyAtomic_WhiteNoise",
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "i_proxyatomic_whitenoise",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_WhiteNoise\uFF1Aopcode=template_independent_action variant=i_proxyatomic_whitenoise \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:Summon",
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_summon",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:Summon\uFF1Aopcode=template_self_action variant=ncr_summon \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:AllD",
@@ -1948,8 +1948,8 @@
       "scope": "SingleEnemyOnly",
       "opcode": "template_target_action",
       "variant": "ncr_applydoomequaldamage",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ApplyDoomEqualDamage\uFF1Aopcode=template_target_action variant=ncr_applydoomequaldamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:IfOstyAlive",
@@ -1964,8 +1964,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_ostyalldamage",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:OstyAllDamage\uFF1Aopcode=template_self_action variant=ncr_ostyalldamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:B",
@@ -1980,8 +1980,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_killosty",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:KillOsty\uFF1Aopcode=template_self_action variant=ncr_killosty \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:E",
@@ -1996,8 +1996,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_increaseallcardcoststhisturn",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:IncreaseAllCardCostsThisTurn\uFF1Aopcode=template_self_action variant=ncr_increaseallcardcoststhisturn \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "A:ProxyAtomic_Calcify",
@@ -2020,8 +2020,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_addrandometherealcardtohand",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:AddRandomEtherealCardToHand\uFF1Aopcode=template_self_action variant=ncr_addrandometherealcardtohand \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "T:LoseHp",
@@ -2036,16 +2036,16 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_createsoulindraw",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:CreateSoulInDraw\uFF1Aopcode=template_self_action variant=ncr_createsoulindraw \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:ExhaustSelectedDrawCard",
       "scope": "NonTargeted",
       "opcode": "exhaust_card",
       "variant": "selected",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ExhaustSelectedDrawCard\uFF1Aopcode=exhaust_card variant=selected \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:ApplyDoom",
@@ -2060,8 +2060,8 @@
       "scope": "AbilityTrigger",
       "opcode": "trigger",
       "variant": "event",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=A:whenEnergyCostAtLeast\uFF1A\u89E6\u53D1\u5668 energy_cost_at_least_card_played/combat \u4E0D\u5728 0.6.0 \u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:ForEachCardDrawnThisTurn",
@@ -2148,48 +2148,48 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_summonx",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:SummonX\uFF1Aopcode=template_self_action variant=ncr_summonx \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:CreateSoulInDrawX",
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_createsoulindrawx",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:CreateSoulInDrawX\uFF1Aopcode=template_self_action variant=ncr_createsoulindrawx \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:UpgradeRandomDiscardCards",
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_upgraderandomdiscardcards",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:UpgradeRandomDiscardCards\uFF1Aopcode=template_self_action variant=ncr_upgraderandomdiscardcards \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:ProxyAtomic_Dredge",
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "i_proxyatomic_dredge",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Dredge\uFF1Aopcode=template_independent_action variant=i_proxyatomic_dredge \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:ProxyAtomic_Eidolon",
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "i_proxyatomic_eidolon",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Eidolon\uFF1Aopcode=template_independent_action variant=i_proxyatomic_eidolon \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:KillEnemiesAtDoomThreshold",
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_killenemiesatdoomthreshold",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:KillEnemiesAtDoomThreshold\uFF1Aopcode=template_self_action variant=ncr_killenemiesatdoomthreshold \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "T:TempStrengthLoss",
@@ -2220,8 +2220,8 @@
       "scope": "SingleEnemyOnly",
       "opcode": "template_target_action",
       "variant": "ncr_ostydamage",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:OstyDamage\uFF1Aopcode=template_target_action variant=ncr_ostydamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:IfFirstPlayThisTurn",
@@ -2276,8 +2276,8 @@
       "scope": "SingleEnemyOnly",
       "opcode": "template_target_action",
       "variant": "ncr_doublehangdamage",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:DoubleHangDamage\uFF1Aopcode=template_target_action variant=ncr_doublehangdamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "T:LoseHp",
@@ -2308,8 +2308,8 @@
       "scope": "Modifier",
       "opcode": "modify_damage",
       "variant": "triggered_attack_percentage",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=M:TriggeredAttackDamagePercent\uFF1AModifier \u64CD\u4F5C\uFF08M:TriggeredAttackDamagePercent\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:WheneverCreatureDies",
@@ -2348,8 +2348,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_allenemiesloseeventhp",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:AllEnemiesLoseEventHp\uFF1Aopcode=template_self_action variant=ncr_allenemiesloseeventhp \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:ApplySelfDoom",
@@ -2404,16 +2404,16 @@
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "ncr_ostymaxhpbonusdamage",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:OstyMaxHpBonusDamage\uFF1AModifier \u64CD\u4F5C\uFF08NCR:OstyMaxHpBonusDamage\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:RepeatPerVoidPlayedCombat",
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "ncr_repeatpervoidplayedcombat",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:RepeatPerVoidPlayedCombat\uFF1AModifier \u64CD\u4F5C\uFF08NCR:RepeatPerVoidPlayedCombat\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:ForEachOstyAttackThisTurn",
@@ -2468,8 +2468,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_blocktripleostymaxhp",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:BlockTripleOstyMaxHp\uFF1Aopcode=template_self_action variant=ncr_blocktripleostymaxhp \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:AddVoidToSelectedHandCard",
@@ -2484,32 +2484,32 @@
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "i_proxyatomic_seance",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Seance\uFF1Aopcode=template_independent_action variant=i_proxyatomic_seance \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:AddSweepingGazeToHand",
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_addsweepinggazetohand",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:AddSweepingGazeToHand\uFF1Aopcode=template_self_action variant=ncr_addsweepinggazetohand \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:CreateSoulInHand",
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_createsoulinhand",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:CreateSoulInHand\uFF1Aopcode=template_self_action variant=ncr_createsoulinhand \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:CreateSoulInDiscard",
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_createsoulindiscard",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:CreateSoulInDiscard\uFF1Aopcode=template_self_action variant=ncr_createsoulindiscard \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:TargetLoseStrength",
@@ -2540,8 +2540,8 @@
       "scope": "SingleEnemyOnly",
       "opcode": "template_target_action",
       "variant": "ncr_applypower_sicempower",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ApplyPower_SicEmPower\uFF1Aopcode=template_target_action variant=ncr_applypower_sicempower \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "A:whenDebuffApplied",
@@ -2556,8 +2556,8 @@
       "scope": "SingleEnemyOnly",
       "opcode": "template_target_action",
       "variant": "ncr_unpowereddamage",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:UnpoweredDamage\uFF1Aopcode=template_target_action variant=ncr_unpowereddamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:AddRetainToSelectedHandCard",
@@ -2572,16 +2572,16 @@
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "ncr_foreachexhaustedsoul",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ForEachExhaustedSoul\uFF1AModifier \u64CD\u4F5C\uFF08NCR:ForEachExhaustedSoul\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:DamagePerExhaustedSoul",
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "ncr_damageperexhaustedsoul",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:DamagePerExhaustedSoul\uFF1AModifier \u64CD\u4F5C\uFF08NCR:DamagePerExhaustedSoul\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "A:whenEtherealPlayed",
@@ -2596,48 +2596,48 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "ncr_healosty",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:HealOsty\uFF1Aopcode=template_self_action variant=ncr_healosty \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:ForEachOstyAttackCard",
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "ncr_foreachostyattackcard",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:ForEachOstyAttackCard\uFF1AModifier \u64CD\u4F5C\uFF08NCR:ForEachOstyAttackCard\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:DamagePerOstyAttackCard",
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "ncr_damageperostyattackcard",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:DamagePerOstyAttackCard\uFF1AModifier \u64CD\u4F5C\uFF08NCR:DamagePerOstyAttackCard\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:IncreaseThisCardDamageRun",
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "ncr_increasethiscarddamagerun",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:IncreaseThisCardDamageRun\uFF1Aopcode=template_independent_action variant=ncr_increasethiscarddamagerun \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:DoomScaledDamage",
       "scope": "SingleEnemyOnly",
       "opcode": "template_target_action",
       "variant": "ncr_doomscaleddamage",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:DoomScaledDamage\uFF1Aopcode=template_target_action variant=ncr_doomscaleddamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:ProxyAtomic_Transfigure",
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "i_proxyatomic_transfigure",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Transfigure\uFF1Aopcode=template_independent_action variant=i_proxyatomic_transfigure \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:Create",
@@ -2652,16 +2652,16 @@
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "ncr_ostycurrenthpbonusdamage",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:OstyCurrentHpBonusDamage\uFF1AModifier \u64CD\u4F5C\uFF08NCR:OstyCurrentHpBonusDamage\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "NCR:NextVoidCostsZero",
       "scope": "NonTargeted",
       "opcode": "modify_cost",
       "variant": "set_zero",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=NCR:NextVoidCostsZero\uFF1Aopcode=modify_cost variant=set_zero \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:E",
@@ -2724,8 +2724,8 @@
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "i_proxyatomic_begone",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Begone\uFF1Aopcode=template_independent_action variant=i_proxyatomic_begone \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:Draw",
@@ -2804,8 +2804,8 @@
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "i_proxyatomic_charge",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Charge\uFF1Aopcode=template_independent_action variant=i_proxyatomic_charge \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "A:whenOneStarSpent",
@@ -2820,8 +2820,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "r_adddebristohand",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:AddDebrisToHand\uFF1Aopcode=template_self_action variant=r_adddebristohand \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "T:Apply",
@@ -2844,8 +2844,8 @@
       "scope": "SingleEnemyOnly",
       "opcode": "template_target_action",
       "variant": "r_kingssworddoubledamagethisturn",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:KingsSwordDoubleDamageThisTurn\uFF1Aopcode=template_target_action variant=r_kingssworddoubledamagethisturn \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:RetainHandThisTurn",
@@ -2876,8 +2876,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "r_fillhandwithdebris",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:FillHandWithDebris\uFF1Aopcode=template_self_action variant=r_fillhandwithdebris \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "R:ForEachStarCostCard",
@@ -2932,16 +2932,16 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "r_putselectedhandcardsondraw",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:PutSelectedHandCardsOnDraw\uFF1Aopcode=template_self_action variant=r_putselectedhandcardsondraw \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:ProxyAtomic_Guards",
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "i_proxyatomic_guards",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Guards\uFF1Aopcode=template_independent_action variant=i_proxyatomic_guards \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "T:D_EnergyX",
@@ -2964,8 +2964,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "r_copyselectedcolorlesscard",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:CopySelectedColorlessCard\uFF1Aopcode=template_self_action variant=r_copyselectedcolorlesscard \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "R:AtTurnEndWhenTopOfDraw",
@@ -2988,8 +2988,8 @@
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "r_wheneverdrawn",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:WheneverDrawn\uFF1AModifier \u64CD\u4F5C\uFF08R:WheneverDrawn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "R:CostDownWhenDrawn",
@@ -3004,24 +3004,24 @@
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "r_damageupwhendrawn",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:DamageUpWhenDrawn\uFF1AModifier \u64CD\u4F5C\uFF08R:DamageUpWhenDrawn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "C:ifFatal",
       "scope": "ConditionalTrigger",
       "opcode": "condition",
       "variant": "fatal",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:ifFatal\uFF1A\u6761\u4EF6 kind=fatal \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "R:ForEachSkillPlayedThisTurn",
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "r_foreachskillplayedthisturn",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:ForEachSkillPlayedThisTurn\uFF1AModifier \u64CD\u4F5C\uFF08R:ForEachSkillPlayedThisTurn\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "R:RepeatPerSkillPlayedThisTurn",
@@ -3156,16 +3156,16 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "r_putselectedhandcardondraw",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:PutSelectedHandCardOnDraw\uFF1Aopcode=template_self_action variant=r_putselectedhandcardondraw \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "I:ProxyAtomic_Quasar",
       "scope": "Independent",
       "opcode": "choose_generated_card",
       "variant": "random_colorless",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=I:ProxyAtomic_Quasar\uFF1Aopcode=choose_generated_card variant=random_colorless \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "R:ForEachStarGainedThisTurn",
@@ -3244,16 +3244,16 @@
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "r_foreachgeneratedcardcombat",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:ForEachGeneratedCardCombat\uFF1AModifier \u64CD\u4F5C\uFF08R:ForEachGeneratedCardCombat\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "R:BonusPerGeneratedCardThisCombat",
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "r_bonuspergeneratedcardthiscombat",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=R:BonusPerGeneratedCardThisCombat\uFF1AModifier \u64CD\u4F5C\uFF08R:BonusPerGeneratedCardThisCombat\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "A:ProxyAtomic_SwordSage",
@@ -3300,16 +3300,16 @@
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "cl_proxyatomic_alchemize",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ProxyAtomic_Alchemize\uFF1Aopcode=template_independent_action variant=cl_proxyatomic_alchemize \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "CL:ProxyAtomic_Anointed",
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "cl_proxyatomic_anointed",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ProxyAtomic_Anointed\uFF1Aopcode=template_independent_action variant=cl_proxyatomic_anointed \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "CL:EveryCardsDrawn",
@@ -3332,8 +3332,8 @@
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "cl_proxyatomic_beatdown",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ProxyAtomic_BeatDown\uFF1Aopcode=template_independent_action variant=cl_proxyatomic_beatdown \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "T:D",
@@ -3380,8 +3380,8 @@
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "cl_proxyatomic_catastrophe",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ProxyAtomic_Catastrophe\uFF1Aopcode=template_independent_action variant=cl_proxyatomic_catastrophe \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "T:TempStrengthLoss",
@@ -3396,8 +3396,8 @@
       "scope": "Independent",
       "opcode": "choose_generated_card",
       "variant": "random_current_character",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ProxyAtomic_Discovery\uFF1Aopcode=choose_generated_card variant=random_current_character \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:AllD",
@@ -3420,8 +3420,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "cl_transformselectedhandcards",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:TransformSelectedHandCards\uFF1Aopcode=template_self_action variant=cl_transformselectedhandcards \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:B",
@@ -3460,8 +3460,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "cl_gainblockequaldamage",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:GainBlockEqualDamage\uFF1Aopcode=template_self_action variant=cl_gainblockequaldamage \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "CL:DamageEqualCardsPlayedCombat",
@@ -3476,8 +3476,8 @@
       "scope": "ConditionalTrigger",
       "opcode": "condition",
       "variant": "fatal",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=C:ifFatal\uFF1A\u6761\u4EF6 kind=fatal \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "CL:GainGold",
@@ -3524,16 +3524,16 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "cl_playtopdrawcard",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:PlayTopDrawCard\uFF1Aopcode=template_self_action variant=cl_playtopdrawcard \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "CL:ForEachDrawPileCard",
       "scope": "Modifier",
       "opcode": "template_modifier",
       "variant": "cl_foreachdrawpilecard",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ForEachDrawPileCard\uFF1AModifier \u64CD\u4F5C\uFF08CL:ForEachDrawPileCard\uFF09\u7684\u4FEE\u9970\u7B26\u6570\u5B66\u672A\u5EFA\u6A21\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "CL:FirstAttackOrSkillEachTurn",
@@ -3556,8 +3556,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "cl_damageotherenemiesequal",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:DamageOtherEnemiesEqual\uFF1Aopcode=template_self_action variant=cl_damageotherenemiesequal \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "CL:EveryCardsPlayedThisTurn",
@@ -3588,8 +3588,8 @@
       "scope": "Independent",
       "opcode": "template_independent_action",
       "variant": "cl_gainnextturnblockequalcurrent",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:GainNextTurnBlockEqualCurrent\uFF1Aopcode=template_independent_action variant=cl_gainnextturnblockequalcurrent \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:Self",
@@ -3668,8 +3668,8 @@
       "scope": "NonTargeted",
       "opcode": "template_self_action",
       "variant": "cl_choosefromrandomdrawcards",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ChooseFromRandomDrawCards\uFF1Aopcode=template_self_action variant=cl_choosefromrandomdrawcards \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "N:AllWeak",
@@ -3692,8 +3692,8 @@
       "scope": "Independent",
       "opcode": "choose_generated_card",
       "variant": "random_other_character_attack",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ProxyAtomic_Splash\uFF1Aopcode=choose_generated_card variant=random_other_character_attack \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "CL:WheneverDrawPileShuffled",
@@ -3708,8 +3708,8 @@
       "scope": "Independent",
       "opcode": "move_card",
       "variant": "selected",
-      "acceptedAtomicShape": false,
-      "rejectionReason": "AutoAnthony \u751F\u6210\u5361 \uFF1A\u64CD\u4F5C[0] template=CL:ChooseDrawCardToHand\uFF1Aopcode=move_card variant=selected \u4E0D\u5728\u652F\u6301\u77E9\u9635\u3002\u8BE5\u5361\u4E0D\u5728\u6865\u63A5\u652F\u6301\u77E9\u9635\u5185\uFF0C\u4E3A\u907F\u514D\u9519\u8BEF\u9884\u6D4B\u5DF2\u4E2D\u6B62\u672C\u6B21\u641C\u7D22\u3002"
+      "acceptedAtomicShape": true,
+      "rejectionReason": null
     },
     {
       "template": "CL:AfterTurns",

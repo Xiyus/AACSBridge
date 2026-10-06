@@ -57,7 +57,7 @@ public static class CompatibilityGuard
             "CanBeRandomlyGeneratedInCombat", "OrbEvokeRepeatCount"]),
         ("AutoAnthony.ChaosCompositePower", ["Definition", "Configure", "FireTriggers", "ConfigureTinkered",
             "CaptureMultiplayerState", "HasLiveEffects", "CapturedOperationValues", "WaitForNextTurn", "RemainingTurnTriggers",
-            "IgnoreArmingCardPlay", "SourceTinkeredDefinitionPayload", "SourceUpgraded", "Permanent"]),
+            "IgnoreArmingCardPlay", "SourceTinkeredDefinitionPayload", "SourceUpgraded", "Permanent", "EffectiveOperationAmount"]),
         ("AutoAnthony.ComponentRuntimeApi", ["Register", "RegisterPackage", "ApiVersion"]),
         ("ChaosCardGenerator.GeneratedCard", ["Operations", "Cost", "Type", "Target", "Rarity", "Character", "StarCost", "HasStarCostX", "Tags"]),
         ("ChaosCardGenerator.GeneratorOperation", ["Template", "Scope", "Parameters", "RuntimeSpec", "CardTargetSlot", "RequiresSingleTarget", "OrbOutputId"]),

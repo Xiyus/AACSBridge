@@ -48,6 +48,19 @@ void Run()
     var repeated = Op(Spec("trigger", "event", "self", new("next_turns_start", "next_n_turns", DurationSlot: "duration"),
         [new("duration", 3)]), "C:NextTurnsStart", OperationScope.ConditionalTrigger);
     Check(TriggerReason(repeated) is null, "next N turns");
+    var highCost = Op(Spec("trigger", "event", "self",
+        new("energy_cost_at_least_card_played", "combat", ThresholdSlot: "threshold"),
+        [new("threshold", 2)]), "A:whenEnergyCostAtLeast");
+    Check(TriggerReason(highCost) is null, "resolved-cost trigger admitted");
+    Check(TriggerReason(highCost with { RuntimeSpec = highCost.RuntimeSpec! with
+        { Trigger = new("energy_cost_at_least_card_played", "this_turn", ThresholdSlot: "threshold") } }) is not null,
+        "unwired high-cost lifetime rejected");
+    Check(TriggerReason(highCost with { RuntimeSpec = highCost.RuntimeSpec! with
+        { Trigger = new("energy_cost_at_least_card_played", "combat", ThresholdSlot: "unknown") } }) is not null,
+        "unknown high-cost threshold slot rejected");
+    Check(TriggerReason(highCost with { RuntimeSpec = highCost.RuntimeSpec! with
+        { Values = [new("threshold", 0, "energy_x")] } }) is not null,
+        "dynamic high-cost threshold rejected");
     Check(TriggerReason(delayed with { Parameters = new Dictionary<string, int> { ["triggerIndex"] = 0 } }) is not null,
         "nested trigger rejected");
     Check(TriggerReason(delayed with { RuntimeSpec = delayed.RuntimeSpec! with { Trigger = new("unknown", "next_turn") } }) is not null,
@@ -118,8 +131,14 @@ void Run()
     Check(!DrawnIsSkill(), "one attack is not a skill");
     local.RecordDrawnTypes([]);
     Check(!DrawnIsSkill(), "failed or zero draw clears previous result");
-    foreach (var kind in new[] { "fatal", "first_play_of_this_card_this_turn", "cards_played_this_turn_below",
-                 "has_frost_orb", "energy_x_at_least", "cards_played_this_turn_at_least", "unknown_condition" })
+    foreach (var kind in new[] { "fatal", "has_frost_orb", "cards_played_this_turn_at_least" })
+    {
+        var supportedCondition = conditionOp with { RuntimeSpec = conditionSpec with { Condition = new(kind, "self") } };
+        Check(validateOperation.Invoke(null, [TestChaosCard.Create([supportedCondition]), 0, supportedCondition]) is null,
+            "Batch AP condition admitted: " + kind);
+    }
+    foreach (var kind in new[] { "first_play_of_this_card_this_turn", "cards_played_this_turn_below",
+                 "energy_x_at_least", "unknown_condition" })
     {
         var unsupportedCondition = conditionOp with { RuntimeSpec = conditionSpec with { Condition = new(kind, "self") } };
         Check(validateOperation.Invoke(null, [TestChaosCard.Create([unsupportedCondition]), 0, unsupportedCondition]) is not null,
@@ -150,8 +169,14 @@ void Run()
                  "block_gained", "lightning_orb_evoked", "for_each_discarded_card", "self_exhausted", "attack_received" })
         Check(TriggerReason(Op(Spec("trigger", "event", "self", new(kind, "combat")))) is not null,
             "unwired trigger rejected: " + kind);
-    foreach (var variant in new[] { "m_repeatperattackthisturn", "ncr_foreachexhaustedsoul", "d_foreachenemy",
-                 "d_foreachorb", "ncr_foreachostyattackcard", "r_foreachstargainedthisturn", "r_foreachskillplayedthisturn" })
+    foreach (var variant in new[] { "ncr_foreachexhaustedsoul", "d_foreachorb", "ncr_foreachostyattackcard",
+                 "r_foreachskillplayedthisturn" })
+    {
+        var modifier = Op(Spec("template_modifier", variant, "self"), "M:Fixture", OperationScope.Modifier);
+        Check(validateOperation.Invoke(null, [TestChaosCard.Create([modifier]), 0, modifier]) is null,
+            "Batch AO modifier admitted: " + variant);
+    }
+    foreach (var variant in new[] { "m_repeatperattackthisturn", "d_foreachenemy", "r_foreachstargainedthisturn" })
     {
         var modifier = Op(Spec("template_modifier", variant, "self"), "M:Fixture", OperationScope.Modifier);
         Check(validateOperation.Invoke(null, [TestChaosCard.Create([modifier]), 0, modifier]) is not null,
@@ -231,6 +256,11 @@ void Run()
     stateType.GetMethod("Refresh")!.Invoke(fork, null);
     Check(snapshot.WaitForNextTurn && snapshot.RemainingTurnTriggers == 3, "sibling delayed state isolated");
     Check(snapshot.CapturedOperationValues[1] == 7 && power.CapturedOperationValues[1] == 7, "captured values deep fork");
+    var effectiveAmount = typeof(ChaosCompositePower).GetMethod("EffectiveOperationAmount", BindingFlags.Instance | BindingFlags.NonPublic)!;
+    Check((int)effectiveAmount.Invoke(snapshot, [1, 2])! == 7,
+        "high-cost threshold uses captured operation value instead of fallback");
+    Check((int)effectiveAmount.Invoke(forkSnapshot, [1, 2])! == 99,
+        "high-cost threshold reads isolated branch snapshot");
     var rootVector = (int[])stateType.GetProperty("FingerprintValues")!.GetValue(state)!;
     var forkVector = (int[])stateType.GetProperty("FingerprintValues")!.GetValue(fork)!;
     Check(!rootVector.SequenceEqual(forkVector), "hidden state changes fingerprint");
@@ -279,6 +309,10 @@ void Run()
     // override-signature and duplicated-registry errors which a successful compile cannot detect.
     var mirror = assembly.GetType("AutoAnthonyCombatSolverBridge.CombatSolver.ChaosCompositePowerMirror")!;
     mirror.GetMethod("Register")!.Invoke(null, null);
+    var beforeRegistry = solver.GetType("CombatSolver.Engine.InCombat.Mirrors.Hooks.Card.BeforeCardPlayedMirrors")!
+        .GetField("Registry", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+    Check((bool)beforeRegistry.GetType().GetMethod("HasRegisteredHandler")!.Invoke(beforeRegistry, [power])!,
+        "BeforeCardPlayed installs an executable handler instead of an ignored override");
     var hidden = solver.GetType("CombatSolver.PowerHiddenStateMirrors")!;
     var slots = (System.Collections.IDictionary)hidden.GetField("Registry", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
     Check(slots.Contains(typeof(ChaosCompositePower)), "hidden state registry installed");

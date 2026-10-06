@@ -58,6 +58,11 @@ internal static class ChaosCompositePowerMirror
             return hash;
         });
         AfterCardPlayedMirrors.Registry.Register<ChaosCompositePower>(AfterPlayed);
+        BeforeCardPlayedMirrors.Registry.Register<ChaosCompositePower>((p, c) =>
+        {
+            if (c.PreviewCard.Owner != p.Owner.Player) return;
+            Fire(p, c.Simulator, "energy_cost_at_least_card_played", c.CardPlay);
+        });
         AfterCardDrawnMirrors.Registry.Register<ChaosCompositePower>((p, c) =>
         {
             if (c.PreviewCard.Owner != p.Owner.Player) return;
@@ -99,7 +104,7 @@ internal static class ChaosCompositePowerMirror
         "BeforeSideTurnEnd", "AfterBlockGained", "AfterCurrentHpChanged", "AfterPowerAmountChanged",
         "AfterCardGeneratedForCombat", "AfterOrbChanneled", "AfterOrbEvoked", "AfterStarsSpent",
         "AfterEnergySpent", "AfterStarsGained", "AfterDamageGiven", "AfterModifyingCardPlayCount",
-        "BeforeCardPlayed", "AfterDamageReceived", "AfterShuffle"
+        "AfterDamageReceived", "AfterShuffle"
     };
 
     private static void RegisterNeutralActionHooks()
@@ -304,6 +309,11 @@ internal static class ChaosCompositePowerMirror
         for (var trigger = 0; trigger < operations.Count; trigger++)
         {
             if (operations[trigger].RuntimeSpec?.Trigger?.Kind != kind) continue;
+            // AA evaluates each threshold immediately before its payoff. A previous payoff
+            // can change the resolved cost, so do not snapshot it once for the whole event.
+            if (kind == "energy_cost_at_least_card_played"
+                && (sourcePlay is null || sourcePlay.Card.EnergyCost.GetResolved()
+                    < snapshot.EffectiveOperationAmount(trigger, 2))) continue;
             if (!ChaosCompositePower.TryEnterTrigger(state.ActiveTriggers, trigger, _triggerDepth)) continue;
             var previousDepth = _triggerDepth;
             try
