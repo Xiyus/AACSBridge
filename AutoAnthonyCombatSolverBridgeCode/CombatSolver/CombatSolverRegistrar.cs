@@ -41,7 +41,7 @@ public static class CombatSolverRegistrar
         {
             try
             {
-                RegisterMirrorsFor(type);
+                RegisterMirrorsForType(type);
                 registered++;
             }
             catch (Exception exception)
@@ -104,7 +104,7 @@ public static class CombatSolverRegistrar
 
     /// <summary>
     /// 泛型登记入口：约束到 ChaosCardModel 使 handler 的方法组转换（参数逆变）成立。
-    /// 经 <see cref="RegisterMirrorsFor(Type)"/> 反射调用以覆盖全部具体类型。
+    /// 经 <see cref="RegisterMirrorsForType"/> 反射调用以覆盖全部具体类型。
     /// </summary>
     private static void RegisterMirrorsFor<TCard>() where TCard : ChaosCardModel
     {
@@ -112,9 +112,12 @@ public static class CombatSolverRegistrar
         CardIsPlayableMirrors.Registry.Register<TCard>(ChaosCardIsPlayableMirror.Evaluate);
     }
 
+    // 注意：反射查找必须按 IsGenericMethodDefinition 消歧——本类同时存在泛型与非泛型的同名
+    // 重载，按名字直接 GetMethod 会抛 AmbiguousMatchException（0.1.0 首次实机测试的实际教训）。
     private static readonly MethodInfo RegisterMirrorsForMethod = typeof(CombatSolverRegistrar)
-        .GetMethod(nameof(RegisterMirrorsFor), BindingFlags.NonPublic | BindingFlags.Static)!;
+        .GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
+        .Single(method => method.Name == nameof(RegisterMirrorsFor) && method.IsGenericMethodDefinition);
 
-    private static void RegisterMirrorsFor(Type type)
+    private static void RegisterMirrorsForType(Type type)
         => RegisterMirrorsForMethod.MakeGenericMethod(type).Invoke(null, null);
 }
