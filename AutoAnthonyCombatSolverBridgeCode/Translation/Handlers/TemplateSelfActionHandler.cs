@@ -121,6 +121,10 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "ncr_increasethiscarddamagerun" => null,
             "ncr_allenemiesloseeventhp" => null,
             "ncr_killenemiesatdoomthreshold" => null,
+            // 更多非 Osty 简单变体
+            "r_fillhandwithdebris" => null,
+            "ncr_increaseallcardcoststhisturn" => null,
+            "ncr_addrandometherealcardtohand" => null,
             _ => $"template_self_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
@@ -648,6 +652,39 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                             mirror.Simulator.Kill(enemy);
                     }
                 }
+                return;
+            }
+            case "r_fillhandwithdebris":
+            {
+                // 源码：填满手牌（到上限）的 Debris
+                var handCount = mirror.Simulator.State.GetPlayerCombatState(owner).Hand.Cards.Count;
+                var maxHand = mirror.Simulator.GetMaxHandSize(owner);
+                var debrisCount = Math.Max(0, maxHand - handCount);
+                if (debrisCount > 0)
+                    mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Debris>(
+                        owner, PileType.Hand, debrisCount, owner);
+                return;
+            }
+            case "ncr_increaseallcardcoststhisturn":
+            {
+                // 源码 L1718：全部手牌费用 +amount（本回合）
+                if (count == 0) return;
+                var hand = mirror.Simulator.State.GetPlayerCombatState(owner).Hand.Cards;
+                foreach (var handCard in hand)
+                    handCard.MutablePreview.EnergyCost.AddThisTurn(count);
+                return;
+            }
+            case "ncr_addrandometherealcardtohand":
+            {
+                // 源码：随机 Ethereal 牌入手（分支 RNG 生成）
+                if (count == 0) return;
+                var generated = global::CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions
+                    .GetDistinctUnlockedCharacterCardsForCombat(
+                        mirror.Simulator, owner, count, mirror.Rng.CombatCardGeneration,
+                        mirror.CardMultiplayerConstraint,
+                        candidate => ChaosOperationExecutor.CanBeRandomlyGeneratedInCombat(candidate)
+                            && candidate.Keywords.Contains(CardKeyword.Ethereal));
+                mirror.Simulator.AddGeneratedCardsToCombat(generated.ToList(), PileType.Hand, owner);
                 return;
             }
             default:
