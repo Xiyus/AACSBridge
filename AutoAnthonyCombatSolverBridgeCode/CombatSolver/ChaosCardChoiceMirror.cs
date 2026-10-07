@@ -6,6 +6,8 @@ using CombatSolver.Engine.InCombat.Simulation;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Extensions;
+using MegaCrit.Sts2.Core.Models.CardPools;
+using global::CombatSolver.Engine.InCombat.Extensions;
 
 // 命名空间说明见 AutoAnthonyFacade.cs：文件级 using 从全局解析，外部 CombatSolver 命名空间
 // （CardChoiceSpec/PlanChoiceEffect/PlanCardChoice）不受本文件所在子命名空间遮蔽。
@@ -164,27 +166,26 @@ internal static class ChaosCardChoiceMirror
                 {
                     // 源码 L2471-2500：生成 N 张随机卡 → 玩家选 1 张入手
                     // 镜像：分支 RNG 生成候选 → GenerateToHand 选择
-                    var candidateCount = Math.Max(1, Math.Min(3, amount));
+                    var candidateCount = ChaosOperationExecutor.GeneratedCardChoiceCandidateCount(card.OperationAmount(index));
+                    if (candidateCount == 0) return null;
                     var constraint = card.Owner.RunState.CardMultiplayerConstraint;
-                    IEnumerable<PredictedCard> generated = spec.Variant switch
+                    IEnumerable<CardModel> pool = spec.Variant switch
                     {
-                        "random_colorless" => global::CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions
-                            .GetDistinctUnlockedColorlessForCombat(simulator, card.Owner, candidateCount,
-                                simulator.Rng.CombatCardGeneration, constraint),
-                        "random_other_character_attack" => global::CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions
-                            .GetDistinctUnlockedCharacterCardsForCombat(simulator, card.Owner, candidateCount,
-                                simulator.Rng.CombatCardGeneration, constraint,
-                                candidate => candidate.Type == CardType.Attack),
-                        _ => global::CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions
-                            .GetDistinctUnlockedCharacterCardsForCombat(simulator, card.Owner, candidateCount,
-                                simulator.Rng.CombatCardGeneration, constraint),
+                        "random_colorless" => ModelDb.CardPool<ColorlessCardPool>().GetUnlockedCards(card.Owner.UnlockState, constraint),
+                        "random_other_character_attack" => OtherCharacterPools(card.Owner.UnlockState.CharacterCardPools,
+                                card.Owner.Character.CardPool)
+                            .SelectMany(candidate => candidate.GetUnlockedCards(card.Owner.UnlockState, constraint))
+                            .Where(candidate => candidate.Type == CardType.Attack),
+                        _ => card.Owner.Character.CardPool.GetUnlockedCards(card.Owner.UnlockState, constraint),
                     };
+                    var generated = pool.Where(ChaosOperationExecutor.CanBeRandomlyGeneratedInCombat)
+                        .GetDistinctForCombat(card.Owner, candidateCount, simulator.Rng.CombatCardGeneration, constraint);
                     var options = generated.ToList();
                     if (options.Count == 0) return null;
                     if (ChaosOperationExecutor.GeneratedCardsAreUpgraded(card, index))
                         foreach (var generatedCard in options.Where(candidate => candidate.Preview.IsUpgradable)) generatedCard.Upgrade();
                     simulator.History.CardGenerationOptions(options);
-                    return new CardChoiceSpec(PlanChoiceEffect.GenerateToHand, PileType.None, 1, 1,
+                    return new CardChoiceSpec(PlanChoiceEffect.GenerateToHand, PileType.None, 0, 1,
                         options, options, ReplacementValue: 0d);
                 }
                 case ("template_self_action", "cl_choosefromrandomdrawcards", "none", "none"):
@@ -243,6 +244,14 @@ internal static class ChaosCardChoiceMirror
         }
 
         return null;
+    }
+
+    internal static IReadOnlyList<CardPoolModel> OtherCharacterPools(IEnumerable<CardPoolModel> unlocked, CardPoolModel own)
+    {
+        var pools = unlocked.ToList();
+        // Match AA's unlocked-pool order and single-pool fallback exactly.
+        if (pools.Count > 1) pools.Remove(own);
+        return pools;
     }
 
     /// <summary>

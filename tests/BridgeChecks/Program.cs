@@ -464,6 +464,21 @@ void Run()
     // Exercise every action registration against the unmodified installed solver. This catches
     // override-signature and duplicated-registry errors which a successful compile cannot detect.
     var mirror = assembly.GetType("AutoAnthonyCombatSolverBridge.CombatSolver.ChaosCompositePowerMirror")!;
+    var choiceMirror = assembly.GetType("AutoAnthonyCombatSolverBridge.CombatSolver.ChaosCardChoiceMirror")!;
+    var otherPools = choiceMirror.GetMethod("OtherCharacterPools", BindingFlags.NonPublic | BindingFlags.Static)!;
+    var ownPool = (MegaCrit.Sts2.Core.Models.CardPoolModel)System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(
+        typeof(MegaCrit.Sts2.Core.Models.CardPools.NecrobinderCardPool));
+    var firstOtherPool = (MegaCrit.Sts2.Core.Models.CardPoolModel)System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(
+        typeof(MegaCrit.Sts2.Core.Models.CardPools.IroncladCardPool));
+    var secondOtherPool = (MegaCrit.Sts2.Core.Models.CardPoolModel)System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(
+        typeof(MegaCrit.Sts2.Core.Models.CardPools.SilentCardPool));
+    var unlockedPools = new[] { firstOtherPool, ownPool, secondOtherPool };
+    var splashPools = (IReadOnlyList<MegaCrit.Sts2.Core.Models.CardPoolModel>)otherPools.Invoke(null, [unlockedPools, ownPool])!;
+    Check(splashPools.Count == 2 && ReferenceEquals(splashPools[0], firstOtherPool) && ReferenceEquals(splashPools[1], secondOtherPool),
+        "Splash excludes current character while preserving other unlocked pool order");
+    Check(unlockedPools.Length == 3 && ReferenceEquals(unlockedPools[1], ownPool), "Splash does not mutate the shared unlock pool list");
+    var fallbackPool = (IReadOnlyList<MegaCrit.Sts2.Core.Models.CardPoolModel>)otherPools.Invoke(null, [new[] { ownPool }, ownPool])!;
+    Check(fallbackPool.Count == 1 && ReferenceEquals(fallbackPool[0], ownPool), "Splash matches AA single unlocked character fallback");
     var attackMultiplier = mirror.GetMethod("TriggeredAttackDamageMultiplier", BindingFlags.NonPublic | BindingFlags.Static)!;
     var effectiveOperationsCache = typeof(ChaosCompositePower).GetField("_cachedEffectivePowerOperations", BindingFlags.NonPublic | BindingFlags.Instance)!;
     Check(snapshot.Owner is null, "saved composite snapshot is detached from its owner");

@@ -29,6 +29,23 @@ internal static class ChaosChoiceEffectsPatch
         if (playedCard.Preview is not ChaosCardModel card || !choice.ContextId.StartsWith("aa.operation.", StringComparison.Ordinal)
             || !int.TryParse(choice.ContextId.AsSpan("aa.operation.".Length), out var index)
             || index < 0 || index >= card.Generated.Operations.Count) return true;
+        if (choice.Effect == PlanChoiceEffect.GenerateToHand)
+        {
+            simulator.AcknowledgeExecutionDispatch();
+            if (choice.Cards.FirstOrDefault() is { } generatedToken)
+            {
+                var options = simulator.History.FindLatestCardGenerationOptions(playedCard)
+                    ?? throw new InvalidOperationException("生成选牌缺少候选历史");
+                var generated = CardChoiceSupport.Find(options.Options, generatedToken).Clone();
+                if (card.Generated.Operations[index].RuntimeSpec?.Flags.Contains("set_cost_zero_this_turn") == true)
+                    generated.SetToFreeThisTurn();
+                simulator.AddGeneratedCardToCombat(generated, PileType.Hand, card.Owner,
+                    resultKind: CardGenerationResultKind.Random);
+            }
+            __result = !simulator.HasPendingChoice;
+            if (simulator.HasPendingChoice) simulator.RejectExecutionContinuation();
+            return false;
+        }
         var source = simulator.State.GetPlayerCombatState(card.Owner).GetCardPile(choice.SourcePile);
         if (source is not null && simulator.StateStore.TryGetReadOnly<ChaosCardSlotMirror.BindingState>(playedCard.Original, out var currentBinding)
             && currentBinding?.Resolution is { } resolution)
