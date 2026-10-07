@@ -13,3 +13,4 @@ packages/
 Directory.Build.props
 LocalDependencies.props
 .research/
+dist/
