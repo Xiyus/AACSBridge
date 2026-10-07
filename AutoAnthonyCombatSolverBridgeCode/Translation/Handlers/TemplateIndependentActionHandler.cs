@@ -107,7 +107,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 case "next_ethereal": Grant(typeof(VeilpiercerPower)); break;
                 case "next_power": Grant(typeof(FreePowerPower)); break;
                 case "next_skill": Grant(typeof(FreeSkillPower)); break;
-                case "self": context.Card.SetToFreeThisCombat(); break;
+                case "self": context.Card.EnergyCost.SetThisCombat(0); break;
                 case "referenced_card":
                     // I:SetCostZero is an armed next-attack grant handled by the composite power.
                     break;
@@ -445,7 +445,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             case "d_setthiscardcostzero":
             {
                 // 源码 L2264：card.EnergyCost.SetThisCombat(0)
-                context.Card.SetToFreeThisCombat();
+                context.Card.EnergyCost.SetThisCombat(0);
                 return;
             }
             case "d_increaseallclaws":

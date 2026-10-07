@@ -303,6 +303,16 @@ void Run()
             "installed Tempest output slot: " + output);
     Check(OrbSlotCatalog.ResolveOutput(null, "I:ProxyAtomic_Tempest")?.Id == "lightning",
         "legacy Tempest default output slot");
+    var discardCount = typeof(ChaosCompositePower).Assembly.GetType("AutoAnthony.ChaosOperationExecutor")!
+        .GetMethod("ExecutableDerivativeDiscardCount", BindingFlags.Static | BindingFlags.NonPublic)!;
+    int StatusDiscardCount(string template, int amount, RuntimeValueSlot[]? values = null)
+        => (int)discardCount.Invoke(null, [Op(Spec("template_self_action", "d_createburnindiscard", "self", values: values), template), amount])!;
+    Check(StatusDiscardCount("D:CreateBurnInDiscard", 0) == 1, "unvalued discard derivative produces one card rather than zero");
+    Check(StatusDiscardCount("D:CreateTwoWoundsInDiscard", 0) == 2, "legacy two-wound derivative has two-card default");
+    Check(StatusDiscardCount("D:CreateBurnInDiscard", 0, [new("amount", 0, Source: "energy_x")]) == 0,
+        "explicit zero X derivative does not use missing-value default");
+    Check(StatusDiscardCount("D:CreateBurnInDiscard", 0, [new("amount", 3)]) == 3,
+        "fixed derivative fallback preserves printed count");
     var triggerAtoms = 0;
     var payloadAtoms = 0;
     var auditRows = new List<object>();

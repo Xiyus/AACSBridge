@@ -490,19 +490,12 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 return;
             // ===== 状态牌创建（D:CreateXxxInDiscard 族）=====
             case "d_createdazedindiscard":
-                CreateStatusCards<Dazed>(context, count);
-                return;
             case "d_createtwowoundsindiscard":
-                CreateStatusCards<Wound>(context, count);
-                return;
             case "d_createburnindiscard":
-                CreateStatusCards<Burn>(context, count);
-                return;
             case "d_createslimeindiscard":
-                CreateStatusCards<Slimed>(context, count);
-                return;
             case "d_createvoidindiscard":
-                CreateStatusCards<MegaCrit.Sts2.Core.Models.Cards.Void>(context, count);
+                ChaosDerivativeMirror.Add(mirror.Simulator, context.Card, context.Shape.OperationIndex, PileType.Discard,
+                    ChaosOperationExecutor.ExecutableDerivativeDiscardCount(context.Operation, amount));
                 return;
             case "d_evokeleftmostorb":
             {
@@ -621,7 +614,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             {
                 // 源码 L2145-2150：本卡克隆 + 零费 → 弃牌堆
                 var clone = context.Mirror.Card.CreateClone();
-                clone.MutablePreview.SetToFreeThisCombat();
+                clone.MutablePreview.EnergyCost.SetThisCombat(0);
                 mirror.Simulator.AddGeneratedCardToCombat(clone, PileType.Discard, owner);
                 return;
             }
@@ -853,13 +846,4 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 context.Card.Owner.Creature, context.Card);
     }
 
-    /// <summary>创建状态牌到弃牌堆（与源码 CreateDerivatives → AddGeneratedCardToCombat 等价）。</summary>
-    private static void CreateStatusCards<TStatus>(OperationExecutionContext context, int count) where TStatus : CardModel
-    {
-        if (count <= 0) return;
-        var mirror = context.Mirror;
-        var owner = context.Card.Owner;
-        mirror.Simulator.CreateAndAddGeneratedCardsToCombat<TStatus>(
-            owner, PileType.Discard, count, owner);
-    }
 }
