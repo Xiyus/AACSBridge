@@ -50,9 +50,7 @@ public sealed class LoseHpHandler : IOperationHandler
 
         // selected_enemy：出牌目标；random_enemy：镜像层抽取的显式随机目标
         // （复刻源码 state.Target ?? cardPlay.Target——随机抽取为 null 时回落出牌目标）
-        var target = context.Shape.Spec.Target == "random_enemy"
-            ? context.ResolvedTarget ?? mirror.CardPlay.Target
-            : mirror.CardPlay.Target;
+        var target = context.Target;
         if (target is null)
             return;    // 源码语义：无目标 = 成功 no-op
         mirror.Simulator.Damage([target], amount,
