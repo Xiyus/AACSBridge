@@ -46,6 +46,7 @@ internal static class ChaosCardSlotMirror
             : operation.Template == "R:PlaySelectedSkillMultipleTimes"
                 ? candidate.Preview.Type == CardType.Skill && !candidate.Preview.Keywords.Contains(CardKeyword.Unplayable)
             : operation.Template == "R:CopySelectedColorlessCard" ? candidate.Preview.VisualCardPool.IsColorless
+            : operation.Template == "I:GrantSlyToHandSkillThisTurn" ? candidate.Preview.Type == CardType.Skill && !candidate.Preview.IsSlyThisTurn
             : operation.Template == "NCR:AddVoidToSelectedHandCard" ? !candidate.Preview.Keywords.Contains(CardKeyword.Ethereal)
             : operation.Template == "NCR:AddRetainToSelectedHandCard" ? !candidate.Preview.Keywords.Contains(CardKeyword.Retain) : true).ToList();
         var maximum = Math.Min(options.Count, ChaosOperationExecutor.SelectionCountForEffect(operation, card.OperationAmount(index)));

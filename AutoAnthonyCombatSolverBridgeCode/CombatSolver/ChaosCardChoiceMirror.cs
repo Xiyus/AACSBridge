@@ -74,11 +74,13 @@ internal static class ChaosCardChoiceMirror
                 }
                 case ("template_independent_action", "i_grantslytohandskillthisturn", "none", "none"):
                     return NativeSpec(PlanChoiceEffect.ApplySly, PileType.Hand, 1,
-                        owner.Hand.Cards.Where(candidate => candidate.Preview.Type == CardType.Skill).ToList());
+                        owner.Hand.Cards.Where(candidate => candidate.Preview.Type == CardType.Skill && !candidate.Preview.IsSlyThisTurn).ToList());
                 case ("template_self_action", "ncr_addvoidtoselectedhandcard", "none", "none"):
-                    return NativeSpec(PlanChoiceEffect.ApplyEthereal, PileType.Hand, 1, owner.Hand.Cards);
+                    return NativeSpec(PlanChoiceEffect.ApplyEthereal, PileType.Hand, 1,
+                        owner.Hand.Cards.Where(candidate => !candidate.Preview.Keywords.Contains(CardKeyword.Ethereal)).ToList());
                 case ("template_self_action", "ncr_addretaintoselectedhandcard", "none", "none"):
-                    return NativeSpec(PlanChoiceEffect.ApplyRetain, PileType.Hand, 1, owner.Hand.Cards);
+                    return NativeSpec(PlanChoiceEffect.ApplyRetain, PileType.Hand, 1,
+                        owner.Hand.Cards.Where(candidate => !candidate.Preview.Keywords.Contains(CardKeyword.Retain)).ToList());
                 case ("template_independent_action", "cl_putselectedhandcardondrawtop", "none", "none"):
                     return NativeSpec(PlanChoiceEffect.MoveToDrawTop, PileType.Hand, 1, owner.Hand.Cards);
                 case ("template_independent_action", "i_copyselectedcardnextturn", "none", "none"):
