@@ -3,7 +3,7 @@
   "name": "AutoAnthony × CombatSolver 兼容桥",
   "author": "Xiyus",
   "description": "让 CombatSolver 能够预测 AutoAnthony 生成卡牌的兼容层。支持经过校验的即时效果、选牌、受限触发器、条件和代理模板；超出支持矩阵的卡保守排除。",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "min_game_version": "0.111.0",
   "has_pck": false,
   "has_dll": true,

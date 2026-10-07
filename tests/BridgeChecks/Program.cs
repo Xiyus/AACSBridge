@@ -464,6 +464,19 @@ void Run()
     // Exercise every action registration against the unmodified installed solver. This catches
     // override-signature and duplicated-registry errors which a successful compile cannot detect.
     var mirror = assembly.GetType("AutoAnthonyCombatSolverBridge.CombatSolver.ChaosCompositePowerMirror")!;
+    var attackMultiplier = mirror.GetMethod("TriggeredAttackDamageMultiplier", BindingFlags.NonPublic | BindingFlags.Static)!;
+    var effectiveOperationsCache = typeof(ChaosCompositePower).GetField("_cachedEffectivePowerOperations", BindingFlags.NonPublic | BindingFlags.Instance)!;
+    Check(snapshot.Owner is null, "saved composite snapshot is detached from its owner");
+    effectiveOperationsCache.SetValue(snapshot, new[] { Op(Spec("trigger", "event", "self", new("derivative_played", "combat")), "A:whenSoulPlayed") });
+    Check((decimal)attackMultiplier.Invoke(null, [state, null])! == 1m,
+        "detached unrelated composite does not query attack history or owner during damage");
+    var percentTrigger = Op(Spec("trigger", "event", "self", new("attack_played", "combat")), "A:whenAttackPlayed");
+    var percentModifier = new GeneratorOperation("M:TriggeredAttackDamagePercent", OperationScope.Modifier, "unused",
+        new Dictionary<string, int> { ["triggerIndex"] = 0 }, RuntimeSpec: Spec("template_modifier", "triggered_attack_damage_percent", "self"));
+    effectiveOperationsCache.SetValue(snapshot, new[] { percentTrigger, percentModifier });
+    Check((decimal)attackMultiplier.Invoke(null, [state, null])! == 1.07m,
+        "unconditional attack percent uses captured values without detached owner or unnecessary history");
+    effectiveOperationsCache.SetValue(snapshot, null);
     mirror.GetMethod("Register")!.Invoke(null, null);
     var beforeRegistry = solver.GetType("CombatSolver.Engine.InCombat.Mirrors.Hooks.Card.BeforeCardPlayedMirrors")!
         .GetField("Registry", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;

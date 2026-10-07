@@ -585,31 +585,12 @@ internal static class ChaosCompositePowerMirror
 
     private static decimal ModifyDamage(ChaosCompositePower power, ModifyDamageMirrorContext context)
     {
-        var snapshot = Read(context.Simulator, power).Snapshot;
+        var state = Read(context.Simulator, power);
+        var snapshot = state.Snapshot;
         var combat = (SimulatedCombatState)context.CombatState;
         decimal multiplier = 1m;
         if (context.Dealer == power.Owner && context.Props.IsPoweredAttack() && context.CardSource?.Preview.Type == CardType.Attack)
-        {
-            var operations = snapshot.EffectivePowerOperations();
-            var prior = ChaosHistory.Finished(context.Simulator, snapshot.Owner.Player ?? Read(context.Simulator, power).OwnerPlayer!).Where(play => play.Card.Type == CardType.Attack).ToArray();
-            for (var index = 0; index < operations.Count; index++)
-            {
-                var modifier = operations[index];
-                if (modifier.Template != "M:TriggeredAttackDamagePercent" || !modifier.Parameters.TryGetValue("triggerIndex", out var owner)
-                    || owner < 0 || owner >= index || !CardEffectRules.SuppliesEventAttackForDamageModifier(operations[owner])) continue;
-                var applies = operations[owner].RuntimeSpec?.Trigger?.Kind switch
-                {
-                    "attack_played" => true,
-                    "first_attack_played_each_turn" => prior.Length == 0,
-                    "first_zero_cost_attack_played_each_turn" => context.CardSource.Preview.EnergyCost.GetResolved() == 0
-                        && prior.Count(play => ChaosHistory.CurrentCard(context.Simulator, play).EnergyCost.GetResolved() == 0) == 0,
-                    "nth_attack_played_this_turn" => prior.Length + 1 == snapshot.EffectiveOperationAmount(owner, 3),
-                    "next_attack" or "next_attacks_this_turn" => !snapshot.IgnoreArmingCardPlay && snapshot.NextAttackTriggerAvailable && snapshot.NextAttackTriggersRemaining > 0,
-                    _ => false
-                };
-                if (applies) multiplier *= 1m + Math.Max(0, snapshot.EffectiveOperationAmount(index, 50)) / 100m;
-            }
-        }
+            multiplier *= TriggeredAttackDamageMultiplier(state, context);
         if (snapshot.HasRule("vulnerable_enemy_damage_bonus") && context.Dealer == power.Owner
             && context.Target is { } vulnerableTarget && combat.GetAmount<VulnerablePower>(vulnerableTarget) > 0)
             multiplier *= 1m + snapshot.RuleAmount("vulnerable_enemy_damage_bonus") / 100m;
@@ -624,6 +605,35 @@ internal static class ChaosCompositePowerMirror
                 snapshot.OwnerTurnEffectsExpired, snapshot.DefensiveTurnEffectsExpired)
             && context.Dealer is { } dealer && combat.GetAmount<VulnerablePower>(dealer) > 0)
             multiplier *= Math.Max(0m, 1m - snapshot.EffectiveOperationAmount(reductionIndex, 50) / 100m);
+        return multiplier;
+    }
+
+    private static decimal TriggeredAttackDamageMultiplier(ChaosCompositePredictionState state, ModifyDamageMirrorContext context)
+    {
+        var snapshot = state.Snapshot;
+        var operations = snapshot.EffectivePowerOperations();
+        CardPlay[]? prior = null;
+        CardPlay[] Prior() => prior ??= ChaosHistory.Finished(context.Simulator,
+            state.OwnerPlayer ?? context.CardSource?.Preview.Owner ?? throw Unsupported("攻击增伤缺少玩家来源"))
+            .Where(play => play.Card.Type == CardType.Attack).ToArray();
+        decimal multiplier = 1m;
+        for (var index = 0; index < operations.Count; index++)
+        {
+            var modifier = operations[index];
+            if (modifier.Template != "M:TriggeredAttackDamagePercent" || !modifier.Parameters.TryGetValue("triggerIndex", out var owner)
+                || owner < 0 || owner >= index || !CardEffectRules.SuppliesEventAttackForDamageModifier(operations[owner])) continue;
+            var applies = operations[owner].RuntimeSpec?.Trigger?.Kind switch
+            {
+                "attack_played" => true,
+                "first_attack_played_each_turn" => Prior().Length == 0,
+                "first_zero_cost_attack_played_each_turn" => context.CardSource!.Preview.EnergyCost.GetResolved() == 0
+                    && Prior().Count(play => ChaosHistory.CurrentCard(context.Simulator, play).EnergyCost.GetResolved() == 0) == 0,
+                "nth_attack_played_this_turn" => Prior().Length + 1 == snapshot.EffectiveOperationAmount(owner, 3),
+                "next_attack" or "next_attacks_this_turn" => !snapshot.IgnoreArmingCardPlay && snapshot.NextAttackTriggerAvailable && snapshot.NextAttackTriggersRemaining > 0,
+                _ => false
+            };
+            if (applies) multiplier *= 1m + Math.Max(0, snapshot.EffectiveOperationAmount(index, 50)) / 100m;
+        }
         return multiplier;
     }
 
