@@ -4,7 +4,10 @@ Slay the Spire 2 的纯代码 Bridge Mod（id：`AutoAnthonyCombatSolverBridge`�
 [CombatSolver](https://github.com/Torch1230/CombatSolver) 能够预测
 [AutoAnthony](https://github.com/mewcodex/AutoAnthony) 生成的随机卡牌。
 
-## 重要：本 Mod 人类含量为 0%，出现问题就是蓝色大肥鱼的锅。噢，还有白色龙娘。
+## 重要
+
+本 Mod 人类含量为 0%，出现问题就是蓝色大肥鱼的锅。噢，还有白色龙娘。
+以后也未必更新，想适配新版本直接拿本仓库扔给AI。
 
 ## 当前状态
 
