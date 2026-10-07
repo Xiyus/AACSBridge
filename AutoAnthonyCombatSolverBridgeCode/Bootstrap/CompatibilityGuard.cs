@@ -90,6 +90,7 @@ public static class CompatibilityGuard
         ("CombatSolver.PredictionModPatchAudit", ["CaptureCardOnPlay", "RegisterAdaptedMonsterMachine"]),
         ("CombatSolver.SimulatedCombatState", ["Apply", "ApplyPower", "GetPower", "GetAmount", "ResolveActionCardChoice",
             "ContinueAutoPrePlay", "ContinueScheduledAutoPlays", "ContinueBeforeHandDraw", "ReturnsToHandAfterPlaying",
+            "ApplyTemporaryStrengthLoss", "ApplyTemporaryStrengthGain", "ApplyTemporaryDexterity", "BeginCardPowerApplication", "CompleteCardPowerApplication",
             "AfterCardEnteredCombat", "_rootHistory", "_activeCardExecutionDeaths", "_returnToHandNextTurn"]),
         ("CombatSolver.CardChoiceSupport", ["Apply", "Find", "RemoveTransformedCard", "AddTransformedCard"]),
         ("CombatSolver.Engine.InCombat.Mirrors.Cards.CardResultLocationMirrors", ["Registry"]),

@@ -86,7 +86,7 @@ public sealed class PowerHandler : IOperationHandler
             for (var hit = 0; hit < context.RuntimeValue("hits", 1); hit++)
             {
                 var selected = mirror.Rng.CombatTargets.NextItem(mirror.CombatState.HittableEnemies);
-                if (selected is not null) effects.ApplyPowerFromSource(typeof(PoisonPower), selected, context.ExecutableAmount, owner, card);
+                if (selected is not null) PowerApplicationResolver.Apply(effects, typeof(PoisonPower), selected, context.ExecutableAmount, owner, card);
                 if (mirror.Simulator.HasPendingChoice) return;
             }
             return;
@@ -99,11 +99,11 @@ public sealed class PowerHandler : IOperationHandler
             {
                 case "retain_hand_this_turn":
                     // 源码：固定施加 1 层，不读操作数值
-                    effects.ApplyPowerFromSource(typeof(RetainHandPower), owner, 1, owner, card);
+                    PowerApplicationResolver.Apply(effects, typeof(RetainHandPower), owner, 1, owner, card);
                     return;
                 case "blur":
                     // 源码：固定施加 1 层
-                    effects.ApplyPowerFromSource(typeof(BlurPower), owner, 1, owner, card);
+                    PowerApplicationResolver.Apply(effects, typeof(BlurPower), owner, 1, owner, card);
                     return;
                 case "focus_loss_this_turn":
                     ((SimulatedCombatState)mirror.CombatState).ApplyTemporaryFocusLoss<ChaosTemporaryFocusDownPower>(
@@ -116,13 +116,13 @@ public sealed class PowerHandler : IOperationHandler
                     if (target is null)
                         return;
                     var strength = GetBranchAmount<VulnerablePower>(context, target) * Math.Max(0, context.ExecutableAmount);
-                    effects.ApplyPowerFromSource(typeof(StrengthPower), owner, strength, owner, card);
+                    PowerApplicationResolver.Apply(effects, typeof(StrengthPower), owner, strength, owner, card);
                     return;
                 }
                 default:
                 {
                     var (powerType, sign) = SelfRoutes[spec.Variant];
-                    effects.ApplyPowerFromSource(powerType, owner, sign * context.ExecutableAmount, owner, card);
+                    PowerApplicationResolver.Apply(effects, powerType, owner, sign * context.ExecutableAmount, owner, card);
                     return;
                 }
             }
@@ -140,7 +140,7 @@ public sealed class PowerHandler : IOperationHandler
                     return;
                 var current = GetBranchAmount<VulnerablePower>(context, target);
                 if (current > 0)
-                    effects.ApplyPowerFromSource(typeof(VulnerablePower), target, current, owner, card);
+                    PowerApplicationResolver.Apply(effects, typeof(VulnerablePower), target, current, owner, card);
                 return;
             }
             case "vulnerable":
@@ -175,7 +175,7 @@ public sealed class PowerHandler : IOperationHandler
         if (context.Shape.Spec.Target == "all_enemies")
         {
             foreach (var enemy in context.Mirror.CombatState.HittableEnemies)
-                effects.ApplyPowerFromSource(powerType, enemy, amount, owner, card);
+                PowerApplicationResolver.Apply(effects, powerType, enemy, amount, owner, card);
             return;
         }
 
@@ -184,7 +184,7 @@ public sealed class PowerHandler : IOperationHandler
             : context.Target;
         if (target is null)
             return;    // 源码语义：无目标 = 成功 no-op
-        effects.ApplyPowerFromSource(powerType, target, amount, owner, card);
+        PowerApplicationResolver.Apply(effects, powerType, target, amount, owner, card);
     }
 
     /// <summary>从分支状态读目标生物的 Power 层数（绝不读 live creature）。</summary>

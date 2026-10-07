@@ -137,17 +137,17 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
         {
             case "i_preventdrawthisturn":
                 // 源码 L3252：PowerCmd.Apply<NoDrawPower>(ctx, owner, 1, owner, card)
-                effects.ApplyPowerFromSource(typeof(NoDrawPower), owner.Creature, 1, owner.Creature, context.Card);
+                PowerApplicationResolver.Apply(effects, typeof(NoDrawPower), owner.Creature, 1, owner.Creature, context.Card);
                 return;
             case "i_gaintemporarystrength":
                 // 源码 L3253：PowerCmd.Apply<SetupStrikePower>(ctx, owner, amount, owner, card)
-                effects.ApplyPowerFromSource(typeof(SetupStrikePower), owner.Creature, amount, owner.Creature, context.Card);
+                PowerApplicationResolver.Apply(effects, typeof(SetupStrikePower), owner.Creature, amount, owner.Creature, context.Card);
                 return;
             case "i_applytoallenemies":
                 // 源码 L3260：PowerCmd.Apply<VulnerablePower>(ctx, HittableEnemies, amount, owner, card)
                 if (amount == 0) return;
                 foreach (var enemy in mirror.CombatState.HittableEnemies)
-                    effects.ApplyPowerFromSource(typeof(VulnerablePower), enemy, amount, owner.Creature, context.Card);
+                    PowerApplicationResolver.Apply(effects, typeof(VulnerablePower), enemy, amount, owner.Creature, context.Card);
                 return;
             case "i_gainmaxhp":
                 // 源码 L3254：CreatureCmd.GainMaxHp(owner, amount)
@@ -171,13 +171,13 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 // 源码 L3135：PowerCmd.Apply<ShadowmeldPower>(owner, 1)
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects2)
                     throw new InvalidOperationException("双倍格挡需要分支战斗状态效果汇。");
-                effects2.ApplyPowerFromSource(typeof(ShadowmeldPower), owner.Creature, 1, owner.Creature, context.Card);
+                PowerApplicationResolver.Apply(effects2, typeof(ShadowmeldPower), owner.Creature, 1, owner.Creature, context.Card);
                 return;
             case "i_doubleattackdamagenextturn":
                 // 源码 L3133：PowerCmd.Apply<ShadowStepPower>(owner, 1)
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects3)
                     throw new InvalidOperationException("双倍攻击伤害需要分支战斗状态效果汇。");
-                effects3.ApplyPowerFromSource(typeof(ShadowStepPower), owner.Creature, 1, owner.Creature, context.Card);
+                PowerApplicationResolver.Apply(effects3, typeof(ShadowStepPower), owner.Creature, 1, owner.Creature, context.Card);
                 return;
             case "i_freehandthisturn":
             {
@@ -212,7 +212,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 // 源码 L3071：PowerCmd.Apply<BurstPower>(owner, amount)
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects4)
                     throw new InvalidOperationException("技能重放需要分支战斗状态效果汇。");
-                effects4.ApplyPowerFromSource(typeof(BurstPower), owner.Creature, amount, owner.Creature, context.Card);
+                PowerApplicationResolver.Apply(effects4, typeof(BurstPower), owner.Creature, amount, owner.Creature, context.Card);
                 return;
             }
             case "i_discardhanddrawsame":
@@ -238,7 +238,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 // 原版区分下一张技能与下一张能力牌免费。
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects5)
                     throw new InvalidOperationException("技能免费需要分支战斗状态效果汇。");
-                effects5.ApplyPowerFromSource(typeof(FreeSkillPower), owner.Creature, DependencyResolver.Multiplier(context), owner.Creature, context.Card);
+                PowerApplicationResolver.Apply(effects5, typeof(FreeSkillPower), owner.Creature, DependencyResolver.Multiplier(context), owner.Creature, context.Card);
                 return;
             }
             case "i_setthiscardcostzero":
@@ -262,7 +262,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects6)
                     throw new InvalidOperationException("既定结论需要分支战斗状态效果汇。");
                 var proxyAmount = Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex));
-                effects6.ApplyPowerFromSource(typeof(ForegoneConclusionPower), owner.Creature,
+                PowerApplicationResolver.Apply(effects6, typeof(ForegoneConclusionPower), owner.Creature,
                     proxyAmount, owner.Creature, context.Card);
                 return;
             }
@@ -402,7 +402,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects8)
                     throw new InvalidOperationException("信号增强需要分支战斗状态效果汇。");
                 var sbAmount = Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex));
-                effects8.ApplyPowerFromSource(typeof(SignalBoostPower), owner.Creature,
+                PowerApplicationResolver.Apply(effects8, typeof(SignalBoostPower), owner.Creature,
                     sbAmount, owner.Creature, context.Card);
                 return;
             }
@@ -439,7 +439,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                     throw new InvalidOperationException("下回合格挡需要分支战斗状态效果汇。");
                 var block = mirror.Simulator.State.GetCreature(owner.Creature).Block;
                 if (block > 0)
-                    effects7.ApplyPowerFromSource(typeof(BlockNextTurnPower), owner.Creature, block, owner.Creature, context.Card);
+                    PowerApplicationResolver.Apply(effects7, typeof(BlockNextTurnPower), owner.Creature, block, owner.Creature, context.Card);
                 return;
             }
             case "d_setthiscardcostzero":

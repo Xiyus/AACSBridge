@@ -256,7 +256,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 // 源码：PowerCmd.Apply<FocusPower>(ctx, owner, amount, owner, card)
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects)
                     throw new InvalidOperationException("聚焦需要分支战斗状态效果汇。");
-                effects.ApplyPowerFromSource(typeof(FocusPower), owner.Creature, amount, owner.Creature, context.Card);
+                PowerApplicationResolver.Apply(effects, typeof(FocusPower), owner.Creature, amount, owner.Creature, context.Card);
                 return;
             }
             case "d_gaintemporaryfocus":
@@ -294,7 +294,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects)
                     throw new InvalidOperationException("全体毒需要分支战斗状态效果汇。");
                 foreach (var enemy in mirror.CombatState.HittableEnemies)
-                    effects.ApplyPowerFromSource(typeof(PoisonPower),
+                    PowerApplicationResolver.Apply(effects, typeof(PoisonPower),
                         enemy, count, owner.Creature, context.Card);
                 return;
             }
@@ -324,28 +324,28 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 if (count == 0) return;
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects2)
                     throw new InvalidOperationException("下回合能量需要分支战斗状态效果汇。");
-                effects2.ApplyPowerFromSource(typeof(EnergyNextTurnPower), owner.Creature, count, owner.Creature, context.Card);
+                PowerApplicationResolver.Apply(effects2, typeof(EnergyNextTurnPower), owner.Creature, count, owner.Creature, context.Card);
                 return;
             case "d_losefocus":
                 // 源码 L2187-2188：PowerCmd.Apply<FocusPower>(owner, -amount)
                 if (count == 0) return;
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects3)
                     throw new InvalidOperationException("失焦需要分支战斗状态效果汇。");
-                effects3.ApplyPowerFromSource(typeof(FocusPower), owner.Creature, -count, owner.Creature, context.Card);
+                PowerApplicationResolver.Apply(effects3, typeof(FocusPower), owner.Creature, -count, owner.Creature, context.Card);
                 return;
             case "d_gainstrength":
                 // 源码 L2192-2193：PowerCmd.Apply<StrengthPower>(owner, amount)
                 if (count == 0) return;
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects4)
                     throw new InvalidOperationException("力量需要分支战斗状态效果汇。");
-                effects4.ApplyPowerFromSource(typeof(StrengthPower), owner.Creature, count, owner.Creature, context.Card);
+                PowerApplicationResolver.Apply(effects4, typeof(StrengthPower), owner.Creature, count, owner.Creature, context.Card);
                 return;
             case "d_gaindexterity":
                 // 源码 L2195-2196：PowerCmd.Apply<DexterityPower>(owner, amount)
                 if (count == 0) return;
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects5)
                     throw new InvalidOperationException("敏捷需要分支战斗状态效果汇。");
-                effects5.ApplyPowerFromSource(typeof(DexterityPower), owner.Creature, count, owner.Creature, context.Card);
+                PowerApplicationResolver.Apply(effects5, typeof(DexterityPower), owner.Creature, count, owner.Creature, context.Card);
                 return;
             case "d_triggerrightmostorbpassive":
             {
@@ -365,14 +365,14 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects6)
                     throw new InvalidOperationException("末日需要分支战斗状态效果汇。");
                 foreach (var enemy in mirror.CombatState.HittableEnemies)
-                    effects6.ApplyPowerFromSource(typeof(DoomPower), enemy, count, owner.Creature, context.Card);
+                    PowerApplicationResolver.Apply(effects6, typeof(DoomPower), enemy, count, owner.Creature, context.Card);
                 return;
             case "ncr_applyselfdoom":
                 // 源码 L1778-1779：PowerCmd.Apply<DoomPower>(owner, amount)
                 if (count == 0) return;
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects7)
                     throw new InvalidOperationException("自身末日需要分支战斗状态效果汇。");
-                effects7.ApplyPowerFromSource(typeof(DoomPower), owner.Creature, count, owner.Creature, context.Card);
+                PowerApplicationResolver.Apply(effects7, typeof(DoomPower), owner.Creature, count, owner.Creature, context.Card);
                 return;
             case "ncr_applyweakall":
                 // 源码 L1781-1782：PowerCmd.Apply<WeakPower>(HittableEnemies, amount)
@@ -380,7 +380,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects8)
                     throw new InvalidOperationException("全体虚弱需要分支战斗状态效果汇。");
                 foreach (var enemy in mirror.CombatState.HittableEnemies)
-                    effects8.ApplyPowerFromSource(typeof(WeakPower), enemy, count, owner.Creature, context.Card);
+                    PowerApplicationResolver.Apply(effects8, typeof(WeakPower), enemy, count, owner.Creature, context.Card);
                 return;
             case "ncr_applyvulnerableall":
                 // 源码 L1784-1785：PowerCmd.Apply<VulnerablePower>(HittableEnemies, amount)
@@ -388,7 +388,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects9)
                     throw new InvalidOperationException("全体易伤需要分支战斗状态效果汇。");
                 foreach (var enemy in mirror.CombatState.HittableEnemies)
-                    effects9.ApplyPowerFromSource(typeof(VulnerablePower), enemy, count, owner.Creature, context.Card);
+                    PowerApplicationResolver.Apply(effects9, typeof(VulnerablePower), enemy, count, owner.Creature, context.Card);
                 return;
             case "r_enemieslosestrengththisturn":
                 // 源码 L1521-1522：PowerCmd.Apply<PiercingWailPower>(HittableEnemies, amount)
@@ -396,7 +396,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects10)
                     throw new InvalidOperationException("全体力量损失需要分支战斗状态效果汇。");
                 foreach (var enemy in mirror.CombatState.HittableEnemies)
-                    effects10.ApplyPowerFromSource(typeof(PiercingWailPower), enemy, count, owner.Creature, context.Card);
+                    PowerApplicationResolver.Apply(effects10, typeof(PiercingWailPower), enemy, count, owner.Creature, context.Card);
                 return;
             // ===== 单行 Power 模板族（通用路由）=====
             case "cl_retainhandthisturn" or "r_retainhandthisturn":
@@ -422,7 +422,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                     throw new InvalidOperationException("下回合格挡需要分支战斗状态效果汇。");
                 var block = mirror.Simulator.State.GetCreature(owner.Creature).Block;
                 if (block > 0)
-                    effects11.ApplyPowerFromSource(typeof(BlockNextTurnPower), owner.Creature, block, owner.Creature, context.Card);
+                    PowerApplicationResolver.Apply(effects11, typeof(BlockNextTurnPower), owner.Creature, block, owner.Creature, context.Card);
                 return;
             }
             case "cl_applyweakall" or "r_applyweakall" or "n_allweak":
@@ -830,7 +830,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
         var mirror = context.Mirror;
         if (mirror.CombatState is not ICombatPredictionEffectSink effects)
             throw new InvalidOperationException($"Power 施加需要分支战斗状态效果汇：{powerType.Name}。");
-        effects.ApplyPowerFromSource(powerType, context.Card.Owner.Creature, amount,
+        PowerApplicationResolver.Apply(effects, powerType, context.Card.Owner.Creature, amount,
             context.Card.Owner.Creature, context.Card);
     }
 
@@ -842,7 +842,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
         if (mirror.CombatState is not ICombatPredictionEffectSink effects)
             throw new InvalidOperationException($"全体 Power 施加需要分支战斗状态效果汇：{powerType.Name}。");
         foreach (var enemy in mirror.CombatState.HittableEnemies)
-            effects.ApplyPowerFromSource(powerType, enemy, amount,
+            PowerApplicationResolver.Apply(effects, powerType, enemy, amount,
                 context.Card.Owner.Creature, context.Card);
     }
 

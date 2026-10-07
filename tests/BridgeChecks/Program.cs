@@ -450,6 +450,31 @@ void Run()
     // Exact continuation serialization must distinguish counters, not only public Amount.
     var owner = (MegaCrit.Sts2.Core.Entities.Creatures.Creature)System.Runtime.CompilerServices.RuntimeHelpers
         .GetUninitializedObject(typeof(MegaCrit.Sts2.Core.Entities.Creatures.Creature));
+    var powerResolver = assembly.GetType("AutoAnthonyCombatSolverBridge.Translation.PowerApplicationResolver")!
+        .GetMethod("Apply", BindingFlags.NonPublic | BindingFlags.Static)!;
+    var combatType = solver.GetType("CombatSolver.SimulatedCombatState")!;
+    var isolatedCombat = System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(combatType);
+    var routingHarmony = new HarmonyLib.Harmony("aa_bridge_contract_temporary_power_routing");
+    var nativeLoss = combatType.GetMethods().Single(method => method.Name == "ApplyTemporaryStrengthLoss" && !method.IsGenericMethod);
+    var genericApply = combatType.GetMethod("ApplyPowerFromSource")!;
+    var recordPowerCall = new HarmonyLib.HarmonyMethod(typeof(PowerRoutingCapture).GetMethod("Prefix")!);
+    routingHarmony.Patch(nativeLoss, prefix: recordPowerCall);
+    routingHarmony.Patch(genericApply, prefix: recordPowerCall);
+    try
+    {
+        var sourceFixture = TestChaosCard.Create([]);
+        foreach (var temporaryType in new[] { typeof(MegaCrit.Sts2.Core.Models.Powers.ManglePower), typeof(MegaCrit.Sts2.Core.Models.Powers.PiercingWailPower) })
+        {
+            powerResolver.Invoke(null, [isolatedCombat, temporaryType, owner, 2, owner, sourceFixture]);
+            Check(PowerRoutingCapture.Method == "ApplyTemporaryStrengthLoss" && Equals(PowerRoutingCapture.Arguments[0], temporaryType)
+                && ReferenceEquals(PowerRoutingCapture.Arguments[1], owner) && Equals(PowerRoutingCapture.Arguments[2], 2)
+                && ReferenceEquals(PowerRoutingCapture.Arguments[4], sourceFixture),
+                "temporary loss routes through atomic native attribute+restoration pipeline preserving source: " + temporaryType.Name);
+        }
+        powerResolver.Invoke(null, [isolatedCombat, typeof(MegaCrit.Sts2.Core.Models.Powers.StrengthPower), owner, 2, owner, sourceFixture]);
+        Check(PowerRoutingCapture.Method == "ApplyPowerFromSource", "ordinary Strength keeps its native non-temporary application route");
+    }
+    finally { routingHarmony.UnpatchAll(routingHarmony.Id); }
     typeof(MegaCrit.Sts2.Core.Models.PowerModel).GetField("_owner", BindingFlags.Instance | BindingFlags.NonPublic)!
         .SetValue(power, owner);
     var stampPatch = assembly.GetType("AutoAnthonyCombatSolverBridge.Patches.CompositePowerContinuationPatch")!;
@@ -597,5 +622,17 @@ sealed class TestChaosCard : ChaosCardModel
         card._fixture = new(0, generated, "", "", "", "", "",
             operations.Select(operation => operation.RuntimeSpec!).ToArray());
         return card;
+    }
+}
+
+static class PowerRoutingCapture
+{
+    public static string Method = "";
+    public static object[] Arguments = [];
+    public static bool Prefix(MethodBase __originalMethod, object[] __args)
+    {
+        Method = __originalMethod.Name;
+        Arguments = __args;
+        return false;
     }
 }
