@@ -103,7 +103,7 @@ AutoAnthonyCombatSolverBridge/
 │   ├── Patches/                       # Harmony 补丁：自动预出牌、选牌效果、回合顺序、转储
 │   └── Diagnostics/                   # 日志
 ├── tests/BridgeChecks/                # 离线一致性检查（dotnet run）
-└── docs/                              # 目录审计、实机验证证据、行为契约基线
+└── docs/                              # 目录准入审计、行为契约基线
 ```
 
 ## 离线检查
