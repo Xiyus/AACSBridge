@@ -641,16 +641,15 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             {
                 // 源码：CreateDerivatives → Soul → 弃牌堆
                 if (count <= 0) return;
-                mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Soul>(
-                    owner, PileType.Discard, count, owner);
+                ChaosDerivativeMirror.Add(mirror.Simulator, context.Card, context.Shape.OperationIndex, PileType.Discard, count);
                 return;
             }
             case "ncr_createsoulindraw":
             {
-                // 源码：CreateDerivatives → Soul → 抽牌堆
+                // AA inserts each derivative at a random draw-pile position, consuming Shuffle RNG.
                 if (count <= 0) return;
-                mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Soul>(
-                    owner, PileType.Draw, count, owner);
+                ChaosDerivativeMirror.Add(mirror.Simulator, context.Card, context.Shape.OperationIndex, PileType.Draw, count,
+                    CardPilePosition.Random);
                 return;
             }
             case "ncr_createsoulinhand":
@@ -774,8 +773,8 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 var soulCount = context.RuntimeValue("amount",
                     context.Card.ResolveEffectEnergyXValue());
                 if (soulCount <= 0) return;
-                mirror.Simulator.CreateAndAddGeneratedCardsToCombat<Soul>(
-                    owner, PileType.Draw, soulCount, owner);
+                ChaosDerivativeMirror.Add(mirror.Simulator, context.Card, context.Shape.OperationIndex, PileType.Draw, soulCount,
+                    CardPilePosition.Random);
                 return;
             }
             case "ncr_blocktripleostymaxhp":

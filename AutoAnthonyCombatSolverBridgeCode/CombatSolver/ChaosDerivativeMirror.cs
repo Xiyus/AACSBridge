@@ -17,11 +17,12 @@ internal static class ChaosDerivativeMirror
         return PredictedCard.FromGenerated(generated);
     }
 
-    internal static void Add(CombatPredictionSimulator simulator, ChaosCardModel source, int index, PileType pile, int count)
+    internal static void Add(CombatPredictionSimulator simulator, ChaosCardModel source, int index, PileType pile, int count,
+        CardPilePosition position = CardPilePosition.Bottom)
     {
         if (count <= 0) return;
         var cards = Enumerable.Range(0, count).Select(_ => Create(simulator, source, index)).ToList();
-        simulator.AddGeneratedCardsToCombat(cards, pile, source.Owner, CardPilePosition.Bottom, CardGenerationResultKind.Fixed);
+        simulator.AddGeneratedCardsToCombat(cards, pile, source.Owner, position, CardGenerationResultKind.Fixed);
     }
 
     internal static bool Transform(CombatPredictionSimulator simulator, ChaosCardModel source, int operationIndex,
