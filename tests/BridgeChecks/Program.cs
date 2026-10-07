@@ -499,6 +499,38 @@ void Run()
     // Exercise every action registration against the unmodified installed solver. This catches
     // override-signature and duplicated-registry errors which a successful compile cannot detect.
     var mirror = assembly.GetType("AutoAnthonyCombatSolverBridge.CombatSolver.ChaosCompositePowerMirror")!;
+    var derivativeMirror = assembly.GetType("AutoAnthonyCombatSolverBridge.CombatSolver.ChaosDerivativeMirror")!;
+    var randomReplacement = derivativeMirror.GetMethod("TransformReplacement", BindingFlags.Static | BindingFlags.NonPublic)!;
+    var randomTransformFactory = solver.GetType("CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions")!
+        .GetMethod("CreateRandomCardForTransform")!;
+    var transformSimulatorType = solver.GetType("CombatSolver.Engine.InCombat.Simulation.CombatPredictionSimulator")!;
+    var transformRngSetType = solver.GetType("CombatSolver.Engine.InCombat.Simulation.CombatPredictionRngSet")!;
+    var transformSimulator = System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(transformSimulatorType);
+    var transformRngSet = System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(transformRngSetType);
+    var selectionStreamField = transformRngSetType.GetField("_combatCardSelection", BindingFlags.NonPublic | BindingFlags.Instance)!;
+    var selectionStream = Activator.CreateInstance(selectionStreamField.FieldType)!;
+    var selectionRng = (MegaCrit.Sts2.Core.Random.Rng)System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof(MegaCrit.Sts2.Core.Random.Rng));
+    selectionStreamField.FieldType.GetField("_mutable", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(selectionStream, selectionRng);
+    selectionStreamField.SetValue(transformRngSet, selectionStream);
+    transformSimulatorType.GetField("<Rng>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(transformSimulator, transformRngSet);
+    var transformSource = TestChaosCard.Create([Op(Spec("template_self_action", "cl_transformselectedhandcards", "self"), "CL:TransformSelectedHandCards")]);
+    var transformOriginal = TestChaosCard.Create([]);
+    var transformGenerated = TestChaosCard.Create([]);
+    var transformPredictionCardType = solver.GetType("CombatSolver.Engine.Common.PredictedCard")!;
+    var transformPredicted = transformPredictionCardType.GetMethod("FromGenerated")!.Invoke(null, [transformOriginal]);
+    TransformFactoryCapture.Replacement = transformGenerated;
+    var transformHarmony = new HarmonyLib.Harmony("aa_bridge_random_transform_contract");
+    transformHarmony.Patch(randomTransformFactory, prefix: new HarmonyLib.HarmonyMethod(typeof(TransformFactoryCapture).GetMethod("Prefix")!));
+    try
+    {
+        var replacement = randomReplacement.Invoke(null, [transformSimulator, transformSource, 0, transformPredicted]);
+        Check(ReferenceEquals(TransformFactoryCapture.Original, transformOriginal) && TransformFactoryCapture.InCombat,
+            "random hand transform uses selected card's native transformation pool rather than source derivative slot");
+        Check(ReferenceEquals(TransformFactoryCapture.Rng, selectionRng), "random hand transform uses branch CombatCardSelection RNG");
+        Check(ReferenceEquals(transformPredictionCardType.GetProperty("Preview")!.GetValue(replacement), transformGenerated),
+            "random transform wraps native generated replacement without an unrelated derivative upgrade");
+    }
+    finally { transformHarmony.UnpatchAll(transformHarmony.Id); }
     var choiceMirror = assembly.GetType("AutoAnthonyCombatSolverBridge.CombatSolver.ChaosCardChoiceMirror")!;
     var otherPools = choiceMirror.GetMethod("OtherCharacterPools", BindingFlags.NonPublic | BindingFlags.Static)!;
     var ownPool = (MegaCrit.Sts2.Core.Models.CardPoolModel)System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(
@@ -633,6 +665,21 @@ static class PowerRoutingCapture
     {
         Method = __originalMethod.Name;
         Arguments = __args;
+        return false;
+    }
+}
+
+static class TransformFactoryCapture
+{
+    public static MegaCrit.Sts2.Core.Models.CardModel Replacement = null!;
+    public static MegaCrit.Sts2.Core.Models.CardModel Original = null!;
+    public static MegaCrit.Sts2.Core.Random.Rng Rng = null!;
+    public static bool InCombat;
+    public static bool Prefix(MegaCrit.Sts2.Core.Models.CardModel original, bool isInCombat,
+        MegaCrit.Sts2.Core.Random.Rng rng, ref MegaCrit.Sts2.Core.Models.CardModel __result)
+    {
+        Original = original; Rng = rng; InCombat = isInCombat;
+        __result = Replacement;
         return false;
     }
 }

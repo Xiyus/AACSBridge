@@ -114,7 +114,7 @@ public static class CompatibilityGuard
              "AddGeneratedCardToCombat", "AddGeneratedCardsToCombat", "GetMaxHandSize"]),
         ("CombatSolver.Engine.Common.PredictedCard", ["Original", "Preview", "MutablePreview"]),
         ("CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions",
-            ["GetDistinctUnlockedColorlessForCombat", "GetDistinctUnlockedCharacterCardsForCombat", "GetUnlockedCharacterCardsForCombat", "GetDistinctForCombat"]),
+            ["GetDistinctUnlockedColorlessForCombat", "GetDistinctUnlockedCharacterCardsForCombat", "GetUnlockedCharacterCardsForCombat", "GetDistinctForCombat", "CreateRandomCardForTransform"]),
         // 扩展方法不在类型成员上，必须挂在其静态类的契约条目里检查（CreateClone/Simulate/SetToFreeThisTurn
         // 均为扩展方法——前三次实机测试各抓过一次此类契约错误）
         ("CombatSolver.Engine.InCombat.Simulation.CombatPredictedCardExtensions", ["CreateClone", "SetToFreeThisTurn", "SetToFreeThisCombat"]),

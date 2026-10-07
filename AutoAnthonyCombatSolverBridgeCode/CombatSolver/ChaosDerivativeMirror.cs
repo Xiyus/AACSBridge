@@ -2,6 +2,7 @@ using AutoAnthony;
 using CombatSolver;
 using CombatSolver.Engine.Common;
 using CombatSolver.Engine.InCombat.Simulation;
+using CombatSolver.Engine.InCombat.Extensions;
 using MegaCrit.Sts2.Core.Entities.Cards;
 
 namespace AutoAnthonyCombatSolverBridge.CombatSolver;
@@ -28,21 +29,29 @@ internal static class ChaosDerivativeMirror
     internal static bool Transform(CombatPredictionSimulator simulator, ChaosCardModel source, int operationIndex,
         IReadOnlyList<PredictedCard> selected)
     {
+        var random = source.Generated.Operations[operationIndex].Template == "CL:TransformSelectedHandCards";
         var rows = new List<(PredictedCard Old, PredictedCard New, SimCardPile Pile, int Index)>();
         foreach (var old in selected)
         {
-            var replacement = Create(simulator, source, operationIndex);
+            var replacement = TransformReplacement(simulator, source, operationIndex, old);
             var (pile, index) = CardChoiceSupport.RemoveTransformedCard(simulator, old);
             rows.Add((old, replacement, pile, index));
         }
         rows.Sort((left, right) => left.Pile.Type != right.Pile.Type
             ? left.Pile.Type.CompareTo(right.Pile.Type) : left.Index.CompareTo(right.Index));
         foreach (var row in rows)
-            if (!CardChoiceSupport.AddTransformedCard(simulator, row.Old, row.New, row.Pile, row.Index, CardGenerationResultKind.Fixed))
+            if (!CardChoiceSupport.AddTransformedCard(simulator, row.Old, row.New, row.Pile, row.Index,
+                    random ? CardGenerationResultKind.Random : CardGenerationResultKind.Fixed))
             {
                 simulator.RejectExecutionContinuation();
                 return false;
             }
         return true;
     }
+
+    internal static PredictedCard TransformReplacement(CombatPredictionSimulator simulator, ChaosCardModel source,
+        int operationIndex, PredictedCard original)
+        => source.Generated.Operations[operationIndex].Template == "CL:TransformSelectedHandCards"
+            ? PredictedCard.FromGenerated(simulator.CreateRandomCardForTransform(original.Preview, true, simulator.Rng.CombatCardSelection))
+            : Create(simulator, source, operationIndex);
 }
