@@ -121,6 +121,8 @@ public static class CombatSolverRegistrar
     {
         CardOnPlayMirrors.Registry.Register<TCard>(ChaosCardOnPlayMirror.Execute);
         CardIsPlayableMirrors.Registry.Register<TCard>(ChaosCardIsPlayableMirror.Evaluate);
+        CardResultLocationMirrors.Registry.Register<TCard>((card, context) =>
+            ChaosCardPassiveMirror.ResultLocation((ChaosCardModel)context.Card.MutablePreview, context.BaseResult));
         // Passive card hooks apply even when OnPlay is outside the support matrix.
         AfterDeathMirrors.Registry.Register<TCard>(AfterDeath);
         ChaosCardPassiveMirror.Register<TCard>();

@@ -32,7 +32,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
         var spec = shape.Spec;
         // modify_cost/set_zero：本卡费用设为 0
         if (spec.Opcode == "modify_cost" && spec.Variant == "set_zero")
-            return null;
+            return spec.Target is "self" or "referenced_card" or "next_ethereal" or "next_power" or "next_skill" ? null : "未知费用修改目标";
         if (spec.Opcode == "upgrade_card" && spec.Variant == "referenced")
             return null;
         // end_turn/after_card_resolution：结算后结束回合
@@ -97,10 +97,22 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
         if (context.Shape.Spec.Variant is "cl_proxyatomic_catastrophe" or "cl_proxyatomic_beatdown" or "i_proxyatomic_eidolon")
         { new AutoPlayHandler().Execute(context); return; }
 
-        // modify_cost/set_zero：本卡费用设为 0（源码 L2265）
+        // Cost opcodes also describe future grants; do not collapse them into host-card mutation.
         if (context.Shape.Spec.Opcode == "modify_cost")
         {
-            context.Card.SetToFreeThisCombat();
+            void Grant(Type power) => ((ICombatPredictionEffectSink)mirror.CombatState).ApplyPowerFromSource(
+                power, owner.Creature, DependencyResolver.Multiplier(context), owner.Creature, context.Card);
+            switch (context.Shape.Spec.Target)
+            {
+                case "next_ethereal": Grant(typeof(VeilpiercerPower)); break;
+                case "next_power": Grant(typeof(FreePowerPower)); break;
+                case "next_skill": Grant(typeof(FreeSkillPower)); break;
+                case "self": context.Card.SetToFreeThisCombat(); break;
+                case "referenced_card":
+                    // I:SetCostZero is an armed next-attack grant handled by the composite power.
+                    break;
+                default: throw new UnsupportedRuntimeSpecException("modify_cost", context.Shape.Spec.Target);
+            }
             return;
         }
 

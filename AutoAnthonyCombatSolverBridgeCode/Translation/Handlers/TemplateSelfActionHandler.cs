@@ -156,6 +156,28 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
         // 源码门控：ExecutableOrbRepeatCount(amount) = Math.Max(0, amount)，== 0 时跳过
         var count = Math.Max(0, amount);
         var producer = context.Card.Generated.Operations[context.Shape.OperationIndex];
+        if (context.Shape.Spec.Variant is "d_channelfrost" or "d_channeldark" or "d_channellightning"
+            or "d_channelglass" or "d_channelplasma" or "d_channelrandom")
+        {
+            var output = OrbSlotCatalog.ResolveOutput(producer.OrbOutputId, producer.Template)?.Id
+                ?? throw new InvalidOperationException($"引导操作 {producer.Template} 缺少输出球槽");
+            for (var repeat = 0; repeat < count; repeat++)
+            {
+                var orb = output switch
+                {
+                    "lightning" => CanonicalModels.Orb<LightningOrb>().ToMutable(),
+                    "frost" => CanonicalModels.Orb<FrostOrb>().ToMutable(),
+                    "dark" => CanonicalModels.Orb<DarkOrb>().ToMutable(),
+                    "plasma" => CanonicalModels.Orb<PlasmaOrb>().ToMutable(),
+                    "glass" => CanonicalModels.Orb<GlassOrb>().ToMutable(),
+                    "random" => OrbModel.GetRandomOrb(mirror.Rng.CombatOrbGeneration).ToMutable(),
+                    _ => throw new InvalidOperationException($"未知输出球槽 {output}")
+                };
+                mirror.Simulator.OrbChannel(owner, orb);
+                if (mirror.Simulator.HasPendingChoice) return;
+            }
+            return;
+        }
         if (ChaosOperationExecutor.SimpleHandDerivativeProducerTemplates.Contains(producer.Template))
         {
             ChaosDerivativeMirror.Add(mirror.Simulator, context.Card, context.Shape.OperationIndex, PileType.Hand,
@@ -229,40 +251,6 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
 
         switch (context.Shape.Spec.Variant)
         {
-            case "d_channelfrost":
-                if (count == 0) return;
-                mirror.Simulator.OrbChannel<FrostOrb>(owner, count);
-                return;
-            case "d_channeldark":
-                if (count == 0) return;
-                mirror.Simulator.OrbChannel<DarkOrb>(owner, count);
-                return;
-            case "d_channellightning":
-                if (count == 0) return;
-                mirror.Simulator.OrbChannel<LightningOrb>(owner, count);
-                return;
-            case "d_channelglass":
-                if (count == 0) return;
-                mirror.Simulator.OrbChannel<GlassOrb>(owner, count);
-                return;
-            case "d_channelplasma":
-                if (count == 0) return;
-                mirror.Simulator.OrbChannel<PlasmaOrb>(owner, count);
-                return;
-            case "d_channelrandom":
-            {
-                // 源码：OrbModel.GetRandomOrb(Rng.CombatOrbGeneration)——分支 RNG 同流。
-                // 真实代码的 for 循环不因 Channel 失败而中断——RNG 消耗必须与实际严格一致
-                //（每次迭代消耗 1 次 GetRandomOrb，无论入队是否成功）。
-                for (var index = 0; index < count; index++)
-                {
-                    var orb = OrbModel.GetRandomOrb(mirror.Rng.CombatOrbGeneration).ToMutable();
-                    mirror.Simulator.OrbChannel(owner, orb);
-                    if (mirror.Simulator.HasPendingChoice)
-                        return;    // 选择挂起是合法边界（续接戳会抓到 RNG 差异）
-                }
-                return;
-            }
             case "d_gainfocus":
             {
                 // 源码：PowerCmd.Apply<FocusPower>(ctx, owner, amount, owner, card)

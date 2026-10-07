@@ -19,6 +19,20 @@ internal static class ChaosCardPassiveMirror
         or "R:AtTurnEndWhenTopOfDraw" or "R:PlayAtTurnEndIfTopOfDraw" or "CL:ReturnThisToHand";
     internal static bool ReturnsNextTurn(ChaosCardModel card) => card.Generated.Operations.Any(op => op.Template == "CL:ReturnThisToHand");
 
+    internal static CardLocation ResultLocation(ChaosCardModel card, CardLocation location)
+    {
+        card._postPlayExhaustMovePile = null;
+        var destination = card.Generated.Operations.Any(op => op.Template == "R:ReturnThisToHand") ? PileType.Hand
+            : card.Generated.Operations.Any(op => op.Template == "R:PutThisOnDraw") ? PileType.Draw : (PileType?)null;
+        if (location.pileType == PileType.Exhaust) card._postPlayExhaustMovePile = destination;
+        else if (location.pileType == PileType.Discard && destination is { } pile)
+        {
+            location.pileType = pile;
+            if (pile == PileType.Draw) location.position = CardPilePosition.Top;
+        }
+        return location;
+    }
+
     internal static void Entered(CombatPredictionSimulator simulator, PredictedCard predicted)
     {
         var current = (SimulatedCombatState)simulator.State.CombatState;
@@ -49,6 +63,10 @@ internal static class ChaosCardPassiveMirror
     }
     internal static void Register<T>() where T : ChaosCardModel
     {
+        AfterCardExhaustedMirrors.Registry.Register<T>((card, context) =>
+        {
+            if (context.Card.References(card)) ExhaustMove(context.Simulator, context.Card, context.CausedByEthereal);
+        });
         AfterAutoPostPlayPhaseEnteredMirrors.Registry.Register<T>((card, c) =>
         {
             if (c.Player != card.Owner || c.State.FindCard(card) is not { } predicted) return;

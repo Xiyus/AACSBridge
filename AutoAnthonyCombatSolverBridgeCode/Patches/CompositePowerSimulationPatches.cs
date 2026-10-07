@@ -18,7 +18,6 @@ internal static class ChaosCardSelfExhaustPatch
     private static void Postfix(CombatPredictionSimulator simulator, PredictedCard card, bool causedByEthereal)
     {
         if (simulator.HasPendingChoice) { simulator.RejectExecutionContinuation(); return; }
-        ChaosCardPassiveMirror.ExhaustMove(simulator, card, causedByEthereal);
         ChaosCardExhaustMirror.Execute(simulator, card);
     }
 }

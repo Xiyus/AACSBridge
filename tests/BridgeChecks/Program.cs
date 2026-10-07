@@ -501,9 +501,42 @@ void Run()
     var concreteCard = aa.GetTypes().First(type => !type.IsAbstract && typeof(ChaosCardModel).IsAssignableFrom(type));
     registrar.GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
         .Single(method => method.Name == "RegisterMirrorsForType").Invoke(null, [concreteCard]);
+    var locationRegistry = solver.GetType("CombatSolver.Engine.InCombat.Mirrors.Cards.CardResultLocationMirrors")!
+        .GetField("Registry", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+    var locationReceiver = System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(concreteCard);
+    Check(((System.Collections.IDictionary)locationRegistry.GetType().GetField("_registrations", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .GetValue(locationRegistry)!).Contains(concreteCard),
+        "concrete Chaos card installs its actual post-play result-location override");
+    var passiveType = assembly.GetType("AutoAnthonyCombatSolverBridge.CombatSolver.ChaosCardPassiveMirror")!;
+    var resultLocation = passiveType.GetMethod("ResultLocation", BindingFlags.Static | BindingFlags.NonPublic)!;
+    TestChaosCard MovementCard(params string[] templates)
+    {
+        var fixture = TestChaosCard.Create(templates.Select(template => Op(Spec("template_independent_action", "unused", "self"), template)).ToArray());
+        typeof(MegaCrit.Sts2.Core.Models.AbstractModel).GetProperty("IsMutable")!.SetValue(fixture, true);
+        return fixture;
+    }
+    var drawMovement = MovementCard("R:PutThisOnDraw");
+    var returnMovement = MovementCard("R:PutThisOnDraw", "R:ReturnThisToHand");
+    MegaCrit.Sts2.Core.Entities.Cards.CardLocation ResolveMovement(TestChaosCard fixture, MegaCrit.Sts2.Core.Entities.Cards.PileType pile)
+        => (MegaCrit.Sts2.Core.Entities.Cards.CardLocation)resultLocation.Invoke(null,
+            [fixture, new MegaCrit.Sts2.Core.Entities.Cards.CardLocation(null!, pile, MegaCrit.Sts2.Core.Entities.Cards.CardPilePosition.Bottom)])!;
+    var drawResult = ResolveMovement(drawMovement, MegaCrit.Sts2.Core.Entities.Cards.PileType.Discard);
+    Check(drawResult.pileType == MegaCrit.Sts2.Core.Entities.Cards.PileType.Draw && drawResult.position == MegaCrit.Sts2.Core.Entities.Cards.CardPilePosition.Top,
+        "PutThisOnDraw returns played card to draw top before next-turn draw");
+    Check(ResolveMovement(returnMovement, MegaCrit.Sts2.Core.Entities.Cards.PileType.Discard).pileType == MegaCrit.Sts2.Core.Entities.Cards.PileType.Hand,
+        "return to hand takes precedence over draw movement exactly as AA");
+    var moveAfterExhaust = typeof(ChaosCardModel).GetField("_postPlayExhaustMovePile", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)!;
+    Check(ResolveMovement(drawMovement, MegaCrit.Sts2.Core.Entities.Cards.PileType.Exhaust).pileType == MegaCrit.Sts2.Core.Entities.Cards.PileType.Exhaust
+        && Equals(moveAfterExhaust.GetValue(drawMovement), MegaCrit.Sts2.Core.Entities.Cards.PileType.Draw), "exhaust event preserved before draw-top movement");
+    Check(ResolveMovement(drawMovement, MegaCrit.Sts2.Core.Entities.Cards.PileType.None).pileType == MegaCrit.Sts2.Core.Entities.Cards.PileType.None
+        && moveAfterExhaust.GetValue(drawMovement) is null, "none result stays removed and clears stale post-exhaust movement");
     var deathRegistry = solver.GetType("CombatSolver.Engine.InCombat.Mirrors.Hooks.Death.AfterDeathMirrors")!
         .GetField("Registry", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
     var cardReceiver = System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(concreteCard);
+    var exhaustRegistry = solver.GetType("CombatSolver.Engine.InCombat.Mirrors.Hooks.Card.AfterCardExhaustedMirrors")!
+        .GetField("Registry", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+    Check((bool)exhaustRegistry.GetType().GetMethod("HasRegisteredHandler")!.Invoke(exhaustRegistry, [cardReceiver])!,
+        "concrete Chaos card has registered exhaust movement rather than an unmirrored override");
     Check((bool)deathRegistry.GetType().GetMethod("HasRegisteredHandler")!.Invoke(deathRegistry, [cardReceiver])!,
         "concrete Chaos card has actual AfterDeath cost handler");
     var deathContextType = solver.GetType("CombatSolver.Engine.InCombat.Mirrors.Hooks.Death.AfterDeathMirrorContext")!;
