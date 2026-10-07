@@ -13,4 +13,12 @@ packages/
 Directory.Build.props
 LocalDependencies.props
 .research/
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.pfx
+*.p12
+*.log
 dist/

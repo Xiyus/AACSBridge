@@ -5,14 +5,13 @@
 
       推荐：指向*已安装*的 Mod 目录（Steam 创意工坊 content 或游戏 mods/ 目录），
       这样桥始终针对游戏实际运行的二进制编译。Steam 更新任一 Mod 后，请重新核对
-      游戏日志里的 CompatibilityGuard 输出——桥锁定了版本与 DLL 哈希
-      （见 README 兼容性锁定表）。
+      游戏日志里的 CompatibilityGuard 输出和行为契约检查结果（见 README 兼容性说明）。
     -->
     <PropertyGroup>
         <!-- Steam 创意工坊安装的 AutoAnthony（目录内含 AutoAnthony.dll + AutoAnthony.json） -->
-        <AutoAnthonyDllDir>E:/Games/Steam/steamapps/workshop/content/2868840/3786611028</AutoAnthonyDllDir>
+        <AutoAnthonyDllDir>C:/PATH/TO/Steam/steamapps/workshop/content/2868840/3786611028</AutoAnthonyDllDir>
 
         <!-- Steam 创意工坊安装的 CombatSolver（目录内含 CombatSolver.dll + CombatSolver.json） -->
-        <CombatSolverDllDir>E:/Games/Steam/steamapps/workshop/content/2868840/3790899961</CombatSolverDllDir>
+        <CombatSolverDllDir>C:/PATH/TO/Steam/steamapps/workshop/content/2868840/3790899961</CombatSolverDllDir>
     </PropertyGroup>
 </Project>
