@@ -6,6 +6,8 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Models.Orbs;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
+using MegaCrit.Sts2.Core.Commands;
+using CombatSolver.Engine.InCombat.Simulation;
 
 // 命名空间说明见 AutoAnthonyFacade.cs：外部类型一律通过文件级 using + 非限定名引用。
 
@@ -43,13 +45,15 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
             "ncr_doublehangdamage" => null,
             "ncr_applydoomequaldamage" => null,
             "d_triggerlightningpassivesattarget" => null,
+            "ncr_applyeventdamageasdoom" => null,
+            "ncr_copytargetdebuffstoothers" => null,
             _ => $"template_target_action 的 variant={spec.Variant} 不在支持矩阵",
         };
     }
 
     public void Execute(OperationExecutionContext context)
     {
-        var target = context.Mirror.CardPlay.Target;
+        var target = context.Target;
         if (target is null)
             return;    // 源码语义：无目标 = no-op
 
@@ -60,10 +64,16 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
 
         switch (context.Shape.Spec.Variant)
         {
+            case "ncr_copytargetdebuffstoothers":
+                TargetDebuffResolver.Copy(context);
+                return;
+            case "ncr_applyeventdamageasdoom":
+                if (context.EventAmount > 0) effects.ApplyPowerFromSource(typeof(DoomPower), target, (int)context.EventAmount, owner.Creature, context.Card);
+                return;
             case "t_poison":
             {
                 // 源码 L749-753：PowerCmd.Apply<PoisonPower>(ctx, target, amount, owner, card)
-                var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
+                var amount = context.ExecutableAmount;
                 effects.ApplyPowerFromSource(typeof(PoisonPower), target, amount, owner.Creature, context.Card);
                 return;
             }
@@ -88,19 +98,28 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
             }
             case "ncr_applydoom":
             {
-                // 源码 L1832-1835：PowerCmd.Apply<DoomPower>(target, amount)（简单路径）
-                var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
+                var amount = context.ExecutableAmount;
+                var modifierIndex = context.Card.Generated.Operations.ToList().FindIndex(op => op.Template == "NCR:DoomPerDoomThreshold");
+                if (modifierIndex >= 0)
+                {
+                    var prefix = modifierIndex > 0 && context.Card.Generated.Operations[modifierIndex - 1].Template == "NCR:ForEachDoomThreshold";
+                    var threshold = ChaosOperationExecutor.RuntimeSpecValue(context.Card, prefix ? modifierIndex - 1 : modifierIndex, "threshold", 0);
+                    var bonus = ChaosOperationExecutor.RuntimeSpecValue(context.Card, modifierIndex, "bonus", 0);
+                    if (threshold > 0 && bonus > 0)
+                        amount += ((global::CombatSolver.SimulatedCombatState)mirror.CombatState).GetAmount<DoomPower>(target) / threshold * bonus;
+                }
                 effects.ApplyPowerFromSource(typeof(DoomPower), target, amount, owner.Creature, context.Card);
                 return;
             }
             case "t_removeblockandartifact":
             {
                 // 源码 L767-772：移除目标格挡 + 移除神器 Power
-                // 简化：格挡清零（CreatureCmd.LoseBlock 等价——DamageBlock 全量）
                 var creatureState = mirror.Simulator.State.GetCreature(target);
                 var currentBlock = creatureState.Block;
                 if (currentBlock > 0)
                     creatureState.DamageBlock(currentBlock, ValueProp.Unpowered);
+                if (mirror.CombatState is global::CombatSolver.SimulatedCombatState artifactCombat)
+                    artifactCombat.SetAmount<ArtifactPower>(target, 0);
                 return;
             }
             case "ncr_targetlosestrength":
@@ -112,16 +131,8 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
             }
             case "ncr_doublevulnerableweak":
             {
-                // 源码 L1787-1790：翻倍目标的易伤和虚弱（DebilitatePower 路径）
-                if (mirror.CombatState is global::CombatSolver.SimulatedCombatState debuffCombat)
-                {
-                    var vulnerable = debuffCombat.GetAmount<VulnerablePower>(target);
-                    if (vulnerable > 0)
-                        effects.ApplyPowerFromSource(typeof(VulnerablePower), target, vulnerable, owner.Creature, context.Card);
-                    var weak = debuffCombat.GetAmount<WeakPower>(target);
-                    if (weak > 0)
-                        effects.ApplyPowerFromSource(typeof(WeakPower), target, weak, owner.Creature, context.Card);
-                }
+                var amount = ChaosOperationExecutor.ExecutableOperationCount(context.Operation, context.ExecutableAmount);
+                if (amount > 0) effects.ApplyPowerFromSource(typeof(DebilitatePower), target, amount, owner.Creature, context.Card);
                 return;
             }
             case "r_kingssworddoubledamagethisturn":
@@ -136,26 +147,34 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
                 if (mirror.CombatState is global::CombatSolver.SimulatedCombatState doomCombat)
                 {
                     var doom = doomCombat.GetAmount<DoomPower>(target);
-                    if (doom > 0)
                     {
                         var (resolvedDamage, resolvedHits) = DamageModifierResolver.Resolve(context, doom, 1);
-                        if (resolvedHits > 0)
-                            mirror.Simulator.Damage([target], resolvedDamage,
-                                context.DamageProps, owner.Creature, context.Mirror.Card, context.Mirror.CardPlay);
+                        var results = new List<DamageResult>();
+                        if (context.Card.Type == MegaCrit.Sts2.Core.Entities.Cards.CardType.Power)
+                            for (var hit = 0; hit < resolvedHits; hit++)
+                            {
+                                results.AddRange(mirror.Simulator.Damage([target], resolvedDamage, ValueProp.Unpowered,
+                                    owner.Creature, mirror.Card, mirror.CardPlay));
+                                if (mirror.Simulator.HasPendingChoice) break;
+                            }
+                        else
+                        {
+                            var attack = DamageCmd.Attack(resolvedDamage).WithHitCount(resolvedHits).FromCard(context.Card, mirror.CardPlay).Targeting(target);
+                            attack.Simulate(mirror.Simulator);
+                            results.AddRange(attack.Results.SelectMany(result => result));
+                        }
+                        if (context.Resolution is { } resolution)
+                        {
+                            resolution.LastAttackKilled |= results.Any(result => result.WasTargetKilled);
+                            resolution.LastDamageDealt = decimal.ToInt32(results.Sum(result => result.TotalDamage + result.OverkillDamage));
+                        }
                     }
                 }
                 return;
             }
             case "ncr_ostydamage":
             {
-                // 源码：Osty 对目标造成伤害（经 DamageAndHits——Osty 为攻击者）
-                var osty = mirror.Simulator.State.GetOsty(owner);
-                if (osty is null) return;    // Osty 不存在 = no-op
-                var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
-                var (ostyDamage, ostyHits) = DamageModifierResolver.Resolve(context, amount, 1);
-                if (ostyHits > 0)
-                    mirror.Simulator.Damage([target], ostyDamage,
-                        context.DamageProps, osty, context.Mirror.Card, context.Mirror.CardPlay);
+                OstyDamageResolver.Execute(context, target);
                 return;
             }
             case "ncr_unpowereddamage":
@@ -163,10 +182,11 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
                 // 源码 L1727-1735：Unpowered 伤害（Power 卡路径——无力量加成）
                 var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
                 var (dmg, hits) = DamageModifierResolver.Resolve(context, amount, 1);
-                if (hits > 0)
-                    mirror.Simulator.Damage([target], dmg,
-                        MegaCrit.Sts2.Core.ValueProps.ValueProp.Unpowered,
-                        owner.Creature, context.Mirror.Card, context.Mirror.CardPlay);
+                for (var hit = 0; hit < hits; hit++)
+                {
+                    mirror.Simulator.Damage([target], dmg, ValueProp.Unpowered, owner.Creature, mirror.Card, mirror.CardPlay);
+                    if (mirror.Simulator.HasPendingChoice) break;
+                }
                 return;
             }
             case "ncr_applypower_sicempower":
@@ -178,20 +198,19 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
             }
             case "ncr_doublehangdamage":
             {
-                // 源码：翻倍目标的 HangDamage（简化——施加等量 StranglePower）
                 if (mirror.CombatState is global::CombatSolver.SimulatedCombatState hangCombat)
                 {
-                    var hang = hangCombat.GetAmount<StranglePower>(target);
-                    if (hang > 0)
-                        effects.ApplyPowerFromSource(typeof(StranglePower), target, hang, owner.Creature, context.Card);
+                    var hang = hangCombat.GetAmount<HangPower>(target);
+                    var increase = Math.Max(2, hang);
+                    if (hang + increase > 999_999_999) increase = Math.Max(0, 999_999_999 - hang);
+                    if (increase > 0) effects.ApplyPowerFromSource(typeof(HangPower), target, increase, owner.Creature, context.Card);
                 }
                 return;
             }
             case "ncr_applydoomequaldamage":
             {
                 // 源码 L1711-1714：Doom = 本次伤害量（state.LastDamageDealt）
-                // 简化：Doom = OperationAmount（直接打出时近似）
-                var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
+                var amount = context.Resolution?.LastDamageDealt ?? 0;
                 if (amount > 0)
                     effects.ApplyPowerFromSource(typeof(DoomPower), target, amount, owner.Creature, context.Card);
                 return;
@@ -200,8 +219,12 @@ public sealed class TemplateTargetActionHandler : IOperationHandler
             {
                 // 源码 L2330：触发所有闪电球的被动（对目标）
                 var orbQueue = mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue;
-                foreach (var orb in orbQueue.Orbs.OfType<LightningOrb>().ToList())
-                    mirror.Simulator.OrbPassive(orb, target);
+                for (var repeat = 0; repeat < ChaosOperationExecutor.UpgradedOperationRepeatCount(context.Card, context.Shape.OperationIndex); repeat++)
+                    foreach (var orb in orbQueue.Orbs.Where(orb => ChaosOrbResolver.MatchesSource(orb, context.Operation)).ToList())
+                    {
+                        mirror.Simulator.OrbPassive(orb, target);
+                        if (mirror.Simulator.HasPendingChoice) return;
+                    }
                 return;
             }
             default:

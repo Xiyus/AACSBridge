@@ -5,6 +5,11 @@ using CombatSolver.Engine.Common;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Orbs;
 using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.Factories;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using CombatSolver.Engine.InCombat.Simulation;
+using MegaCrit.Sts2.Core.Models.Cards;
+using MegaCrit.Sts2.Core.Extensions;
 
 // 命名空间说明见 AutoAnthonyFacade.cs：外部类型一律通过文件级 using + 非限定名引用。
 
@@ -28,7 +33,6 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
         // modify_cost/set_zero：本卡费用设为 0
         if (spec.Opcode == "modify_cost" && spec.Variant == "set_zero")
             return null;
-        // upgrade_card/referenced：升级引用卡（简化——升级本卡）
         if (spec.Opcode == "upgrade_card" && spec.Variant == "referenced")
             return null;
         // end_turn/after_card_resolution：结算后结束回合
@@ -52,9 +56,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             "cl_drawtofullhand" => null,
             "i_nextskillcostszero" => null,
             "i_setthiscardcostzero" => null,
-            "i_upgrade" => "手牌升级选择尚未接入选牌镜像",
-            "i_playtopcardandexhaust" or "i_playthiscard" => "嵌套自动出牌尚未接入执行续接",
-            "cl_exhaustuptohandcards" => "可选数量的手牌消耗尚未接入选牌镜像",
+            "i_upgrade" or "cl_exhaustuptohandcards" => null,
             "d_increasethiscardcost" => null,
             // 代理模板（简单 Power/球操作）
             "i_proxyatomic_foregoneconclusion" => null,
@@ -92,6 +94,8 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
         var mirror = context.Mirror;
         var owner = context.Card.Owner;
         var amount = context.ExecutableAmount;
+        if (context.Shape.Spec.Variant is "cl_proxyatomic_catastrophe" or "cl_proxyatomic_beatdown" or "i_proxyatomic_eidolon")
+        { new AutoPlayHandler().Execute(context); return; }
 
         // modify_cost/set_zero：本卡费用设为 0（源码 L2265）
         if (context.Shape.Spec.Opcode == "modify_cost")
@@ -100,17 +104,17 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             return;
         }
 
-        // upgrade_card/referenced：升级引用卡（简化——升级本卡）
         if (context.Shape.Spec.Opcode == "upgrade_card")
         {
-            if (context.Card.IsUpgradable)
-                global::CombatSolver.Engine.Common.PredictionUtils.UpgradeCard(context.Card);
+            if (context.ReferencedCard is { } referenced && referenced.Preview.IsUpgradable)
+                context.Mirror.Simulator.Upgrade(referenced);
             return;
         }
 
         // end_turn/after_card_resolution：结算后结束回合（no-op——回合结束由求解器管理）
         if (context.Shape.Spec.Opcode == "end_turn")
         {
+            if (context.Resolution is { } resolution) resolution.EndTurnRequested = true;
             return;
         }
 
@@ -177,8 +181,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 // 对实际抽到的分支卡施加单回合保留（含抽牌事件的结算）。
                 if (amount <= 0) return;
                 var drawn = mirror.Simulator.Draw(owner, amount);
-                if (mirror.Simulator.HasPendingChoice)
-                    throw new InvalidOperationException("抽牌保留需要抽牌事件完整结算，不能丢弃保留续接。");
+                if (mirror.Simulator.HasPendingChoice) return;
                 foreach (var drawnCard in drawn)
                     drawnCard.MutablePreview.GiveSingleTurnRetain();
                 return;
@@ -189,8 +192,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 if (mirror.CombatState is not global::CombatSolver.SimulatedCombatState combat)
                     throw new InvalidOperationException("即时毒结算需要分支战斗状态。");
                 if (!global::CombatSolver.CorePowerSupport.TriggerPoison(mirror.Simulator, combat,
-                        mirror.CombatState.HittableEnemies.ToArray()))
-                    throw new InvalidOperationException("即时毒结算出现选择，尚未接入执行续接。");
+                        mirror.CombatState.HittableEnemies.ToArray())) return;
                 return;
             }
             case "i_replaynextskills":
@@ -224,7 +226,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 // 原版区分下一张技能与下一张能力牌免费。
                 if (mirror.CombatState is not ICombatPredictionEffectSink effects5)
                     throw new InvalidOperationException("技能免费需要分支战斗状态效果汇。");
-                effects5.ApplyPowerFromSource(typeof(FreeSkillPower), owner.Creature, 1, owner.Creature, context.Card);
+                effects5.ApplyPowerFromSource(typeof(FreeSkillPower), owner.Creature, DependencyResolver.Multiplier(context), owner.Creature, context.Card);
                 return;
             }
             case "i_setthiscardcostzero":
@@ -233,10 +235,8 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 context.Card.SetToFreeThisCombat();
                 return;
             }
-            case "i_upgrade":
             case "i_playtopcardandexhaust":
             case "i_playthiscard":
-            case "cl_exhaustuptohandcards":
                 throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);
             case "d_increasethiscardcost":
             {
@@ -265,7 +265,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                     if (mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue.Orbs.Count == 0) break;
                     mirror.Simulator.OrbEvokeNext(owner, 1, dequeue: i == evokeCount - 1);
                     if (mirror.Simulator.HasPendingChoice)
-                        throw new InvalidOperationException("多重激发出现选择，尚未接入执行续接。");
+                        return;
                 }
                 return;
             }
@@ -292,7 +292,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                     };
                     mirror.Simulator.OrbChannel(owner, orb);
                     if (mirror.Simulator.HasPendingChoice)
-                        throw new InvalidOperationException("Tempest 引导出现选择，尚未接入执行续接。");
+                        return;
                 }
                 return;
             }
@@ -317,19 +317,13 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             case "i_proxyatomic_voltaic":
             {
                 // 源码 L2682-2690：引导 = 本战斗已引导的匹配球数
-                // 模拟近似：当前球队列中的匹配球数（已激发的不计——保守下界）
                 var orbQueue = mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue;
                 var operation = context.Card.Generated.Operations[context.Shape.OperationIndex];
                 var output = OrbSlotCatalog.ResolveOutput(operation.OrbOutputId, operation.Template)?.Id;
-                var sourceCount = output switch
-                {
-                    "lightning" => orbQueue.Orbs.OfType<LightningOrb>().Count(),
-                    "frost" => orbQueue.Orbs.OfType<FrostOrb>().Count(),
-                    "dark" => orbQueue.Orbs.OfType<DarkOrb>().Count(),
-                    "plasma" => orbQueue.Orbs.OfType<PlasmaOrb>().Count(),
-                    "glass" => orbQueue.Orbs.OfType<GlassOrb>().Count(),
-                    _ => orbQueue.Orbs.Count,
-                };
+                var sourceCount = ((global::CombatSolver.SimulatedCombatState)mirror.CombatState)._rootHistory.OrbsChanneled
+                    .Count(entry => entry.Actor == owner.Creature && ChaosOrbResolver.MatchesSource(entry.Orb, operation))
+                    + mirror.Simulator.History.Entries.OfType<CombatPredictionOrbChanneledEntry>()
+                        .Count(entry => entry.Orb.Owner == owner && ChaosOrbResolver.MatchesSource(entry.Orb, operation));
                 if (sourceCount > 0)
                 {
                     for (var i = 0; i < sourceCount; i++)
@@ -344,80 +338,42 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                             _ => OrbModel.GetRandomOrb(mirror.Rng.CombatOrbGeneration).ToMutable(),
                         };
                         mirror.Simulator.OrbChannel(owner, orb);
+                        if (mirror.Simulator.HasPendingChoice) return;
                     }
                 }
                 return;
             }
             case "i_proxyatomic_dredge":
-            {
-                // 源码 L2711-2715：选 N 张弃牌堆卡入手
-                // 求解器原生 PlanChoiceEffect.MoveToHand（选牌镜像通道）
-                var count = Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex));
-                var discard = mirror.Simulator.State.GetPlayerCombatState(owner).DiscardPile.Cards;
-                if (discard.Count == 0) return;
-                var selected = discard.Take(count).ToList();
-                foreach (var card in selected)
-                    mirror.Simulator.AddToPile(card,
-                        MegaCrit.Sts2.Core.Entities.Cards.PileType.Hand);
-                return;
-            }
             case "i_proxyatomic_transfigure":
-            {
-                // 源码 L2717-2725：选手牌 1 张，费用 +amount（本战斗），Replay +1
-                var hand = mirror.Simulator.State.GetPlayerCombatState(owner).Hand.Cards;
-                var selected2 = hand.FirstOrDefault();
-                if (selected2 is null) return;
-                var addAmount = Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex));
-                if (!selected2.Preview.EnergyCost.CostsX)
-                    selected2.MutablePreview.EnergyCost.AddThisCombat(addAmount);
-                selected2.MutablePreview.BaseReplayCount++;
-                return;
-            }
             case "i_proxyatomic_begone":
             case "i_proxyatomic_guards":
             case "i_proxyatomic_charge":
             case "i_proxyatomic_seance":
-            {
-                // 源码 L2785-2838：变形选牌（Begone/Guards 从手牌，Charge/Seance 从抽牌堆）
-                // 模拟近似：消耗选中卡并替换为衍生卡（简化——移除选中卡）
-                // 精确变形需要 TransformToDerivatives 的完整复刻
-                var isHand = context.Shape.Spec.Variant is "i_proxyatomic_begone" or "i_proxyatomic_guards";
-                var pile = isHand
-                    ? mirror.Simulator.State.GetPlayerCombatState(owner).Hand.Cards
-                    : mirror.Simulator.State.GetPlayerCombatState(owner).DrawPile.Cards;
-                var transformCount = context.Shape.Spec.Variant switch
-                {
-                    "i_proxyatomic_begone" => Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex)),
-                    "i_proxyatomic_guards" => pile.Count,
-                    _ => Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex)),
-                };
-                var toTransform = pile.Where(c => c.Preview.IsTransformable).Take(transformCount).ToList();
-                foreach (var card in toTransform)
-                    mirror.Simulator.Exhaust(card);
-                return;
-            }
+            case "i_upgrade":
+            case "cl_exhaustuptohandcards":
+                throw new InvalidOperationException("选择操作必须通过逐操作选牌执行链结算");
             case "cl_proxyatomic_alchemize":
             {
-                // 源码 L2445-2455：随机药水并立即使用
-                // 药水效果超出战斗模拟范围——no-op（保守）
+                var potion = PotionFactory.CreateRandomPotionInCombat(owner, mirror.Rng.CombatPotionGeneration);
+                if (effects.TryProcurePotion(owner, potion) && mirror.CombatState is global::CombatSolver.SimulatedCombatState potionCombat)
+                {
+                    potionCombat.RecordLongTermResource(20);
+                    potionCombat.RecordGrowthReward(global::CombatSolver.GrowthSource.Alchemize);
+                }
+                mirror.Simulator.History.PotionGenerated(potion);
                 return;
             }
             case "cl_proxyatomic_catastrophe":
-            {
-                // 源码 L2527-2547：自动打出抽牌堆随机卡 N 次
-                // 嵌套自动出牌超出镜像边界——no-op（保守）
-                return;
-            }
             case "cl_proxyatomic_beatdown":
-            {
-                // 源码 L2571-2596：自动打出弃牌堆攻击卡 N 次
-                // 嵌套自动出牌超出镜像边界——no-op（保守）
+                new AutoPlayHandler().Execute(context);
                 return;
-            }
             case "cl_proxyatomic_anointed":
             {
-                // 源码：Anointed 原卡（触发型——OnPlay 极简）
-                // no-op（保守）
+                var free = Math.Max(0, mirror.Simulator.GetMaxHandSize(owner) - mirror.OwnerState.Hand.Cards.Count);
+                var cards = mirror.OwnerState.DrawPile.Cards.Where(card => card.Preview.Rarity == CardRarity.Rare)
+                    .TakeRandom(free, mirror.Rng.CombatCardSelection).ToList();
+                mirror.Simulator.History.CardsSelected(cards);
+                mirror.Simulator.AddToPile(cards, PileType.Hand);
                 return;
             }
             case "i_proxyatomic_doubleenergy":
@@ -439,11 +395,8 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 return;
             }
             case "i_proxyatomic_eidolon":
-            {
-                // 源码：Eidolon 原卡 OnPlay——仅 EnergyCost.UpgradeBy(-1)
-                // 费用修改对模拟影响极小——no-op（保守）
+                new AutoPlayHandler().Execute(context);
                 return;
-            }
             case "i_reducethiscardcostcombat":
             {
                 // 源码 L3150：本卡费用 -amount（本战斗）
@@ -452,9 +405,12 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             }
             case "i_drawuntilnonattack":
             {
-                // 源码 L3255：抽牌直到抽到非攻击牌
-                // 简化：抽 1 张（精确复刻需要逐张检查类型——分支状态读取）
-                mirror.Simulator.Draw(owner, 1);
+                IReadOnlyList<PredictedCard> drawn;
+                do
+                {
+                    drawn = mirror.Simulator.Draw(owner, 1);
+                    if (mirror.Simulator.HasPendingChoice) return;
+                } while (drawn.FirstOrDefault()?.Preview.Type == CardType.Attack);
                 return;
             }
             case "ncr_increasethiscarddamagerun":
@@ -488,7 +444,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
                 foreach (var chaosCard in allCards)
                     if (chaosCard.Preview is ChaosCardModel chaos
                         && chaos.Generated.Operations.Any(op => op.Template == "D:IncreaseAllClaws"))
-                        chaos.ExtraDamage += amount;
+                        ((ChaosCardModel)chaosCard.MutablePreview).ExtraDamage += amount;
                 return;
             }
             default:

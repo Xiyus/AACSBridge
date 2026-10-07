@@ -25,8 +25,18 @@ public sealed record OperationExecutionContext(
     OperationShape Shape,
     Creature? ResolvedTarget = null,
     bool IsTriggered = false,
-    OperationResolutionState? Resolution = null)
+    OperationResolutionState? Resolution = null,
+    decimal EventAmount = 0,
+    global::CombatSolver.Engine.Common.PredictedCard? EventCard = null,
+    bool UsePoweredCardDamage = false,
+    bool HasTargetOverride = false)
 {
+    public global::CombatSolver.Engine.Common.PredictedCard? ReferencedCard
+        => SelectedCards.FirstOrDefault() ?? Resolution?.LastMovedCard ?? Resolution?.IterationCard ?? EventCard;
+    public IReadOnlyList<global::CombatSolver.Engine.Common.PredictedCard> SelectedCards
+        => Operation.CardTargetSlot is { } slot && Resolution?.CardSelections.TryGetValue(slot, out var selected) == true ? selected : [];
+    public GeneratorOperation Operation => Card.Generated.Operations[Shape.OperationIndex];
+    public Creature? Target => HasTargetOverride || CardEffectRules.UsesExplicitRandomEnemyTarget(Operation) ? ResolvedTarget : Mirror.CardPlay.Target;
     /// <summary>
     /// 主数值：OperationAmount（live DynamicVar 优先，含升级/成长）+ 非卡牌的外部伤害加成。
     /// 与 Execute L595-L615 的链一致（简单操作依赖乘数恒为 1，校验层已排除依赖操作）。
@@ -36,6 +46,8 @@ public sealed record OperationExecutionContext(
         get
         {
             var amount = Card.OperationAmount(Shape.OperationIndex);
+            if (!ChaosOperationExecutor.IsRepeatedDependencyDamagePayoff(Card, Shape.OperationIndex))
+                amount *= DependencyResolver.Multiplier(this);
             if (Card.Type != CardType.Power)
                 amount += Card.CapturedExternalDamageBonus(Shape.OperationIndex);
             return amount;
@@ -47,7 +59,7 @@ public sealed record OperationExecutionContext(
         => ChaosOperationExecutor.RuntimeSpecValue(Card, Shape.OperationIndex, slotId, fallback);
 
     /// <summary>伤害命令的 props（与 DamagePropsForCardEffect 一致：Power 卡 Unpowered，否则 Move）。</summary>
-    public ValueProp DamageProps => ChaosOperationExecutor.DamagePropsForCardEffect(Card.Type, IsTriggered, !IsTriggered);
+    public ValueProp DamageProps => ChaosOperationExecutor.DamagePropsForCardEffect(Card.Type, IsTriggered, !IsTriggered || UsePoweredCardDamage);
 
     /// <summary>格挡命令的 props（与 BlockPropsForCardEffect 一致）。</summary>
     public ValueProp BlockProps => ChaosOperationExecutor.BlockPropsForCardEffect(Card.Type, IsTriggered);

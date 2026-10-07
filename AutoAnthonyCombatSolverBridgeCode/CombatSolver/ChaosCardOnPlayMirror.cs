@@ -2,6 +2,8 @@ using AutoAnthony;
 using ChaosCardGenerator;
 using CombatSolver.Engine.Common;
 using CombatSolver.Engine.InCombat.Mirrors.Cards.OnPlay;
+using CombatSolver;
+using CombatSolver.Engine.InCombat.Simulation;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Hooks;
@@ -60,25 +62,41 @@ internal static class ChaosCardOnPlayMirror
                     : card.LastStarsSpent)
             : 0;
         card.SetResolvedXValues(resolvedEnergyX, resolvedStarX);
-
-        var operations = card.Generated.Operations;
-        // 0.9.0：条件结果缓存（EvaluateConditionOnce 语义——按索引一次评估）
-        var conditionResults = new Dictionary<int, bool>();
-        var resolution = new OperationResolutionState();
-        for (var index = 0; index < operations.Count; index++)
+        context.Simulator.AcknowledgeExecutionDispatch();
+        Continue(card, context, 0, new Dictionary<int, bool>(), new OperationResolutionState
         {
+            PriorAttackHitsOnTargetAtPlayStart = context.CardPlay.Target is { } target
+                ? ((SimulatedCombatState)context.CombatState).GetPoweredAttackHitsThisTurn(card.Owner.Creature, target) : 0,
+            TargetDebuffSnapshot = context.CardPlay.Target is { } debuffTarget && card.Generated.Operations.Any(op => op.Template == "NCR:CopyTargetDebuffsToOthers")
+                ? TargetDebuffResolver.Capture(context.Simulator, debuffTarget) : null
+        });
+    }
+
+    private static bool Continue(ChaosCardModel card, CardOnPlayMirrorContext context, int nextIndex,
+        Dictionary<int, bool> conditionResults, OperationResolutionState resolution)
+    {
+        context.Simulator.AcknowledgeExecutionDispatch();
+        var operations = card.Generated.Operations;
+        var extraOperations = card.IsUpgraded && card.Generated.Upgrade is { } upgrade
+            ? upgrade.Effects.Where(effect => effect.Kind == CardUpgradeKind.ExecuteOperationOnPlay)
+                .Select(effect => effect.OperationIndex).OfType<int>().Where(index => (uint)index < (uint)operations.Count).ToArray() : [];
+        // 0.9.0：条件结果缓存（EvaluateConditionOnce 语义——按索引一次评估）
+        for (var pc = nextIndex; pc < operations.Count + extraOperations.Length; pc++)
+        {
+            var isExtra = pc >= operations.Count;
+            var index = isExtra ? extraOperations[pc - operations.Count] : pc;
             var operation = operations[index];
+            if (ChaosCardPassiveMirror.IsOperation(operation.Template)) continue;
             // 0.9.0：条件操作——评估并缓存，不执行（复刻源码 L178-190）
-            if (operation.Scope == OperationScope.ConditionalTrigger)
+            if (!isExtra && operation.Scope == OperationScope.ConditionalTrigger)
             {
                 var conditionSpec = TryEffectiveSpec(card, index);
                 // Batch AQ：ForEach 触发器（immediate）——对本卡已消耗的每张卡执行收益
                 // （复刻源码 L180-182 ExecuteForEach；ExhaustedByCard 由 ExhaustHandler 记录）
                 if (conditionSpec?.Opcode == "trigger"
-                    && conditionSpec.Trigger is { Kind: "for_each_exhausted_card" or "for_each_exhausted_non_attack"
-                        or "for_each_exhausted_status", Lifetime: "immediate" })
+                    && conditionSpec.Trigger is { Lifetime: "immediate" } foreachTrigger && IsForEachKind(foreachTrigger.Kind))
                 {
-                    ExecuteForEach(card, index, context, resolution);
+                    if (!ExecuteForEach(card, index, context, resolution)) return false;
                     continue;
                 }
                 if (conditionSpec?.Condition is { } condition
@@ -92,10 +110,12 @@ internal static class ChaosCardOnPlayMirror
             // 校验层已保证只剩可执行操作；这里防御性地重复 Play 的元数据跳过规则
             if (operation.Scope is OperationScope.Modifier or OperationScope.AbilityTrigger)
                 continue;
+            if (operation.Scope == OperationScope.AbilityRule && ChaosOperationExecutor.RequiresCompositePower(operation))
+                continue;
             if (operation.Template is "N_SELECT_HAND_CARD" or "N_SELECT_HAND_ATTACK")
                 continue;
             // 0.9.0：payoff 的条件门控（复刻源码 L192-200）——triggerIndex 指向条件操作
-            if (operation.Parameters.TryGetValue("triggerIndex", out var gateIndex)
+            if (!isExtra && operation.Parameters.TryGetValue("triggerIndex", out var gateIndex)
                 && gateIndex >= 0 && gateIndex < operations.Count)
             {
                 var gate = operations[gateIndex];
@@ -105,8 +125,7 @@ internal static class ChaosCardOnPlayMirror
                     // Batch AQ：ForEach 触发器的收益已由 ForEach 循环执行——主循环跳过
                     var gateSpec = TryEffectiveSpec(card, gateIndex);
                     if (gateSpec?.Opcode == "trigger"
-                        && gateSpec.Trigger is { Kind: "for_each_exhausted_card" or "for_each_exhausted_non_attack"
-                            or "for_each_exhausted_status" })
+                        && gateSpec.Trigger is { } foreachGate && IsForEachKind(foreachGate.Kind))
                         continue;
                     if (!conditionResults.TryGetValue(gateIndex, out var gateResult) || !gateResult)
                         continue;    // 条件 false → 跳过 payoff
@@ -116,11 +135,46 @@ internal static class ChaosCardOnPlayMirror
             }
 
             var spec = ChaosOperationExecutor.EffectiveRuntimeSpec(card, index);
+            var operationContext = new OperationExecutionContext(context, card, new OperationShape(index, operation.Scope, spec), Resolution: resolution);
+            if (!ChaosCardSlotMirror.Resolve(context, card, index, resolution))
+            {
+                Suspend(pc);
+                return false;
+            }
+            if (!DependencyResolver.Matches(operationContext) || DependencyResolver.Multiplier(operationContext) <= 0) continue;
+            if (SelectionEffectResolver.TryExecute(operationContext))
+            {
+                if (context.Simulator.HasPendingChoice)
+                {
+                    context.Simulator.RejectExecutionContinuation();
+                    Suspend(pc + 1);
+                    return false;
+                }
+                continue;
+            }
 
             // 0.5.0：选择型操作跳过——由 CardChoiceMirrors 在 OwnChoice 阶段解析
             // （求解器展开分支 + 原生 Effect 施加，与源码 CardCmd/CardPileCmd 语义一致）
-            if (ChaosCardChoiceMirror.IsSupportedSelection(spec))
+            if (ChaosCardChoiceMirror.IsSupportedSelection(spec) && operation.CardTargetSlot is null
+                && !(spec.Opcode == "exhaust_card" && spec.Variant == "referenced" && operationContext.ReferencedCard is not null))
+            {
+                var selection = ChaosCardChoiceMirror.BuildOperationSpec(context.Simulator, context.Card, card, index, operationContext.ExecutableAmount);
+                if (selection is not null)
+                {
+                    var binding = context.Simulator.StateStore.Get(context.Card.Original, static () => new ChaosCardSlotMirror.BindingState());
+                    binding.Resolution = resolution;
+                    binding.Slot = null;
+                    var combat = (SimulatedCombatState)context.CombatState;
+                    combat.ResolveActionCardChoice(context.Simulator, context.Card, string.Empty, selection,
+                        combat._activeCardExecutionDeaths ?? new HashSet<uint>(), $"aa.operation.{index}");
+                    if (context.Simulator.HasPendingChoice)
+                    {
+                        Suspend(pc + 1);
+                        return false;
+                    }
+                }
                 continue;
+            }
 
             var handler = OperationHandlerRegistry.Instance.TryGet(OperationKey.FromSpec(spec));
             if (handler is null)
@@ -137,10 +191,41 @@ internal static class ChaosCardOnPlayMirror
             handler.Execute(new OperationExecutionContext(context, card,
                 new OperationShape(index, operation.Scope, spec), resolvedRandomTarget, Resolution: resolution));
             if (context.Simulator.HasPendingChoice)
-                throw PredictionUnsupportedException.ForContent(
-                    Describe(card, index, "操作产生选择，尚未接入整卡执行续接"), typeof(ChaosCardModel));
+            {
+                // Most simulator command families rely on full-action replay for deeper choices.
+                // Only retain our tail when the inner command owns its complete continuation.
+                if (handler is not Translation.Handlers.DrawHandler) context.Simulator.RejectExecutionContinuation();
+                Suspend(pc + 1);
+                return false;
+            }
         }
         ChaosCompositePowerMirror.Arm(card, context);
+        if (context.Simulator.StateStore.TryGetReadOnly<ChaosCardSlotMirror.BindingState>(context.Card.Original, out var completedBinding))
+        { completedBinding!.Resolution = null; completedBinding.Slot = null; }
+        if (resolution.EndTurnRequested && context.OwnerState.Phase == MegaCrit.Sts2.Core.Combat.PlayerTurnPhase.Play)
+            ((SimulatedCombatState)context.CombatState).RequestPlayerTurnEnd();
+        return true;
+
+        void Suspend(int index) => context.Simulator.AppendExecutionContinuation(
+            new OperationFrame(context.Card, context.CardPlay, index, conditionResults, resolution));
+    }
+
+    private sealed record OperationFrame(PredictedCard Card, CardPlay Play, int NextIndex,
+        Dictionary<int, bool> Conditions, OperationResolutionState Resolution) : ICombatPredictionExecutionFrame
+    {
+        public IEnumerable<CardPlay> ActiveCardPlays => [Play];
+        public void PrepareFork(PredictionForkContext context)
+        {
+            CombatPredictionSimulator.PrepareExecutionCardPlay(Card, Play, context);
+            Resolution.PrepareFork(context);
+        }
+        public ICombatPredictionExecutionFrame Fork(PredictionForkContext context) => this with
+        {
+            Card = context.RequireRemap(Card), Play = context.RequireRemap(Play),
+            Conditions = new Dictionary<int, bool>(Conditions), Resolution = Resolution.Fork(context)
+        };
+        public bool Resume(CombatPredictionSimulator simulator) => Continue((ChaosCardModel)Card.MutablePreview,
+            new CardOnPlayMirrorContext { Simulator = simulator, Card = Card, CardPlay = Play }, NextIndex, Conditions, Resolution);
     }
 
     // --- 整卡预校验（fail-closed；结果由 ChaosCardSupport 按 (根实例, 升级态) 缓存）----------------
@@ -166,30 +251,20 @@ internal static class ChaosCardOnPlayMirror
                 selectionIndex = index;
             }
         }
-        if (selectionCount > 1)
-            return Describe(card, null, "含多个选择型操作（0.5.0 只支持单选卡）");
-        if (selectionIndex >= 0 && operations.Skip(selectionIndex + 1).Any(op => op.Scope != OperationScope.Modifier))
-            return Describe(card, selectionIndex, "选牌后还有操作；OwnChoice 的末尾结算会改变触发事件顺序");
 
         if (operations.Any(ChaosOperationExecutor.RequiresCompositePower))
         {
             if (card.RuntimeProfileId.Length != 0)
                 return Describe(card, null, "外部角色 Profile 的触发器尚未适配");
-            if (operations.Any(op => op.Scope == OperationScope.Modifier))
-                return Describe(card, null, "带触发器的卡暂不支持 Modifier");
-            if (selectionCount > 0)
-                return Describe(card, null, "带触发器的卡暂不支持选牌，避免 OwnChoice 重排武装时机");
         }
 
         if (card.IsUpgraded && card.Generated.Upgrade is { } upgrade)
         {
             foreach (var effect in upgrade.Effects)
             {
-                if (effect.Kind is CardUpgradeKind.RepeatOperation or CardUpgradeKind.ExecuteOperationOnPlay
-                    or CardUpgradeKind.ChooseExhaust or CardUpgradeKind.UpgradeDerivative
-                    or CardUpgradeKind.UpgradeGeneratedCards or CardUpgradeKind.SelectAllCards
-                    or CardUpgradeKind.IncreaseAllX)
-                    return Describe(card, null, $"结构性升级 {effect.Kind} 不在支持矩阵");
+                if (effect.Kind == CardUpgradeKind.SelectAllCards && effect.OperationIndex is { } selectedIndex
+                    && (uint)selectedIndex < (uint)operations.Count && operations[selectedIndex].Template != "I:Upgrade")
+                    return Describe(card, selectedIndex, "SelectAllCards 的选择变体尚未实现");
             }
         }
 
@@ -198,13 +273,19 @@ internal static class ChaosCardOnPlayMirror
 
     private static string? ValidateOperation(ChaosCardModel card, int index, GeneratorOperation operation)
     {
+        if (ChaosCardPassiveMirror.IsOperation(operation.Template) && operation.CardTargetSlot is null)
+            return null;
         if (operation.Template is "N_SELECT_HAND_CARD" or "N_SELECT_HAND_ATTACK")
-            return Describe(card, index, "含玩家选牌选择器（0.5.0 解锁）");
+            return null;
 
         if (operation.Scope is OperationScope.Modifier)
         {
-            if (operation.Parameters.ContainsKey("triggerIndex"))
-                return Describe(card, index, "条件或触发器下的修饰符尚未接入独立门控结算");
+            if (CardEffectRules.IsDependencyPrefix(operation))
+            {
+                var operations = card.Generated.Operations;
+                return index + 1 < operations.Count && CardEffectRules.IsLegalDependencyPayoff(operation, operations[index + 1])
+                    ? null : Describe(card, index, "依赖前缀缺少合法的相邻收益");
+            }
             // 0.2.0 放行：M:base/strength_scaled（BlockHandler 消费）
             // 0.9.0 放行：DamageModifierResolver 支持的伤害/命中修饰符（DamageHandler 消费）
             if (operation.Template == "M:base")
@@ -212,7 +293,8 @@ internal static class ChaosCardOnPlayMirror
                 var modifierSpec = TryEffectiveSpec(card, index);
                 if (modifierSpec is null)
                     return Describe(card, index, "修饰符无法解析执行视角 spec");
-                if (modifierSpec.Opcode != "modify_block" || modifierSpec.Variant != "strength_scaled")
+                if ((modifierSpec.Opcode != "modify_block" || modifierSpec.Variant != "strength_scaled")
+                    && !DamageModifierResolver.IsSupportedModifier(modifierSpec))
                     return Describe(card, index, $"修饰符（{modifierSpec.Opcode}/{modifierSpec.Variant}）的数学未建模");
                 return ValidateSpecShape(card, index, modifierSpec);
             }
@@ -229,7 +311,7 @@ internal static class ChaosCardOnPlayMirror
         {
             var triggerSpec = TryEffectiveSpec(card, index);
             if (triggerSpec is null) return Describe(card, index, "触发器缺少结构化 spec");
-            if (ChaosCardExhaustMirror.IsTrigger(operation))
+            if (ChaosCardExhaustMirror.IsLifecycleTrigger(operation))
                 return ChaosCardExhaustMirror.Validate(card, index);
             // 0.9.0：条件操作（opcode=condition）走 ConditionEvaluator 校验
             if (triggerSpec.Opcode == "condition" && triggerSpec.Condition is { } condition)
@@ -241,8 +323,7 @@ internal static class ChaosCardOnPlayMirror
             // Batch AQ：ForEach 触发器（immediate——打出时对已消耗的卡执行收益）
             if (operation.Scope == OperationScope.ConditionalTrigger
                 && triggerSpec.Opcode == "trigger"
-                && triggerSpec.Trigger is { Kind: "for_each_exhausted_card" or "for_each_exhausted_non_attack"
-                    or "for_each_exhausted_status" })
+                && triggerSpec.Trigger is { } foreachTrigger && IsForEachKind(foreachTrigger.Kind))
             {
                 if (triggerSpec.Trigger.Lifetime != "immediate")
                     return Describe(card, index, $"ForEach 触发器 lifetime={triggerSpec.Trigger.Lifetime} 不在支持矩阵");
@@ -253,6 +334,10 @@ internal static class ChaosCardOnPlayMirror
         }
         if (operation.Scope is OperationScope.AbilityRule)
         {
+            var compositeRule = TryEffectiveSpec(card, index);
+            if (compositeRule is { Opcode: "combat_rule" } && ChaosCompositePowerMirror.IsSupportedRule(compositeRule.Variant)
+                && !operation.Parameters.ContainsKey("triggerIndex") && operation.CardTargetSlot is null)
+                return ValidateSpecShape(card, index, compositeRule);
             if (ChaosOperationExecutor.RequiresCompositePower(operation)
                 || operation.Parameters.ContainsKey("triggerIndex"))
                 return Describe(card, index, "复合规则 Power 或条件规则尚未接入精确 hook");
@@ -260,7 +345,8 @@ internal static class ChaosCardOnPlayMirror
             if (ruleSpec is not null && ruleSpec.Opcode == "combat_rule"
                 && ruleSpec.Variant is "a_proxyatomic_buffer" or "a_proxyatomic_parry"
                     or "a_proxyatomic_royalties" or "a_proxyatomic_calcify" or "a_proxyatomic_swordsage"
-                    or "kings_sword_hits_all")
+                    or "a_proxyatomic_forbiddengrimoire" or "kings_sword_hits_all" or "poison_extra_triggers"
+                    or "derivative_bonus_damage" or "derivative_hits_all" or "played_skills_gain_sly" or "first_cards_free_each_turn")
                 return ValidateSpecShape(card, index, ruleSpec);
             return Describe(card, index, "AbilityRule 操作不在支持矩阵");
         }
@@ -281,12 +367,11 @@ internal static class ChaosCardOnPlayMirror
             // Batch AQ：ForEach 触发器的 payoff——由 ForEach 循环执行，走正常 handler 校验
             var forEachTrigger = trigger.Scope == OperationScope.ConditionalTrigger
                 && triggerSpec.Opcode == "trigger"
-                && triggerSpec.Trigger is { Kind: "for_each_exhausted_card" or "for_each_exhausted_non_attack"
-                    or "for_each_exhausted_status" };
+                && triggerSpec.Trigger is { } foreachGate && IsForEachKind(foreachGate.Kind);
             // 即时条件只门控执行，不能绕过后面的 handler 支持检查。
             if (!immediateCondition && !forEachTrigger)
             {
-                if (!ChaosCardExhaustMirror.IsTrigger(trigger)
+                if (!ChaosCardExhaustMirror.IsLifecycleTrigger(trigger)
                     && ChaosTriggerPolicy.ValidateTrigger(trigger, triggerSpec) is not null)
                     return Describe(card, index, "收益引用了未适配触发器");
                 var payloadSpec = TryEffectiveSpec(card, index);
@@ -294,15 +379,11 @@ internal static class ChaosCardOnPlayMirror
                 var payloadReason = ChaosTriggerPolicy.ValidatePayload(payloadSpec);
                 if (payloadReason is not null) return Describe(card, index, payloadReason);
             }
-            if (forEachTrigger && operation.CardTargetSlot is not null)
-                return Describe(card, index, "ForEach 收益引用迭代卡槽位（CardTargetSlot）尚未支持");
         }
 
-        if (operation.CardTargetSlot is not null)
+        if (operation.CardTargetSlot is not null && operation.Scope is OperationScope.AbilityRule)
             return Describe(card, index, "含玩家选牌槽位（0.5.0 解锁）");
 
-        if (operation.Template == "R:EndTurn")
-            return Describe(card, index, "结束回合操作不在支持矩阵");
 
         var spec = TryEffectiveSpec(card, index);
         if (spec is null)
@@ -355,13 +436,11 @@ internal static class ChaosCardOnPlayMirror
             var effect = operations[index];
             if (!effect.Parameters.TryGetValue("triggerIndex", out var linked) || linked != triggerIndex) continue;
             hasPayload = true;
-            if (effect.Scope is OperationScope.Modifier or OperationScope.AbilityTrigger
-                or OperationScope.ConditionalTrigger or OperationScope.AbilityRule)
+            if (effect.Scope is OperationScope.AbilityTrigger or OperationScope.ConditionalTrigger or OperationScope.AbilityRule)
                 return Describe(card, index, "ForEach 收益是触发器/修饰符（嵌套不支持）");
-            if (effect.CardTargetSlot is not null)
-                return Describe(card, index, "ForEach 收益引用迭代卡槽位（CardTargetSlot）尚未支持");
             var spec = TryEffectiveSpec(card, index);
             if (spec is null) return Describe(card, index, "ForEach 收益缺少 spec");
+            if (effect.Scope == OperationScope.Modifier || ChaosCardChoiceMirror.IsSupportedSelection(spec)) continue;
             var handler = OperationHandlerRegistry.Instance.TryGet(OperationKey.FromSpec(spec));
             if (handler is null) return Describe(card, index, $"ForEach 收益 {spec.Opcode}/{spec.Variant} 无 handler");
             var reason = handler.ValidateSupport(new OperationShape(index, effect.Scope, spec));
@@ -374,39 +453,29 @@ internal static class ChaosCardOnPlayMirror
     }
 
     /// <summary>Batch AQ：ForEach 触发器执行（复刻源码 L383-401 ExecuteForEach）。</summary>
-    private static void ExecuteForEach(ChaosCardModel card, int triggerIndex,
+    private static bool ExecuteForEach(ChaosCardModel card, int triggerIndex,
         CardOnPlayMirrorContext context, OperationResolutionState resolution)
     {
         var triggerKind = TryEffectiveSpec(card, triggerIndex)?.Trigger?.Kind;
         // 源码 L387-388：state.ExhaustedByCard 按触发器 kind 过滤类型
-        var items = resolution.ExhaustedByCard
-            .Where(candidate => ExhaustedCardMatchesTrigger(triggerKind, candidate.Preview.Type))
-            .ToList();
-        var operations = card.Generated.Operations;
-        foreach (var _ in items)
+        var items = triggerKind == "for_each_discarded_card" ? resolution.DiscardedByCard.ToList()
+            : resolution.ExhaustedByCard.Where(candidate => ExhaustedCardMatchesTrigger(triggerKind, candidate.Preview.Type)).ToList();
+        var energyCount = triggerKind == "energy_spent_this_turn_excluding_self"
+            ? Math.Max(0, ((SimulatedCombatState)context.CombatState).GetEnergySpentThisTurn(card.Owner) - Math.Max(0, context.CardPlay.Resources.EnergySpent))
+                / Math.Max(1, ChaosOperationExecutor.RuntimeSpecValue(card, triggerIndex, "threshold", 1)) : -1;
+        var count = energyCount >= 0 ? energyCount : items.Count;
+        for (var iteration = 0; iteration < count; iteration++)
         {
-            for (var index = triggerIndex + 1; index < operations.Count; index++)
-            {
-                var effect = operations[index];
-                if (!effect.Parameters.TryGetValue("triggerIndex", out var linked) || linked != triggerIndex) continue;
-                var spec = ChaosOperationExecutor.EffectiveRuntimeSpec(card, index);
-                var handler = OperationHandlerRegistry.Instance.TryGet(OperationKey.FromSpec(spec))
-                    ?? throw PredictionUnsupportedException.ForContent(
-                        Describe(card, index, $"ForEach 收益 {spec.Opcode}/{spec.Variant} 无 handler（校验层遗漏）"),
-                        typeof(ChaosCardModel));
-                // 复刻 ExecuteWithResolvedTarget 的显式随机目标解析（与主循环一致）
-                Creature? resolvedRandomTarget = null;
-                if (spec.Flags.Contains("random_enemy_reference"))
-                    resolvedRandomTarget = context.Rng.CombatTargets.NextItem(context.CombatState.HittableEnemies);
-                handler.Execute(new OperationExecutionContext(context, card,
-                    new OperationShape(index, effect.Scope, spec), resolvedRandomTarget, Resolution: resolution));
-                if (context.Simulator.HasPendingChoice)
-                    throw PredictionUnsupportedException.ForContent(
-                        Describe(card, index, "ForEach 收益产生选择，尚未接入整卡执行续接"),
-                        typeof(ChaosCardModel));
-            }
+            if (energyCount < 0) resolution.IterationCard = items[iteration];
+            if (!ChaosClauseMirror.Execute(context.Simulator, context.Card, card, context.CardPlay, triggerIndex, resolution,
+                null, 0, context.CardPlay.Target, powered: false, corruptionExhaust: false, triggered: false)) return false;
         }
+        if (energyCount < 0) resolution.IterationCard = null;
+        return true;
     }
+
+    private static bool IsForEachKind(string kind) => kind is "for_each_exhausted_card" or "for_each_exhausted_non_attack"
+        or "for_each_exhausted_status" or "for_each_discarded_card" or "energy_spent_this_turn_excluding_self";
 
     /// <summary>源码 L403-408：按触发器 kind 过滤消耗卡的类型。</summary>
     private static bool ExhaustedCardMatchesTrigger(string? triggerKind, CardType cardType) => triggerKind switch

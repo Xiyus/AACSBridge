@@ -26,7 +26,7 @@ public sealed record CompatibilityReport(
     IReadOnlyList<string> Notes)
 {
     public const string MinimumAutoAnthonyVersion = "0.3.137";
-    public const string TestedAutoAnthonyVersion = "0.3.137";
+    public const string TestedAutoAnthonyVersion = "0.3.138";
     public const string MinimumCombatSolverVersion = "0.50.1";
     public const string TestedCombatSolverVersion = "0.50.1";
 }
@@ -37,7 +37,7 @@ public sealed record CompatibilityReport(
 /// 而不是抛 TypeLoadException 崩掉。
 ///
 /// 纪律（来自 CombatSolver 第三方适配文档与 AutoAnthony 的 COMPONENT_API）：
-///  - 锁定依赖版本，并在运行期核对方法/字段签名；
+///  - 保存已审计参考版本，并在运行期核对接口/schema/行为契约；
 ///  - 自检不通过时一个镜像都不注册——部分适配比完全不适配更危险；
 ///  - 记录程序集 MVID + SHA256，让玩家和开发者能核对桥实际运行的二进制。
 /// </summary>
@@ -54,10 +54,17 @@ public static class CompatibilityGuard
         ("AutoAnthony.ChaosRunDefinitions", ["ForSlot", "GetCards", "GetAllCards"]),
         ("AutoAnthony.ChaosOperationExecutor", ["Play", "EffectiveRuntimeSpec", "RequiresCompositePower",
             "RuntimeSpecValue", "DamagePropsForCardEffect", "BlockPropsForCardEffect", "ExecutableOperationCount",
-            "CanBeRandomlyGeneratedInCombat", "OrbEvokeRepeatCount"]),
+            "CanBeRandomlyGeneratedInCombat", "OrbEvokeRepeatCount", "DerivativeIsUpgraded", "SimpleHandDerivativeProducerTemplates",
+            "DependencyPrefix", "IsRepeatedDependencyDamagePayoff", "CardSelectorForSlot", "SelectionCountForEffect",
+            "SkipsCardSelectionAtZero", "UpgradedOperationRepeatCount", "GeneratedCardsAreUpgraded", "DamageModifierSharesResolution",
+            "RollingGrowthOwner", "ResolveTriggeredRollingDamage", "DoomThresholdMultiplier"]),
+        ("AutoAnthony.ChaosDerivativeResolver", ["Create", "Definition", "Matches"]),
         ("AutoAnthony.ChaosCompositePower", ["Definition", "Configure", "FireTriggers", "ConfigureTinkered",
             "CaptureMultiplayerState", "HasLiveEffects", "CapturedOperationValues", "WaitForNextTurn", "RemainingTurnTriggers",
-            "IgnoreArmingCardPlay", "SourceTinkeredDefinitionPayload", "SourceUpgraded", "Permanent", "EffectiveOperationAmount"]),
+            "IgnoreArmingCardPlay", "SourceTinkeredDefinitionPayload", "SourceUpgraded", "Permanent", "EffectiveOperationAmount",
+            "HasRule", "RuleAmount", "TurnLimitedTriggerExpired", "EffectivePowerOperations", "EffectiveDescriptionOperations",
+            "EffectiveDefinitionOperationAmount", "StartTriggerNeedsPlayerChoice", "LinkedEffectAmount", "HasTriggerWithLinkedEffect",
+            "IsNthAttackPlayedThisTurnTrigger", "NthAttackPlayedThisTurnThreshold", "AdvanceRollingDamage"]),
         ("AutoAnthony.ComponentRuntimeApi", ["Register", "RegisterPackage", "ApiVersion"]),
         ("ChaosCardGenerator.GeneratedCard", ["Operations", "Cost", "Type", "Target", "Rarity", "Character", "StarCost", "HasStarCostX", "Tags"]),
         ("ChaosCardGenerator.GeneratorOperation", ["Template", "Scope", "Parameters", "RuntimeSpec", "CardTargetSlot", "RequiresSingleTarget", "OrbOutputId"]),
@@ -80,7 +87,10 @@ public static class CompatibilityGuard
         ("CombatSolver.ModelPredictionStateMirrors", ["RegisterRelic", "RegisterModifier", "Get"]),
         ("CombatSolver.PredictionModHookSubscriberCapture", ["Capture", "KnownPreRootSubscriberTypeNames"]),
         ("CombatSolver.PredictionModPatchAudit", ["CaptureCardOnPlay", "RegisterAdaptedMonsterMachine"]),
-        ("CombatSolver.SimulatedCombatState", ["Apply", "ApplyPower", "GetPower", "GetAmount"]),
+        ("CombatSolver.SimulatedCombatState", ["Apply", "ApplyPower", "GetPower", "GetAmount", "ResolveActionCardChoice",
+            "ContinueAutoPrePlay", "ContinueScheduledAutoPlays", "ContinueBeforeHandDraw", "ReturnsToHandAfterPlaying",
+            "AfterCardEnteredCombat", "_rootHistory", "_activeCardExecutionDeaths", "_returnToHandNextTurn"]),
+        ("CombatSolver.CardChoiceSupport", ["Apply", "Find", "RemoveTransformedCard", "AddTransformedCard"]),
         ("CombatSolver.Engine.Common.ICombatPredictionEffectSink", ["ApplyPower", "ApplyPowerFromSource"]),
         ("CombatSolver.StrategicEffectMirrors", ["Register"]),
         ("CombatSolver.PowerHiddenStateMirrors", ["Register", "RegisterRootCapture"]),
@@ -139,18 +149,31 @@ public static class CompatibilityGuard
 
     private static void VerifyCompositeSeams(BridgeModFacts aa, BridgeModFacts cs, Assembly? solver, List<string> failures)
     {
-        // These private lifecycle seams require the exact audited binary, not just a member with the same name.
-        if (!string.Equals(aa.Sha256, "ad004f42f18ed86ccc7f66317823cf77fb40195b6466872bbd7038b3d8952965", StringComparison.OrdinalIgnoreCase))
-            failures.Add("0.6.0 触发器适配要求锁定的 AutoAnthony 0.3.137 DLL SHA256。");
+        // Known binaries take the fast path. Other builds must retain the executable
+        // contracts of the adapted types; unrelated assembly changes are allowed.
+        if (!string.Equals(aa.Sha256, "689b9c5056227c0b47e406159853938c407d56f5726604b1eac3c1b72c10fa50", StringComparison.OrdinalIgnoreCase))
+        {
+            var anthony = FindLoadedAssembly("AutoAnthony");
+            if (anthony is null) failures.Add("AutoAnthony 程序集未加载。");
+            else VerifyBehavior(anthony, failures);
+        }
         if (!string.Equals(cs.Sha256, "832060172aa5eae8d79546f120a10e4571c324b7c0d6ab2c6abc2bcad24323cd", StringComparison.OrdinalIgnoreCase))
-            failures.Add("0.6.0 模拟生命周期接缝要求锁定的 CombatSolver 0.50.1 DLL SHA256。");
+        {
+            if (solver is null) failures.Add("CombatSolver 程序集未加载。");
+            else VerifyBehavior(solver, failures);
+        }
         if (solver is null) return;
         var seams = new[]
         {
             ("CombatSolver.PersistentPowerSupport", "TriggerAfterSideTurnStart", "System.Boolean", 5),
             ("CombatSolver.EndTurnPowerSupport", "TriggerRegular", "System.Boolean", 5),
             ("CombatSolver.ContinuationStamp", "AppendPowers", "System.Void", 3),
-            ("CombatSolver.Engine.InCombat.Mirrors.HookMirrors", "AfterCardExhausted", "System.Void", 3)
+            ("CombatSolver.Engine.InCombat.Mirrors.HookMirrors", "AfterCardExhausted", "System.Void", 3),
+            ("CombatSolver.PowerLifecycleSupport", "ResolvePowerAmountChanges", "System.Void", 2),
+            ("CombatSolver.PowerLifecycleSupport", "AfterEnergySpent", "System.Void", 4),
+            ("CombatSolver.PowerLifecycleSupport", "AfterStarsSpent", "System.Void", 4),
+            ("CombatSolver.PersistentPowerSupport", "TriggerOwnerAfterSideTurnStart", "System.Boolean", 3),
+            ("CombatSolver.MonsterMoveSemantics", "ApplyForecastMove", "System.Boolean", 6)
         };
         foreach (var (typeName, name, returns, count) in seams)
         {
@@ -160,6 +183,25 @@ public static class CompatibilityGuard
             if (methods?.Length != 1) failures.Add($"0.6.0 接缝签名不匹配：{typeName}.{name}。");
         }
     }
+
+    private static void VerifyBehavior(Assembly assembly, List<string> failures)
+    {
+        try { BehaviorContract.Verify(assembly, failures); }
+        catch (Exception exception)
+        { failures.Add($"{assembly.GetName().Name}：无法核验行为契约：{exception.GetType().Name}: {exception.Message}"); }
+    }
+
+    // Explicit offline maintenance command only; runtime never refreshes its own baseline.
+    internal static object CaptureBehaviorBaseline(Assembly anthony, Assembly solver) =>
+        new Dictionary<string, SortedDictionary<string, string>>
+        {
+            ["AutoAnthony"] = BehaviorContract.Capture(anthony, AutoAnthonyContract.Select(c => c.Type)
+                .Concat(["ChaosCardGenerator.CardEffectRules", "AutoAnthony.ChaosTemporaryFocusPower"])),
+            ["CombatSolver"] = BehaviorContract.Capture(solver, CombatSolverContract.Select(c => c.Type)
+                .Concat(["CombatSolver.PowerLifecycleSupport", "CombatSolver.MonsterMoveSemantics",
+                    "CombatSolver.Engine.InCombat.Mirrors.HookMirrors", "CombatSolver.BeforeCardPlaySupport",
+                    "CombatSolver.CardPlaySupport"]))
+        };
 
     // --- 程序集发现 --------------------------------------------------------------------------
 
@@ -224,7 +266,7 @@ public static class CompatibilityGuard
             missingMembers);
     }
 
-    // --- 版本锁定 -----------------------------------------------------------------------------
+    // --- 参考版本与 schema --------------------------------------------------------------------
 
     private static BridgeModFacts VerifyAutoAnthonyVersions(Assembly? assembly, BridgeModFacts facts, List<string> failures, List<string> notes)
     {
@@ -243,6 +285,7 @@ public static class CompatibilityGuard
                 failures.Add($"AutoAnthony：OperationRuntimeSpec.CurrentSchemaVersion 为 {schema}，预期为 1。RuntimeSpec 契约已变化，桥需要复查后才能安全读取 spec。");
             notes.Add($"AutoAnthony RuntimeSpec schema = {schema}。");
         }
+        else failures.Add("AutoAnthony：无法读取 RuntimeSpec schema，拒绝启用。");
 
         // 组件创作 API：仅供参考——桥读取 spec，不创作组件。
         var apiType = assembly.GetType("ChaosCardGenerator.ComponentApi", throwOnError: false);
@@ -270,20 +313,19 @@ public static class CompatibilityGuard
     {
         if (facts.ManifestVersion is null)
         {
-            failures.Add($"{displayName}：无法读取 manifest 版本（预期至少 {minimum}）。桥有意锁定版本——拒绝在无法识别的构建上运行。");
+            notes.Add($"{displayName}：无法读取 manifest 版本，改由接口/schema/行为契约核验兼容性。");
             return;
         }
 
         if (facts.ManifestVersion < Version.Parse(minimum))
         {
-            failures.Add($"{displayName}：版本 {facts.ManifestVersion} 低于要求的最低版本 {minimum}。");
-            return;
+            notes.Add($"{displayName}：版本 {facts.ManifestVersion} 早于参考下限 {minimum}；仍须通过完整接口/schema/行为契约核验。");
         }
 
         if (facts.ManifestVersion != Version.Parse(tested))
-            notes.Add($"{displayName}：版本 {facts.ManifestVersion} 新于已测试的 {tested}——契约检查已通过，但信任预测前应重跑 strict-diff 夹具。");
+            notes.Add($"{displayName}：版本 {facts.ManifestVersion} 不同于已测试的 {tested}；兼容性由接口/schema/行为契约核验，版本变化不单独阻止启用。");
         else
-            notes.Add($"{displayName}：版本 {facts.ManifestVersion} 与锁定的测试版本一致。");
+            notes.Add($"{displayName}：版本 {facts.ManifestVersion} 与已测试版本一致。");
     }
 
     // --- 游戏侧契约 ------------------------------------------------------------------------------

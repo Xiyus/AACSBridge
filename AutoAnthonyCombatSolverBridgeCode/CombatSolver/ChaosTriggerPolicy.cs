@@ -1,11 +1,18 @@
 using AutoAnthony;
 using ChaosCardGenerator;
+using AutoAnthonyCombatSolverBridge.Translation;
 
 namespace AutoAnthonyCombatSolverBridge.CombatSolver;
 
 /// <summary>The bounded 0.6 contract. Every linked payload is checked before arming.</summary>
 internal static class ChaosTriggerPolicy
 {
+    private static readonly Lazy<HashSet<string>> KnownFlags = new(() => Enum.GetValues<GeneratedCharacter>()
+        .SelectMany(character => CharacterComponentCatalogs.Get(character).Atoms)
+        .SelectMany(atom => OperationRuntimeSpecCompiler.GetOrCompile(atom).Flags)
+        .Concat(new[] { "requires_event_amount_payload", "requires_event_card_payload", "requires_referenced_card_payload",
+            "event_enemy_reference", "host_discard_lifecycle", "legacy_inline_double_x", "upgrade_generated" })
+        .ToHashSet(StringComparer.Ordinal));
     internal static string? ValidateTrigger(GeneratorOperation operation, OperationRuntimeSpec spec)
     {
         if (!ChaosOperationExecutor.RequiresCompositePower(operation) || spec.Condition is not null
@@ -16,18 +23,33 @@ internal static class ChaosTriggerPolicy
         {
             ("next_turn_start", "next_turn") => true,
             ("next_turns_start", "next_n_turns") => true,
+            ("turns_elapsed", "delayed") => true,
+            ("cards_drawn_threshold" or "cards_played_this_turn_threshold", "combat") => true,
             ("turn_start" or "turn_end" or "card_played" or "attack_played" or "skill_played"
                 or "power_played" or "card_drawn" or "card_exhausted", "combat") => true,
             // Batch AQ-2：this_turn lifetime（回合结束过期——TurnLimitedTriggerExpired 机制已有）
             ("attack_played", "this_turn") => true,
+            ("vulnerable_enemy_damage_reduction", "this_turn") => true,
             ("energy_cost_at_least_card_played", "combat") => true,
+            ("energy_spent_threshold" or "stars_spent_threshold", "combat") => true,
+            ("first_card_played_each_turn" or "first_attack_played_each_turn" or "first_zero_cost_attack_played_each_turn"
+                or "nth_attack_played_this_turn" or "first_attack_or_skill_each_turn" or "soul_played"
+                or "ethereal_card_played" or "derivative_played" or "next_attack", "combat") => true,
+            ("next_attack" or "next_attacks_this_turn", "this_turn") => true,
+            ("block_gained" or "owner_hp_lost_during_turn" or "osty_hp_lost" or "card_generated"
+                or "status_generated" or "orb_channeled" or "lightning_orb_evoked" or "stars_spent_or_gained"
+                or "draw_pile_shuffled" or "attack_damaged_enemy" or "attack_dealt_damage" or "attack_received"
+                or "vulnerable_applied" or "doom_applied" or "enemy_debuff_applied", "combat") => true,
+            ("card_drawn" or "card_played" or "attack_received", "this_turn") => true,
             ("strike_card_drawn" or "ethereal_card_drawn" or "card_drawn_during_turn"
                 or "first_status_drawn_each_turn", "combat") => true,
             _ => false
         };
         if (!supported || (trigger.ThresholdSlot is not null
-                && (trigger.Kind != "energy_cost_at_least_card_played" || trigger.ThresholdSlot != "threshold"))
-            || (trigger.DurationSlot is not null && trigger.Kind != "next_turns_start"))
+                && (trigger.Kind is not ("energy_cost_at_least_card_played" or "energy_spent_threshold" or "stars_spent_threshold" or "nth_attack_played_this_turn"
+                    or "cards_drawn_threshold" or "cards_played_this_turn_threshold" or "turns_elapsed" or "next_attacks_this_turn")
+                    || trigger.ThresholdSlot != "threshold"))
+            || (trigger.DurationSlot is not null && trigger.Kind is not ("next_turns_start" or "next_attacks_this_turn")))
             return $"触发器 {trigger.Kind}/{trigger.Lifetime} 不在 0.6.0 支持矩阵";
         if (spec.Values.Any(value => value.Source != "fixed"))
             return "触发器计数只支持 fixed 值源";
@@ -36,24 +58,14 @@ internal static class ChaosTriggerPolicy
 
     internal static string? ValidatePayload(OperationRuntimeSpec spec)
     {
-        // No choices, card mutations, event references, or effects which recursively emit our events.
-        // This also keeps trigger execution atomic: no pending-choice continuation is approximated.
-        if (spec.Condition is not null || spec.Trigger is not null
-            || spec.Flags.Any(flag => flag is not
-                ("damage_reference" or "block_reference" or "energy_reference" or "random_enemy_reference"
-                 or "has_numeric_literal" or "scalable_reward_wording" or "printed_damage_value"
-                 or "printed_block_value" or "immediate_block_gain" or "all_enemies_reference"
-                 or "heal_reference" or "leading_heal_reference" or "zero_damage" or "count_unit_reference"))
-            || spec.Values.Any(value => value.Source != "fixed"))
-            return "触发收益含条件、额外标记或非 fixed 值源";
-        return (spec.Opcode, spec.Variant, spec.Target) switch
-        {
-            ("gain_block", "immediate", "self") => null,
-            ("gain_energy", "immediate", "self") => null,
-            ("heal", "immediate", "self") => null,
-            ("deal_damage", "all", "all_enemies") => null,
-            ("deal_damage", "random", "random_enemy") => null,
-            _ => "0.6.0 触发收益只支持自身格挡/能量/治疗、全体或随机伤害"
-        };
+        if (spec.Condition is not null || spec.Trigger is not null) return "触发收益不能嵌套触发器/条件";
+        if (spec.Flags.Any(flag => !KnownFlags.Value.Contains(flag))) return "触发收益含未知标记";
+        if (spec.Values.Any(value => value.Source is not ("fixed" or "energy_x" or "star_x" or "special_x")))
+            return "触发收益含未知值源";
+        if (ChaosCardChoiceMirror.IsSupportedSelection(spec) || DamageModifierResolver.IsSupportedModifier(spec)
+            || spec.Variant is "i_replayattack" or "d_replayeventcard") return null;
+        var handler = OperationHandlerRegistry.Instance.TryGet(OperationKey.FromSpec(spec));
+        return handler is null ? $"触发收益无 handler：{spec.Opcode}/{spec.Variant}"
+            : handler.ValidateSupport(new OperationShape(0, OperationScope.NonTargeted, spec));
     }
 }

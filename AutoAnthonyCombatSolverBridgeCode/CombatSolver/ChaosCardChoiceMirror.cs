@@ -5,6 +5,7 @@ using CombatSolver.Engine.Common;
 using CombatSolver.Engine.InCombat.Simulation;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Extensions;
 
 // 命名空间说明见 AutoAnthonyFacade.cs：文件级 using 从全局解析，外部 CombatSolver 命名空间
 // （CardChoiceSpec/PlanChoiceEffect/PlanCardChoice）不受本文件所在子命名空间遮蔽。
@@ -14,17 +15,9 @@ using MegaCrit.Sts2.Core.Models;
 namespace AutoAnthonyCombatSolverBridge.CombatSolver;
 
 /// <summary>
-/// 混沌卡的玩家选牌登记（0.5.0）：把"选一张手牌消耗/弃置/从弃牌堆取回"类操作映射成
-/// CombatSolver 的原生 CardChoiceSpec——出牌路径在 OwnChoice 阶段调
-/// CardChoiceSupport.GetSpec（第三方登记优先）拿到本 spec，按候选展开搜索分支，
-/// 选中的结果记进计划，部署时照常应答原生选牌页面；效果由求解器的原生
-/// PlanChoiceEffect（Exhaust/Discard/MoveToHand/MoveToDrawTop）施加——与
-/// AutoAnthony 执行器的 CardCmd.Exhaust/Discard/CardPileCmd.Add 语义一致。
-///
-/// 时序说明：求解器的模型是"OnPlay 镜像先跑全部非选牌效果 → OwnChoice 阶段解析选择"，
-/// 即选择在卡的结算末尾发生；真实执行器是逐操作顺序（选择可能在中途）。对"选牌在
-/// 最后一个操作"的卡两者一致；选牌在前的卡存在顺序近似（终态等价，中途触发顺序
-/// 可能不同）——严格 diff 会暴露问题。
+/// 每个选择在其原始操作位置构造原生 CardChoiceSpec，并由求解器展开候选与记录计划。
+/// OwnChoice 保持为空，避免尾部再次选择。卡槽选择先记录引用，再执行对应消费者；
+/// 复制、变形和重放使用桥的精确结算，其他选择复用原生 PlanChoiceEffect。
 /// </summary>
 internal static class ChaosCardChoiceMirror
 {
@@ -33,10 +26,14 @@ internal static class ChaosCardChoiceMirror
     /// 0.5.0 只支持卡上恰好一个选择型操作（校验层拒绝多选卡）。
     /// </summary>
     public static CardChoiceSpec? BuildSpec(CombatPredictionSimulator simulator, PredictedCard playedCard, ChaosCardModel card)
+        => null; // Choices now execute in operation order inside OnPlay.
+
+    internal static CardChoiceSpec? BuildOperationSpec(CombatPredictionSimulator simulator, PredictedCard playedCard, ChaosCardModel card, int operationIndex, int? amountOverride = null)
     {
         var operations = card.Generated.Operations;
         for (var index = 0; index < operations.Count; index++)
         {
+            if (index != operationIndex) continue;
             var operation = operations[index];
             OperationRuntimeSpec spec;
             try
@@ -55,10 +52,44 @@ internal static class ChaosCardChoiceMirror
             var amount = card.OperationAmount(index);
             if (card.Type != CardType.Power)
                 amount += card.CapturedExternalDamageBonus(index);
+            if (amountOverride is { } resolvedAmount) amount = resolvedAmount;
 
             switch ((spec.Opcode, spec.Variant, spec.SourceZone, spec.DestinationZone))
             {
+                case ("template_independent_action", "i_upgrade", "none", "none"):
+                {
+                    var options = owner.Hand.Cards.Where(candidate => candidate.Preview.IsUpgradable).ToList();
+                    var all = card.IsUpgraded && card.Generated.Upgrade?.Effects.Any(effect =>
+                        effect.Kind == CardUpgradeKind.SelectAllCards && effect.OperationIndex == index) == true;
+                    return NativeSpec(PlanChoiceEffect.Upgrade, PileType.Hand, all ? options.Count : 1, options);
+                }
+                case ("template_independent_action", "cl_exhaustuptohandcards", "none", "none"):
+                {
+                    var options = owner.Hand.Cards;
+                    var maximum = Math.Min(Math.Max(0, amount), options.Count);
+                    return maximum == 0 ? null : new CardChoiceSpec(PlanChoiceEffect.Exhaust, PileType.Hand, 0, maximum,
+                        options, options, ReplacementValue: 0d);
+                }
+                case ("template_independent_action", "i_grantslytohandskillthisturn", "none", "none"):
+                    return NativeSpec(PlanChoiceEffect.ApplySly, PileType.Hand, 1,
+                        owner.Hand.Cards.Where(candidate => candidate.Preview.Type == CardType.Skill).ToList());
+                case ("template_self_action", "ncr_addvoidtoselectedhandcard", "none", "none"):
+                    return NativeSpec(PlanChoiceEffect.ApplyEthereal, PileType.Hand, 1, owner.Hand.Cards);
+                case ("template_self_action", "ncr_addretaintoselectedhandcard", "none", "none"):
+                    return NativeSpec(PlanChoiceEffect.ApplyRetain, PileType.Hand, 1, owner.Hand.Cards);
+                case ("template_independent_action", "cl_putselectedhandcardondrawtop", "none", "none"):
+                    return NativeSpec(PlanChoiceEffect.MoveToDrawTop, PileType.Hand, 1, owner.Hand.Cards);
+                case ("template_independent_action", "i_copyselectedcardnextturn", "none", "none"):
+                    return NativeSpec(PlanChoiceEffect.Nightmare, PileType.Hand, 1, owner.Hand.Cards);
+                case ("template_independent_action", "i_proxyatomic_transfigure", "none", "none"):
+                    return NativeSpec(PlanChoiceEffect.Modify, PileType.Hand, 1, owner.Hand.Cards);
+                case ("template_self_action", "r_playselectedskillmultipletimes", "none", "none"):
+                    return ChaosOperationExecutor.ExecutableOperationCount(operation, amount) == 0 ? null : NativeSpec(
+                        PlanChoiceEffect.AutoPlayRepeated, PileType.Hand, 1, owner.Hand.Cards.Where(candidate =>
+                            candidate.Preview.Type == CardType.Skill && !candidate.Preview.Keywords.Contains(CardKeyword.Unplayable)).ToList());
                 case ("exhaust_card", "selected", "hand", "none"):
+                case ("exhaust_card", "referenced", "none", "none"):
+                case ("exhaust_card", "referenced", "hand", "none"):
                 {
                     // 源码 Exhaust 的直选分支：count = HandExhaustSelectionCount(amount, hand.Count)
                     var hand = owner.Hand.Cards;
@@ -150,6 +181,9 @@ internal static class ChaosCardChoiceMirror
                     };
                     var options = generated.ToList();
                     if (options.Count == 0) return null;
+                    if (ChaosOperationExecutor.GeneratedCardsAreUpgraded(card, index))
+                        foreach (var generatedCard in options.Where(candidate => candidate.Preview.IsUpgradable)) generatedCard.Upgrade();
+                    simulator.History.CardGenerationOptions(options);
                     return new CardChoiceSpec(PlanChoiceEffect.GenerateToHand, PileType.None, 1, 1,
                         options, options, ReplacementValue: 0d);
                 }
@@ -158,40 +192,46 @@ internal static class ChaosCardChoiceMirror
                     // 源码 L1398-1408：从随机抽牌堆卡中选 1 张入手
                     var draw = owner.DrawPile.Cards;
                     if (draw.Count == 0) return null;
-                    // 简化：全部抽牌堆卡作为候选（精确版需要 StableShuffle + Take(4)）
-                    return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Draw, 1, draw);
+                    var optionCount = ChaosOperationExecutor.ExecutableGeneratedCardCount(amount);
+                    if (optionCount == 0) return null;
+                    var sampled = draw.ToList().StableShuffle(simulator.Rng.CombatCardSelection).Take(Math.Min(optionCount, 4)).ToHashSet();
+                    return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Draw, 1, draw.Where(sampled.Contains).ToList());
                 }
                 case ("template_self_action", "r_putselectedhandcardsondraw", "none", "none"):
                 {
                     // 源码：从手牌选 N 张放到抽牌堆
                     var hand = owner.Hand.Cards;
-                    return NativeSpec(PlanChoiceEffect.MoveToDrawTop, PileType.Hand, 1, hand);
+                    return NativeSpec(PlanChoiceEffect.MoveToDrawTop, PileType.Hand,
+                        ChaosOperationExecutor.SelectionCountForEffect(operation, amount), hand);
                 }
                 case ("template_self_action", "r_copyselectedcolorlesscard", "none", "none"):
                 {
-                    // 源码：从手牌选 1 张无色牌复制（简化：选 1 张手牌）
-                    var hand = owner.Hand.Cards;
-                    return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Hand, 1, hand);
+                    var hand = owner.Hand.Cards.Where(candidate => candidate.Preview.VisualCardPool.IsColorless).ToList();
+                    return NativeSpec(PlanChoiceEffect.Duplicate, PileType.Hand, 1, hand);
                 }
                 case ("template_self_action", "cl_transformselectedhandcards", "none", "none"):
                 {
-                    // 源码：从手牌选 N 张变形（简化：选 1 张手牌）
-                    var hand = owner.Hand.Cards;
-                    return NativeSpec(PlanChoiceEffect.MoveToHand, PileType.Hand, 1, hand);
+                    var hand = owner.Hand.Cards.Where(candidate => candidate.Preview.IsTransformable).ToList();
+                    return NativeSpec(PlanChoiceEffect.Transform, PileType.Hand,
+                        ChaosOperationExecutor.SelectionCountForEffect(operation, amount), hand);
                 }
                 case ("template_independent_action", "i_proxyatomic_begone", "none", "none"):
                 case ("template_independent_action", "i_proxyatomic_guards", "none", "none"):
                 {
                     // 源码 L2794-2825：从手牌选 N 张变形（Begone/Guards 代理）
                     var hand = owner.Hand.Cards.Where(candidate => candidate.Preview.IsTransformable).ToList();
-                    return NativeSpec(PlanChoiceEffect.Transform, PileType.Hand, 1, hand);
+                    if (spec.Variant == "i_proxyatomic_guards")
+                        return hand.Count == 0 ? null : new CardChoiceSpec(PlanChoiceEffect.Transform, PileType.Hand, 0, hand.Count, hand, hand, ReplacementValue: 0d);
+                    return NativeSpec(PlanChoiceEffect.Transform, PileType.Hand,
+                        ChaosOperationExecutor.SelectionCountForEffect(operation, amount), hand);
                 }
                 case ("template_independent_action", "i_proxyatomic_charge", "none", "none"):
                 case ("template_independent_action", "i_proxyatomic_seance", "none", "none"):
                 {
                     // 源码 L2807-2835：从抽牌堆选 N 张变形（Charge/Seance 代理）
                     var draw = owner.DrawPile.Cards.Where(candidate => candidate.Preview.IsTransformable).ToList();
-                    return NativeSpec(PlanChoiceEffect.Transform, PileType.Draw, 1, draw);
+                    return NativeSpec(PlanChoiceEffect.Transform, PileType.Draw,
+                        Math.Max(1, card.OperationAmount(index)), draw);
                 }
                 case ("exhaust_card", "selected", "draw", "none"):
                 {
@@ -219,6 +259,12 @@ internal static class ChaosCardChoiceMirror
         => (spec.Opcode, spec.Variant, spec.SourceZone, spec.DestinationZone) switch
         {
             ("exhaust_card", "selected", "hand", "none") => true,
+            ("exhaust_card", "referenced", "none", "none") => true,
+            ("exhaust_card", "referenced", "hand", "none") => true,
+            ("template_independent_action", "i_upgrade" or "cl_exhaustuptohandcards" or "i_grantslytohandskillthisturn"
+                or "cl_putselectedhandcardondrawtop" or "i_copyselectedcardnextturn" or "i_proxyatomic_transfigure", "none", "none") => true,
+            ("template_self_action", "ncr_addvoidtoselectedhandcard" or "ncr_addretaintoselectedhandcard", "none", "none") => true,
+            ("template_self_action", "r_playselectedskillmultipletimes", "none", "none") => true,
             ("discard_card", "selected", "hand", "none") => true,
             ("move_card", "selected", "discard", "hand") => true,
             ("move_card", "selected", "discard", "draw") => true,
@@ -252,7 +298,8 @@ internal static class ChaosCardChoiceMirror
     {
         if (options.Count == 0 || count <= 0)
             return null;
-        return new CardChoiceSpec(effect, source, count, count, options, options,
+        var clamped = Math.Min(count, options.Count);
+        return new CardChoiceSpec(effect, source, clamped, clamped, options, options,
             ReplacementValue: 0d,
             IsImplicitAllSelection: options.Count <= count);
     }

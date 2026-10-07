@@ -4,6 +4,7 @@ using ChaosCardGenerator;
 using CombatSolver.Engine.InCombat.Simulation;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using AutoAnthonyCombatSolverBridge.CombatSolver;
 
 // 命名空间说明见 AutoAnthonyFacade.cs：外部类型一律通过文件级 using + 非限定名引用。
 
@@ -31,8 +32,11 @@ public sealed class DamageHandler : IOperationHandler
         return (spec.Variant, spec.Target) switch
         {
             ("selected", "selected_enemy") => null,
+            ("selected", "event_enemy") => null,
             ("all", "all_enemies") => null,
             ("random", "random_enemy") => null,
+            ("selected_energy_x_hits" or "selected_energy_x_threshold" or "cards_played_combat", "selected_enemy") => null,
+            ("random_star_x_hits", "random_enemy") => null,
             _ => $"deal_damage 的 (variant={spec.Variant}, target={spec.Target}) 组合不在支持矩阵",
         };
     }
@@ -43,23 +47,39 @@ public sealed class DamageHandler : IOperationHandler
         var card = context.Card;
 
         var amount = context.ExecutableAmount;
-        var damage = context.RuntimeValue("damage", amount);
+        decimal damage = context.RuntimeValue("damage", amount);
+        damage = ChaosOperationExecutor.ResolveTriggeredRollingDamage(card.Generated.Operations,
+            context.Shape.OperationIndex, damage, context.EventAmount, context.IsTriggered);
         var hits = Math.Max(0, context.RuntimeValue("hits", 1));
+        if (spec.Variant == "cards_played_combat")
+            damage = ChaosHistory.Finished(context.Mirror.Simulator, card.Owner, thisTurn: false).Count();
+        if (spec.Variant == "selected_energy_x_threshold")
+        {
+            var thresholdIndex = Enumerable.Range(0, card.Generated.Operations.Count)
+                .FirstOrDefault(index => ChaosOperationExecutor.EffectiveRuntimeSpec(card, index).Condition?.Kind == "energy_x_at_least", -1);
+            var threshold = thresholdIndex >= 0
+                ? ChaosOperationExecutor.RuntimeSpecValue(card, thresholdIndex, "threshold", 0)
+                : context.RuntimeValue("threshold", 0);
+            if (threshold > 0 && hits >= threshold && (spec.Flags.Contains("legacy_inline_double_x")
+                || Enumerable.Range(0, card.Generated.Operations.Count)
+                    .Any(index => ChaosOperationExecutor.EffectiveRuntimeSpec(card, index).Variant == "r_doubleenergyx"))) hits *= 2;
+        }
         // 0.9.0：修饰符解析（DamageModifierResolver 复刻 DamageAndHits 数学）
         // ——含 ExtraDamage 叠加、前缀缩放 baseHits、动态总命中替换、附加命中叠加
         var (finalDamage, resolvedHits) = DamageModifierResolver.Resolve(context, damage, hits);
         hits = resolvedHits;
         if (hits == 0)
             return;    // 源码语义：零 hits = 成功 no-op，不是失败
+        if (context.Resolution is { } local) local.LastDamageDealt = 0;
 
         var mirror = context.Mirror;
 
         // Power 卡：Unpowered 逐 hit 路径（源码 L1119-1153）
-        if (card.Type == CardType.Power || context.IsTriggered)
+        if (card.Type == CardType.Power || context.IsTriggered && !context.UsePoweredCardDamage)
         {
             var props = context.DamageProps;    // Power → ValueProp.Unpowered
             var dealer = card.Owner.Creature;
-            if (spec.Variant == "all")
+            if (spec.Target == "all_enemies")
             {
                 for (var hit = 0; hit < hits; hit++)
                     RecordKills(mirror.Simulator.Damage(mirror.CombatState.HittableEnemies.ToArray(), finalDamage,
@@ -67,7 +87,7 @@ public sealed class DamageHandler : IOperationHandler
                 return;
             }
 
-            if (spec.Variant == "random")
+            if (spec.Target == "random_enemy")
             {
                 // 源码 L1183-1194：每 hit 独立从分支 CombatTargets 流抽一个敌人
                 for (var hit = 0; hit < hits; hit++)
@@ -81,7 +101,7 @@ public sealed class DamageHandler : IOperationHandler
                 return;
             }
 
-            var powerTarget = mirror.CardPlay.Target;
+            var powerTarget = context.Target;
             if (powerTarget is null)
                 return;    // 源码语义：无目标 = 成功 no-op
             for (var hit = 0; hit < hits; hit++)
@@ -91,44 +111,59 @@ public sealed class DamageHandler : IOperationHandler
         }
 
         // 普通卡：攻击命令管线
-        switch (spec.Variant)
+        switch (spec.Target)
         {
-            case "selected":
+            case "selected_enemy":
+            case "event_enemy":
             {
                 // 与源码 state.Target ?? cardPlay.Target 一致（immediate 执行时两者同源）
-                var target = mirror.CardPlay.Target;
+                var target = context.Target;
                 if (target is null)
                     return;    // 源码语义：无目标 = 成功 no-op
-                DamageCmd.Attack(finalDamage)
+                var attack = DamageCmd.Attack(finalDamage)
                     .WithHitCount(hits)
                     .FromCard(card, mirror.CardPlay)
-                    .Targeting(target)
-                    .Simulate(mirror.Simulator);
-                if (context.Resolution is { } res)
-                    res.LastAttackKilled |= !target.IsAlive;
+                    .Targeting(target);
+                attack.Simulate(mirror.Simulator);
+                RecordKills(attack.Results.SelectMany(result => result).ToArray(), context);
                 return;
             }
-            case "all":
+            case "all_enemies":
             {
-                var enemies = mirror.CombatState.HittableEnemies.ToArray();
-                DamageCmd.Attack(finalDamage)
+                var repeatOnKill = Enumerable.Range(0, card.Generated.Operations.Count)
+                    .Any(index => ChaosOperationExecutor.EffectiveRuntimeSpec(card, index).Variant == "m_repeatareaonkill");
+                if (repeatOnKill)
+                {
+                    var remaining = hits;
+                    while (remaining-- > 0)
+                    {
+                        var echo = DamageCmd.Attack(finalDamage).FromCard(card, mirror.CardPlay).TargetingAllOpponents(mirror.CombatState);
+                        echo.Simulate(mirror.Simulator);
+                        if (mirror.Simulator.HasPendingChoice) return;
+                        var results = echo.Results.SelectMany(result => result).ToArray();
+                        remaining += results.Count(result => result.WasTargetKilled);
+                        RecordKills(results, context);
+                    }
+                    return;
+                }
+                var attack = DamageCmd.Attack(finalDamage)
                     .WithHitCount(hits)
                     .FromCard(card, mirror.CardPlay)
-                    .TargetingAllOpponents(mirror.CombatState)
-                    .Simulate(mirror.Simulator);
-                if (context.Resolution is { } resAll)
-                    resAll.LastAttackKilled |= enemies.Any(enemy => !enemy.IsAlive);
+                    .TargetingAllOpponents(mirror.CombatState);
+                attack.Simulate(mirror.Simulator);
+                RecordKills(attack.Results.SelectMany(result => result).ToArray(), context);
                 return;
             }
-            case "random":
+            case "random_enemy":
                 // 镜像层已按源码复刻 ExecuteWithResolvedTarget 的显式随机目标抽取
                 // （消耗一次 CombatTargets，结果不影响本路径）；命令自身的逐 hit 随机
                 // 目标由模拟器用分支 RNG 结算（与真实命令的 RNG 用法一致）。
-                DamageCmd.Attack(finalDamage)
+                var randomAttack = DamageCmd.Attack(finalDamage)
                     .WithHitCount(hits)
                     .FromCard(card, mirror.CardPlay)
-                    .TargetingRandomOpponents(mirror.CombatState)
-                    .Simulate(mirror.Simulator);
+                    .TargetingRandomOpponents(mirror.CombatState);
+                randomAttack.Simulate(mirror.Simulator);
+                RecordKills(randomAttack.Results.SelectMany(result => result).ToArray(), context);
                 return;
             default:
                 throw new UnsupportedRuntimeSpecException(spec.Opcode, spec.Variant);
@@ -140,6 +175,9 @@ public sealed class DamageHandler : IOperationHandler
         OperationExecutionContext context)
     {
         if (context.Resolution is { } resolution)
+        {
             resolution.LastAttackKilled |= results.Any(result => result.WasTargetKilled);
+            resolution.LastDamageDealt += decimal.ToInt32(results.Sum(result => result.TotalDamage + result.OverkillDamage));
+        }
     }
 }

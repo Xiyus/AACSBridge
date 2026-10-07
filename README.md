@@ -17,12 +17,20 @@ AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 Com
 
 ---
 
-## 当前开发状态（2026-10-07，Batch AS）
+## 当前开发状态（2026-10-07，全量实现候选）
 
-当前源码已超过历史 1.0.0：**212 个注册键，128 项离线检查通过**。本机已安装 DLL 枚举到
-467 个目录原子，331 个通过单操作校验；这是单操作准入统计，**不是整卡覆盖率或实机等价率**，
+当前源码已超过历史 1.0.0：**241 个注册键，134 项统一离线检查通过**。本机已安装 DLL 枚举到
+467 个目录原子，440 个通过单操作校验；其余结构项在必要的合法配对上下文中准入，
+实现清单为 **467/467**。这是目录准入统计，**不是整卡覆盖率或实机等价率**，
 不能与历史 587/931 直接比较。逐条结果及二进制 hash 见 [目录审计](docs/catalog-audit.json)，
 本轮结论与剩余工作见 [验收与后续清单](docs/acceptance-and-backlog.md)。
+
+按“全部实现后再统一测试”的要求完成目录与执行链补齐，包括触发器、战斗规则、命名卡槽、
+多次选择、ForEach、嵌套自动出牌、衍生槽/附魔、结构升级及已有近似路径纠偏。
+完整范围、配对口径和统一实机测试清单见 [全量实现候选](docs/implementation-completion-2026-10-07.md)，
+配对准入逐项证据见 [实现审计](docs/catalog-audit-work.json)。
+
+以下为本轮以前的开发记录。
 
 本轮新增唯一抽到技能牌条件和四种有实际派发的抽牌触发；修复规则代理被跳过、左球位置、
 全体球重复激发、状态牌重复消耗、回洗手牌误触发弃牌，以及修饰符历史计数近似。
@@ -47,7 +55,7 @@ SEARCH_FAILURE 为 0，4 次 `firstScalarDifference` 均为 null。但发现一�
 
 本卡消耗事件覆盖统一消耗入口，按顺序执行 `triggerIndex` 链接收益；不在 OnPlay 执行，
 不与消耗堆回合事件混淆。无收益、嵌套触发/修饰符、事件卡槽、动态收益及选择续接均拒绝。
-128 项离线检查通过，包括事件身份/收益准入与拒绝、死亡 hook 登记、阻止移除过滤及实际 Harmony 接缝。
+134 项离线检查通过，包括事件身份/收益准入与拒绝、死亡 hook 登记、阻止移除过滤及实际 Harmony 接缝。
 费用修复和新消耗事件均待新一轮实机严格 diff 验证；单操作目录准入仍为 331/467。
 
 ### Batch AR：高费用出牌触发器
@@ -285,24 +293,30 @@ AutoAnthonyCombatSolverBridge/
 
 ---
 
-## 兼容性锁定
+## 兼容性检查
 
-| 组件 | 版本 | SHA256 |
+| 组件 | 已审计版本 | 参考 SHA256 |
 |---|---|---|
 | Slay the Spire 2 | 0.111.0 | — |
-| AutoAnthony | 0.3.137 | `ad004f42f18ed86ccc7f66317823cf77fb40195b6466872bbd7038b3d8952965` |
+| AutoAnthony | 0.3.138 | `689b9c5056227c0b47e406159853938c407d56f5726604b1eac3c1b72c10fa50` |
 | CombatSolver | 0.50.1 | `832060172aa5eae8d79546f120a10e4571c324b7c0d6ab2c6abc2bcad24323cd` |
 
 `CompatibilityGuard` 在 Mod 初始化时做运行时自检（CombatSolver 第三方适配文档的要求）：
 
-- 两个程序集已加载、manifest 版本 ≥ 锁定最低版（AutoAnthony 0.3.137 / CombatSolver 0.50.1）；
+- 两个程序集已加载；manifest 版本用于日志与参考，不单独决定兼容性；
 - 关键类型/成员签名逐个存在（`ChaosCardModel.Generated`、`CardOnPlayMirrors.Registry`、
   `AdaptedCardOnPlayMirrors.Register`、`KnownPreRootSubscriberTypeNames` 等，全反射、零硬引用）；
 - `OperationRuntimeSpec.CurrentSchemaVersion == 1`（schema 变了 = 拒绝启用）；
-- 记录两个 DLL 的 MVID + SHA256 到日志；**0.6.0 私有生命周期接缝要求上表的精确 SHA256**，不匹配时整体禁用；
+- 记录两个 DLL 的 MVID + SHA256 到日志；已审计哈希走快速路径，其他构建核验嵌入的行为契约基线；
+- 核验相关类型的方法签名、字段/常量、规范化 IL 与异常处理，包含内部异步状态机；
+  DLL 包装、版本号、无关类型及新增无关方法变化不会单独禁用桥；相关行为变化则列出具体成员并拒绝启用；
 - 审计 `ChaosCardModel.OnPlay` 上的 Harmony 补丁（决定 0.1.0 走普通注册表还是 `AdaptedCardOnPlayMirrors`）。
 
 **任何一项失败 → 桥整体禁用，一个补丁都不打、一个镜像都不注册**（日志会列出全部失败原因）。
+
+行为基线见 `docs/compatibility-behavior-baseline.json`，只能在离线审查后显式更新，运行时不自动重建。
+这是一项保守的漂移检测：相关方法的等价重构也可能要求复查；它不能证明数据资源、其他 Mod
+或基线范围外的传递依赖永远不改变行为。未知 RuntimeSpec 仍在逐卡准入时拒绝。
 
 ---
 

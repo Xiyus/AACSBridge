@@ -40,6 +40,8 @@ public static class CombatSolverRegistrar
         HandlerCatalog.RegisterAll(OperationHandlerRegistry.Instance);
         BridgeLog.Info($"翻译表就绪：{OperationHandlerRegistry.Instance.Count} 个 (Opcode, Variant) 形状。");
         ChaosCompositePowerMirror.Register();
+        PowerDynamicVarWarmup.RegisterAdaptedCanonicalPower<ChaosTemporaryFocusPower>();
+        PowerDynamicVarWarmup.RegisterAdaptedCanonicalPower<ChaosTemporaryFocusDownPower>();
 
         // 2. 镜像登记（逐具体类型）
         var registered = 0;
@@ -121,8 +123,9 @@ public static class CombatSolverRegistrar
         CardIsPlayableMirrors.Registry.Register<TCard>(ChaosCardIsPlayableMirror.Evaluate);
         // Passive card hooks apply even when OnPlay is outside the support matrix.
         AfterDeathMirrors.Registry.Register<TCard>(AfterDeath);
+        ChaosCardPassiveMirror.Register<TCard>();
         // 0.5.0：玩家选牌登记（spec 按卡实例的操作动态构造；无选择型操作返回 null = 没有选择）
-        CardChoiceMirrors.Register<TCard>(ChaosCardChoiceMirror.BuildSpec, ChaosCardChoiceMirror.Apply);
+        CardChoiceMirrors.Register<TCard>((simulator, predicted, card) => ChaosCardChoiceMirror.BuildSpec(simulator, predicted, card)!, ChaosCardChoiceMirror.Apply);
     }
 
     // 注意：反射查找必须按 IsGenericMethodDefinition 消歧——本类同时存在泛型与非泛型的同名

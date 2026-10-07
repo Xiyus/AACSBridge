@@ -15,8 +15,19 @@ namespace AutoAnthonyCombatSolverBridge.Patches;
 [HarmonyPatch(typeof(global::CombatSolver.Engine.InCombat.Mirrors.HookMirrors), "AfterCardExhausted")]
 internal static class ChaosCardSelfExhaustPatch
 {
+    private static void Postfix(CombatPredictionSimulator simulator, PredictedCard card, bool causedByEthereal)
+    {
+        if (simulator.HasPendingChoice) { simulator.RejectExecutionContinuation(); return; }
+        ChaosCardPassiveMirror.ExhaustMove(simulator, card, causedByEthereal);
+        ChaosCardExhaustMirror.Execute(simulator, card);
+    }
+}
+
+[HarmonyPatch(typeof(SimulatedCombatState), nameof(SimulatedCombatState.AfterCardEnteredCombat))]
+internal static class ChaosCardEnteredPatch
+{
     private static void Postfix(CombatPredictionSimulator simulator, PredictedCard card)
-        => ChaosCardExhaustMirror.Execute(simulator, card);
+        => ChaosCardPassiveMirror.Entered(simulator, card);
 }
 
 [HarmonyPatch(typeof(CombatPredictionSimulator), nameof(CombatPredictionSimulator.ManualPlay))]
@@ -34,6 +45,28 @@ internal static class CompositePowerEndBoundaryPatch
 [HarmonyPatch(typeof(global::CombatSolver.Engine.InCombat.Mirrors.HookMirrors), "BeforeSideTurnStart")]
 internal static class CompositePowerStartBoundaryPatch
 {
+    private static void Prefix(CombatPredictionSimulator simulator)
+    {
+        ChaosHistory.StartSide(simulator);
+        ChaosCompositePowerMirror.ResetBudget(simulator);
+    }
+}
+
+[HarmonyPatch(typeof(global::CombatSolver.Engine.InCombat.Mirrors.HookMirrors), "BeforeSideTurnEnd")]
+internal static class CompositePowerSideEndBudgetPatch
+{
+    private static void Prefix(CombatPredictionSimulator simulator) => ChaosCompositePowerMirror.ResetBudget(simulator);
+}
+
+[HarmonyPatch(typeof(MonsterMoveSemantics), nameof(MonsterMoveSemantics.ApplyForecastMove))]
+internal static class CompositePowerMonsterBudgetPatch
+{
+    private static void Prefix(CombatPredictionSimulator simulator) => ChaosCompositePowerMirror.ResetBudget(simulator);
+}
+
+[HarmonyPatch(typeof(PotionOnUseSupport), nameof(PotionOnUseSupport.Use))]
+internal static class CompositePowerPotionBudgetPatch
+{
     private static void Prefix(CombatPredictionSimulator simulator) => ChaosCompositePowerMirror.ResetBudget(simulator);
 }
 
@@ -44,9 +77,7 @@ internal static class CompositePowerSideStartPatch
     private static void Postfix(CombatPredictionSimulator simulator, SimulatedCombatState combat,
         CombatSide side, IReadOnlyList<Creature> participants, bool __result)
     {
-        if (__result) ChaosCompositePowerMirror.Start(simulator, combat, side, participants);
-        else if (combat.EffectivePowers().OfType<ChaosCompositePower>().Any())
-            throw ChaosCompositePowerMirror.Unsupported("回合开始阶段产生未适配的选择续接");
+        if (!__result && combat.EffectivePowers().OfType<ChaosCompositePower>().Any()) simulator.RejectExecutionContinuation();
     }
 }
 
@@ -57,8 +88,7 @@ internal static class CompositePowerSideEndPatch
         CombatSide side, IEnumerable<Creature> participants, bool __result)
     {
         if (__result) ChaosCompositePowerMirror.End(simulator, combat, side, participants);
-        else if (combat.EffectivePowers().OfType<ChaosCompositePower>().Any())
-            throw ChaosCompositePowerMirror.Unsupported("回合结束阶段产生未适配的选择续接");
+        else if (combat.EffectivePowers().OfType<ChaosCompositePower>().Any()) simulator.RejectExecutionContinuation();
     }
 }
 

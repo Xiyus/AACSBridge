@@ -29,6 +29,7 @@ public sealed class CreateCopyHandler : IOperationHandler
         return (spec.Variant, spec.Target, spec.SourceZone, spec.DestinationZone) switch
         {
             ("this_card", "self_card", "none", "discard") => null,
+            ("referenced_card" or "referenced_attack", _, "none", "hand" or "discard") => null,
             _ => $"create_copy 的 (variant={spec.Variant}, target={spec.Target}, zones={spec.SourceZone}->{spec.DestinationZone}) 组合不在支持矩阵",
         };
     }
@@ -42,9 +43,11 @@ public sealed class CreateCopyHandler : IOperationHandler
 
         for (var index = 0; index < count; index++)
         {
+            var source = context.Shape.Spec.Variant == "this_card" ? context.Mirror.Card : context.ReferencedCard;
+            if (source is null) return;
             context.Mirror.Simulator.AddGeneratedCardToCombat(
-                context.Mirror.Card.CreateClone(),
-                PileType.Discard,
+                source.CreateClone(),
+                context.Shape.Spec.DestinationZone == "discard" ? PileType.Discard : PileType.Hand,
                 context.Card.Owner,
                 CardPilePosition.Bottom,
                 CardGenerationResultKind.Fixed);

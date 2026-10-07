@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.Powers;
 using CardTag = MegaCrit.Sts2.Core.Entities.Cards.CardTag;
+using AutoAnthonyCombatSolverBridge.CombatSolver;
 
 namespace AutoAnthonyCombatSolverBridge.Translation;
 
@@ -32,7 +33,10 @@ internal static class DamageModifierResolver
             or "ncr_foreachexhaustedsoul" or "ncr_damageperexhaustedsoul"
             or "r_foreachskillplayedthisturn" or "r_foreachgeneratedcardcombat"
             or "cl_foreachdrawpilecard" or "r_wheneverdrawn"
-            or "r_bonuspergeneratedcardthiscombat",
+            or "r_bonuspergeneratedcardthiscombat" or "m_repeatperattackthisturn" or "r_repeatperskillplayedthisturn"
+            or "ncr_repeatperostyattackthisturn" or "m_repeatareaonkill" or "r_doubleenergyx" or "cl_increaserollingdamage",
+        "modify_x" => spec.Variant == "double_at_threshold",
+        "modify_power" => spec.Variant == "doom_per_threshold",
         "modify_hits" => spec.Variant is "flat_extra" or "hp_loss_scaled",
         "modify_damage" => spec.Variant is
             "vulnerable_scaled" or "strike_count_scaled" or "current_block"
@@ -55,22 +59,37 @@ internal static class DamageModifierResolver
         var player = mirror.Simulator.State.GetPlayerCombatState(owner);
         var combat = mirror.CombatState as global::CombatSolver.SimulatedCombatState
             ?? throw new InvalidOperationException("修饰符需要分支战斗状态。");
+        if (ChaosOperationExecutor.IsRepeatedDependencyDamagePayoff(card, context.Shape.OperationIndex))
+            baseHits *= DependencyResolver.Multiplier(context);
         for (var index = 0; index < card.Generated.Operations.Count; index++)
         {
             var modifier = card.Generated.Operations[index];
-            if (modifier.Scope != OperationScope.Modifier || modifier.Template == "M:base") continue;
+            if (modifier.Scope != OperationScope.Modifier) continue;
+            if (CardEffectRules.IsDependencyPrefix(modifier) || ChaosCardPassiveMirror.IsOperation(modifier.Template)) continue;
+            if (!ChaosOperationExecutor.DamageModifierSharesResolution(card.Generated.Operations, index, context.Shape.OperationIndex)) continue;
+            if (modifier.Parameters.TryGetValue("triggerIndex", out var gate) && gate >= 0 && gate < card.Generated.Operations.Count
+                && card.Generated.Operations[gate].RuntimeSpec?.Condition is { })
+                if (!ConditionEvaluator.Evaluate(card, card.Generated.Operations[gate], mirror, context.Resolution ?? new OperationResolutionState())) continue;
             var spec = ChaosOperationExecutor.EffectiveRuntimeSpec(card, index);
-            if (!IsSupportedModifier(spec) || modifier.Parameters.ContainsKey("triggerIndex"))
+            if (spec.Opcode is "modify_block" or "modify_orb_slots" or "modify_x" or "modify_power"
+                || spec.Variant is "triggered_attack_percentage" or "m_repeatareaonkill" or "r_doubleenergyx" or "cl_increaserollingdamage") continue;
+            if (!IsSupportedModifier(spec))
                 throw new UnsupportedRuntimeSpecException(spec.Opcode, spec.Variant);
-            var amount = card.OperationAmount(index);
+            var rawAmount = card.OperationAmount(index);
+            var repeats = DependencyResolver.ModifierMultiplier(context, index);
+            var amount = rawAmount * repeats;
             switch (spec.Variant)
             {
                 case "exhaust_pile_scaled" or "m_damageperexhaustcard":
                     damage += (decimal)amount * player.ExhaustPile.Cards.Count;
                     break;
                 case "vulnerable_scaled":
-                    damage += (decimal)amount * (mirror.CardPlay.Target is { } target
+                    damage += (decimal)amount * (context.Target is { } target
                         ? combat.GetAmount<VulnerablePower>(target) : 0);
+                    break;
+                case "current_block":
+                    if (CardEffectRules.CurrentBlockDamageAnchorIndex(card.Generated.Operations, index) == context.Shape.OperationIndex)
+                        damage = mirror.Simulator.State.GetCreature(owner.Creature).Block;
                     break;
                 case "strike_count_scaled":
                     damage += (decimal)amount * player.AllCards.Count(candidate => candidate.Preview.Tags.Contains(CardTag.Strike));
@@ -82,15 +101,26 @@ internal static class DamageModifierResolver
                     break;
                 case "d_repeatperorb":
                     hasDynamicHits = true;
-                    dynamicHits += player.OrbQueue.Orbs.Count;
+                    dynamicHits += RepeatCount(player.OrbQueue.Orbs.Count);
                     break;
                 case "m_repeatperskillinhand":
                     hasDynamicHits = true;
-                    dynamicHits += player.Hand.Cards.Count(candidate => candidate.Preview.Type == CardType.Skill);
+                    dynamicHits += player.Hand.Cards.Count(candidate => candidate.Preview.Type == CardType.Skill) * repeats;
+                    break;
+                case "m_repeatperattackthisturn":
+                    hasDynamicHits = true;
+                    dynamicHits += ChaosHistory.Finished(mirror.Simulator, owner).Count(play => play.Card.Type == CardType.Attack) * repeats;
+                    break;
+                case "r_repeatperskillplayedthisturn":
+                    hasDynamicHits = true;
+                    dynamicHits += RepeatCount(ChaosHistory.Finished(mirror.Simulator, owner).Count(play => play.Card.Type == CardType.Skill));
+                    break;
+                case "ncr_repeatperostyattackthisturn":
+                    additionalHits += RepeatCount(ChaosHistory.Finished(mirror.Simulator, owner).Count(play => play.Card.Tags.Contains(CardTag.OstyAttack)));
                     break;
                 case "r_repeatperstargainedthisturn":
                     hasDynamicHits = true;
-                    dynamicHits += combat.GetStarsGainedThisTurn(owner);
+                    dynamicHits += RepeatCount(combat.GetStarsGainedThisTurn(owner));
                     break;
                 case "m_damageperdiscardthisturn":
                     damage += (decimal)amount * combat.GetCardsDiscardedThisTurn(owner.Creature);
@@ -101,10 +131,10 @@ internal static class DamageModifierResolver
                             .Count(entry => entry.Card.Owner == owner));
                     break;
                 case "ncr_damagepercarddrawnthisturn":
-                    damage += (decimal)amount * combat.GetNonHandDrawsThisTurn(owner);
+                    damage += (decimal)rawAmount * RepeatCount(combat.GetNonHandDrawsThisTurn(owner));
                     break;
                 case "cl_bonusperuniquedebuff":
-                    damage += (decimal)amount * (mirror.CardPlay.Target is { } debuffTarget
+                    damage += (decimal)amount * (context.Target is { } debuffTarget
                         ? combat.EffectivePowers().Count(power => ReferenceEquals(power.Owner, debuffTarget)
                             && power.Type == PowerType.Debuff && power is not ITemporaryPower) : 0);
                     break;
@@ -123,10 +153,9 @@ internal static class DamageModifierResolver
                         ? mirror.Simulator.State.GetCreature(ostyCur).CurrentHp : 0;
                     break;
                 case "ncr_repeatpervoidplayedcombat":
-                    // 源码 L3418-3424：H_dyn += 本场 Ethereal(Void) 出牌数
-                    // 简化：用 0（需要历史 Ethereal 出牌计数）
                     hasDynamicHits = true;
-                    dynamicHits += 0;
+                    dynamicHits += RepeatCount(ChaosHistory.Finished(mirror.Simulator, owner, thisTurn: false)
+                        .Count(play => ChaosHistory.CurrentCard(mirror.Simulator, play).Keywords.Contains(CardKeyword.Ethereal)));
                     break;
                 case "r_damageupwhendrawn":
                     // 源码 ChaosCardModel L844-846：抽到时 ExtraDamage += max(0,A)
@@ -152,24 +181,17 @@ internal static class DamageModifierResolver
                     break;
                 case "ncr_damageperostyattackcard":
                     // 源码 L3440-3445：damage += amount × OstyAttack 卡数（排除自身）
-                    // 依赖链近似：直接计数（实机由 ForEach 前缀提供 dependencyRepeats）
-                    damage += (decimal)amount * player.AllCards.Count(candidate =>
-                        !ReferenceEquals(candidate, mirror.Card)
-                        && candidate.Preview.Tags.Contains(CardTag.OstyAttack));
+                    damage += amount;
                     break;
                 case "ncr_damageperexhaustedsoul":
                     // 源码 L3432-3438：damage += amount × 消耗堆 Soul 衍生卡数
-                    damage += (decimal)amount * player.ExhaustPile.Cards
-                        .Count(candidate => candidate.Preview is Soul);
+                    damage += amount;
                     break;
                 case "r_foreachskillplayedthisturn":
                     // 源码 L3449-3455（等价 R:RepeatPerSkillPlayedThisTurn）：H_dyn += 本回合技能出牌数
-                    // 近似：模拟 History 内的技能出牌（根历史部分无法按类型过滤）
                     hasDynamicHits = true;
-                    dynamicHits += mirror.Simulator.History.Entries
-                        .OfType<CombatPredictionCardPlayFinishedEntry>()
-                        .Count(entry => entry.CardPlay.Player == owner
-                            && entry.CardPlay.Card.Type == CardType.Skill);
+                    dynamicHits += ChaosHistory.Finished(mirror.Simulator, owner)
+                        .Count(play => play.Card.Type == CardType.Skill);
                     break;
                 case "r_foreachgeneratedcardcombat":
                 case "r_bonuspergeneratedcardthiscombat":
@@ -180,16 +202,19 @@ internal static class DamageModifierResolver
                     break;
                 case "hp_loss_scaled" when spec.Opcode == "modify_hits":
                     // 源码 L3385-3391：H += amount × HP 损失事件数
-                    // 近似：用累计 HP 损失量（事件数 ≤ 损失量，保守上界）
-                    additionalHits += Math.Max(0, amount)
-                        * Math.Max(0, combat.GetCumulativeHpLost(owner.Creature));
+                    additionalHits += Math.Max(0, rawAmount) * repeats
+                        * (combat._rootHistory.DamageReceived.Count(entry => entry.Receiver == owner.Creature && entry.Result.UnblockedDamage > 0)
+                            + mirror.Simulator.History.Entries.OfType<CombatPredictionDamageReceivedEntry>()
+                                .Count(entry => entry.Receiver == owner.Creature && entry.Result.UnblockedDamage > 0));
                     break;
                 case "flat_extra" when spec.Opcode == "modify_hits":
-                    additionalHits += Math.Max(1, amount);
+                    additionalHits += Math.Max(1, rawAmount) * repeats;
                     break;
                 default:
                     throw new UnsupportedRuntimeSpecException(spec.Opcode, spec.Variant);
             }
+            int RepeatCount(int liveCount) => CardEffectRules.ResolveDependencyRepeatCount(
+                DependencyResolver.Prefix(card, index) is { } prefix && CardEffectRules.IsMultiplicativeDependencyPrefix(prefix), liveCount, repeats);
         }
         return (damage, Math.Max(0, (hasDynamicHits ? dynamicHits : Math.Max(0, baseHits)) + additionalHits));
     }

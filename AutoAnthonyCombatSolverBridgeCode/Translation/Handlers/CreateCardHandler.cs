@@ -92,6 +92,9 @@ public sealed class CreateCardHandler : IOperationHandler
 
         // 源码：DestinationZone == "discard" ? Discard : Hand（默认 Bottom，与 CardPileCmd 一致）
         var pile = spec.DestinationZone == "discard" ? PileType.Discard : PileType.Hand;
-        mirror.Simulator.AddGeneratedCardsToCombat(generated.ToList(), pile, owner);
+        var created = generated.ToList();
+        if (ChaosOperationExecutor.GeneratedCardsAreUpgraded(context.Card, context.Shape.OperationIndex))
+            foreach (var card in created.Where(card => card.Preview.IsUpgradable)) card.Upgrade();
+        mirror.Simulator.AddGeneratedCardsToCombat(created, pile, owner);
     }
 }

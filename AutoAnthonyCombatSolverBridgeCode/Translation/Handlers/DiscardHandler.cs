@@ -30,5 +30,6 @@ public sealed class DiscardHandler : IOperationHandler
         if (hand.Count == 0)
             return;    // 源码语义：空目标 = no-op
         context.Mirror.Simulator.Discard(hand);
+        context.Resolution?.DiscardedByCard.AddRange(hand);
     }
 }

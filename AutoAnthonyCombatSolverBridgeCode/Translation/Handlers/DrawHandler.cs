@@ -1,4 +1,6 @@
 using AutoAnthonyCombatSolverBridge.Translation;
+using CombatSolver.Engine.Common;
+using CombatSolver.Engine.InCombat.Simulation;
 
 // 命名空间说明见 AutoAnthonyFacade.cs：外部类型一律通过文件级 using + 非限定名引用。
 
@@ -27,6 +29,27 @@ public sealed class DrawHandler : IOperationHandler
     public void Execute(OperationExecutionContext context)
     {
         var drawn = context.Mirror.Simulator.Draw(context.Card.Owner, context.ExecutableAmount);
+        if (context.Mirror.Simulator.HasPendingChoice && context.Resolution is { } resolution && drawn is List<PredictedCard> list)
+        {
+            context.Mirror.Simulator.AppendExecutionContinuation(new DrawResultFrame(list, resolution));
+            return;
+        }
         context.Resolution?.RecordDrawnTypes(drawn.Select(card => card.Preview.Type));
+    }
+
+    private sealed record DrawResultFrame(List<PredictedCard> Drawn, OperationResolutionState Resolution) : ICombatPredictionExecutionFrame
+    {
+        public void PrepareFork(PredictionForkContext context)
+        {
+            CombatPredictionSimulator.ForkExecutionCardList(Drawn, context);
+            Resolution.PrepareFork(context);
+        }
+        public ICombatPredictionExecutionFrame Fork(PredictionForkContext context) => this with
+        { Drawn = context.RequireRemap(Drawn), Resolution = Resolution.Fork(context) };
+        public bool Resume(CombatPredictionSimulator simulator)
+        {
+            Resolution.RecordDrawnTypes(Drawn.Select(card => card.Preview.Type));
+            return true;
+        }
     }
 }

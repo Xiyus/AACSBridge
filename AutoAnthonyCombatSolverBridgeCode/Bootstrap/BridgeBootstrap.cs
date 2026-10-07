@@ -30,8 +30,7 @@ public static class BridgeBootstrap
 
         CombatSolverRegistrar.Initialize(report);
 
-        BridgeLog.Info("1.1.0 生效：122 翻译键覆盖 72% 目录形状——含修饰符数学（DamageAndHits）、条件门控（ConditionMatches）、" +
-                       "球引导/锻造/毒/状态牌/代理 Power/选牌/触发器/随机生成全部可精确预测。" +
-                       "矩阵外的卡保守排除（模拟中不可打）。");
+        BridgeLog.Info("全量实现候选已启用：241 翻译键；目录审计 467/467 原子在必要配对上下文中准入。" +
+                       "此统计不代表全部整卡组合的实机严格 diff 已验收；未知组件继续保守排除。");
     }
 }

@@ -67,6 +67,8 @@ public sealed class PowerHandler : IOperationHandler
             ("vulnerable_double", "selected_enemy") => null,
             ("poison", "selected_enemy") => null,
             ("poison", "all_enemies") => null,
+            ("poison", "random_enemy") => null,
+            ("vulnerable" or "weak" or "poison", "event_enemy") => null,
             _ => $"apply_power 的 (variant={spec.Variant}, target={spec.Target}) 组合不在 0.2.0 支持矩阵",
         };
     }
@@ -79,6 +81,16 @@ public sealed class PowerHandler : IOperationHandler
         if (mirror.CombatState is not ICombatPredictionEffectSink effects)
             throw new InvalidOperationException("apply_power 需要实现了效果汇的分支战斗状态。");
         var owner = card.Owner.Creature;
+        if (context.Operation.Template == "N:RandomPoison")
+        {
+            for (var hit = 0; hit < context.RuntimeValue("hits", 1); hit++)
+            {
+                var selected = mirror.Rng.CombatTargets.NextItem(mirror.CombatState.HittableEnemies);
+                if (selected is not null) effects.ApplyPowerFromSource(typeof(PoisonPower), selected, context.ExecutableAmount, owner, card);
+                if (mirror.Simulator.HasPendingChoice) return;
+            }
+            return;
+        }
 
         // 1) 自增益路由（TryExecuteStructuredSelfPower 优先于敌方分派）
         if (spec.Target == "self")
@@ -93,10 +105,14 @@ public sealed class PowerHandler : IOperationHandler
                     // 源码：固定施加 1 层
                     effects.ApplyPowerFromSource(typeof(BlurPower), owner, 1, owner, card);
                     return;
+                case "focus_loss_this_turn":
+                    ((SimulatedCombatState)mirror.CombatState).ApplyTemporaryFocusLoss<ChaosTemporaryFocusDownPower>(
+                        owner, context.ExecutableAmount, owner);
+                    return;
                 case "strength_per_target_vulnerable":
                 {
                     // 源码：力量 = 目标当前易伤层数 × max(0, amount)；无目标记警告后 no-op
-                    var target = mirror.CardPlay.Target;
+                    var target = context.Target;
                     if (target is null)
                         return;
                     var strength = GetBranchAmount<VulnerablePower>(context, target) * Math.Max(0, context.ExecutableAmount);
@@ -119,7 +135,7 @@ public sealed class PowerHandler : IOperationHandler
             case "vulnerable_double":
             {
                 // 源码：目标当前易伤 > 0 时施加等量易伤（翻倍）
-                var target = mirror.CardPlay.Target;
+                var target = context.Target;
                 if (target is null)
                     return;
                 var current = GetBranchAmount<VulnerablePower>(context, target);
@@ -163,7 +179,9 @@ public sealed class PowerHandler : IOperationHandler
             return;
         }
 
-        var target = context.Mirror.CardPlay.Target;
+        var target = context.Shape.Spec.Target == "random_enemy"
+            ? context.ResolvedTarget ?? context.Mirror.Rng.CombatTargets.NextItem(context.Mirror.CombatState.HittableEnemies)
+            : context.Target;
         if (target is null)
             return;    // 源码语义：无目标 = 成功 no-op
         effects.ApplyPowerFromSource(powerType, target, amount, owner, card);

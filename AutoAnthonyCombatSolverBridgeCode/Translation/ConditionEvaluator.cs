@@ -3,6 +3,7 @@ using ChaosCardGenerator;
 using CombatSolver.Engine.InCombat.Mirrors.Cards.OnPlay;
 using MegaCrit.Sts2.Core.Models.Orbs;
 using MegaCrit.Sts2.Core.Models.Powers;
+using AutoAnthonyCombatSolverBridge.CombatSolver;
 
 namespace AutoAnthonyCombatSolverBridge.Translation;
 
@@ -15,7 +16,8 @@ internal static class ConditionEvaluator
         or "last_drawn_card_is_skill" or "enemy_intends_attack" or "osty_alive"
         or "doom_applied_this_turn" or "osty_attacked_this_turn" or "no_attacks_in_hand" or "hand_empty"
         // Batch AP：第三批条件
-        or "has_frost_orb" or "fatal" or "cards_played_this_turn_at_least";
+        or "has_frost_orb" or "fatal" or "cards_played_this_turn_at_least"
+        or "cards_played_this_turn_below" or "first_play_of_this_card_this_turn" or "energy_x_at_least";
 
     internal static bool Evaluate(ChaosCardModel card, GeneratorOperation conditionOp,
         CardOnPlayMirrorContext mirror, OperationResolutionState resolution)
@@ -51,7 +53,12 @@ internal static class ConditionEvaluator
             // Batch AP：第三批条件
             "has_frost_orb" => playerState.OrbQueue.Orbs.Any(orb => orb is FrostOrb),
             "fatal" => resolution.LastAttackKilled,
-            "cards_played_this_turn_at_least" => combat.GetCardsPlayedThisTurn(owner.Creature) >= threshold,
+            "cards_played_this_turn_at_least" => ChaosHistory.Finished(mirror.Simulator, owner).Count() >= threshold,
+            "cards_played_this_turn_below" => ChaosHistory.Finished(mirror.Simulator, owner).Count() < threshold,
+            "first_play_of_this_card_this_turn" => !ChaosHistory.Finished(mirror.Simulator, owner)
+                .Any(play => mirror.Card.References(play.Card)),
+            "energy_x_at_least" => card.ResolvedEnergyXValue >= Math.Max(1,
+                card.OperationAmount(card.Generated.Operations.ToList().IndexOf(conditionOp))),
             _ => throw new UnsupportedRuntimeSpecException(spec.Opcode, kind!),
         };
     }

@@ -20,6 +20,8 @@ public static class HandlerCatalog
         registry.Register(new OperationKey("deal_damage", "selected"), damage);
         registry.Register(new OperationKey("deal_damage", "all"), damage);
         registry.Register(new OperationKey("deal_damage", "random"), damage);
+        foreach (var variant in new[] { "selected_energy_x_hits", "selected_energy_x_threshold", "random_star_x_hits", "cards_played_combat" })
+            registry.Register(new OperationKey("deal_damage", variant), damage);
         registry.Register(new OperationKey("gain_block", "immediate"), new Handlers.BlockHandler());
         registry.Register(new OperationKey("draw_cards", "immediate"), new Handlers.DrawHandler());
         registry.Register(new OperationKey("gain_energy", "immediate"), new Handlers.EnergyHandler());
@@ -40,9 +42,13 @@ public static class HandlerCatalog
         // 0.3.0：牌堆移动（确定性形状——选牌/RNG 形状仍由校验层拒绝）
         registry.Register(new OperationKey("exhaust_card", "all"), new Handlers.ExhaustHandler());
         registry.Register(new OperationKey("exhaust_card", "random"), new Handlers.ExhaustHandler());
+        registry.Register(new OperationKey("exhaust_card", "referenced"), new Handlers.ExhaustHandler());
+        registry.Register(new OperationKey("exhaust_card", "selected"), new Handlers.ExhaustHandler());
         registry.Register(new OperationKey("discard_card", "all"), new Handlers.DiscardHandler());
         registry.Register(new OperationKey("move_card", "random"), new Handlers.MoveCardRandomHandler());
         registry.Register(new OperationKey("create_copy", "this_card"), new Handlers.CreateCopyHandler());
+        registry.Register(new OperationKey("create_copy", "referenced_card"), new Handlers.CreateCopyHandler());
+        registry.Register(new OperationKey("create_copy", "referenced_attack"), new Handlers.CreateCopyHandler());
         registry.Register(new OperationKey("draw_and_discard", "nonzero_cost"), new Handlers.DrawAndDiscardHandler());
 
         // 0.6.x：代理模板（解决 Imbued 附魔自动施放矩阵外卡导致的 TURN_SETUP_FAILURE）
@@ -115,7 +121,7 @@ public static class HandlerCatalog
                      "a_proxyatomic_buffer", "a_proxyatomic_parry", "a_proxyatomic_royalties",
                      "a_proxyatomic_calcify", "a_proxyatomic_swordsage", "a_proxyatomic_forbiddengrimoire",
                      "retain_hand_at_turn_end", "retain_block_between_turns",
-                     "kings_sword_hits_all", "skills_cost_zero",
+                     "kings_sword_hits_all", "skills_cost_zero", "first_cards_free_each_turn",
                      // A:rule 族（ApplyBoundPower 一行式）
                      "poison_extra_triggers", "derivative_bonus_damage",
                      "derivative_hits_all", "played_skills_gain_sly", "derivative_retain",
@@ -129,7 +135,7 @@ public static class HandlerCatalog
                                           "r_kingssworddoubledamagethisturn", "ncr_doomscaleddamage", "ncr_ostydamage",
                                           "ncr_unpowereddamage", "ncr_applypower_sicempower",
                                           "ncr_doublehangdamage", "ncr_applydoomequaldamage",
-                                          "d_triggerlightningpassivesattarget" })
+                                          "d_triggerlightningpassivesattarget", "ncr_applyeventdamageasdoom", "ncr_copytargetdebuffstoothers" })
             registry.Register(new OperationKey("template_target_action", variant), templateTarget);
 
         // 0.8.x：template_independent_action 简单独立模板（禁抽/临时力量/全体易伤/最大生命/本卡成长，8 条）
@@ -143,7 +149,7 @@ public static class HandlerCatalog
                      "i_freehandthisturn", "i_drawwithretain", "i_triggerpoisonnow",
                      "i_replaynextskills", "i_discardhanddrawsame", "cl_drawtofullhand",
                      "i_nextskillcostszero", "i_setthiscardcostzero",
-                     "i_upgrade", "i_playtopcardandexhaust", "i_playthiscard",
+                     "i_upgrade",
                      "cl_exhaustuptohandcards", "d_increasethiscardcost",
                      // 代理模板（简单 Power/球操作）
                      "i_proxyatomic_foregoneconclusion", "i_proxyatomic_multicast", "i_proxyatomic_tempest",
@@ -159,6 +165,19 @@ public static class HandlerCatalog
                      "d_setthiscardcostzero", "d_increaseallclaws",
                  })
             registry.Register(new OperationKey("template_independent_action", variant), templateIndependent);
+        var autoPlay = new Handlers.AutoPlayHandler();
+        foreach (var variant in new[] { "i_playtopxcards", "i_playtopcardandexhaust", "i_playthiscard", "r_playthiscard",
+                     "i_autoplayrandomattackfromhand", "i_playatrandomenemy", "i_playexhaustedshivsattarget" })
+            registry.Register(new OperationKey("template_independent_action", variant), autoPlay);
+        registry.Register(new OperationKey("template_self_action", "d_autoplayrandomattackfromdraw"), autoPlay);
+        registry.Register(new OperationKey("template_self_action", "r_playselectedskillmultipletimes"), autoPlay);
+        var misc = new Handlers.MiscOperationHandler();
+        foreach (var variant in new[] { "i_exhaustrandomattack", "i_addexhaustedattackdamage", "i_transform", "d_returneventcardtohand",
+                     "cl_puteventcardondrawtop", "i_addcardreward", "i_replayattack", "d_replayeventcard" })
+            registry.Register(new OperationKey("template_independent_action", variant), misc);
+        registry.Register(new OperationKey("template_self_action", "d_transformstatusestofuel"), misc);
+        registry.Register(new OperationKey("modify_orb_slots", "loss"), misc);
+        registry.Register(new OperationKey("restrict_block_from_cards", "next_n_turns"), misc);
 
         // 0.9.x：modify_cost/set_zero（4 条——本卡费用设为 0）
         registry.Register(new OperationKey("modify_cost", "set_zero"), templateIndependent);

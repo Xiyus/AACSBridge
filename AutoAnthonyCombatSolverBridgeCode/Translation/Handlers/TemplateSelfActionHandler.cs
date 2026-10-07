@@ -8,6 +8,8 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.Orbs;
 using MegaCrit.Sts2.Core.Models.Powers;
+using AutoAnthonyCombatSolverBridge.CombatSolver;
+using MegaCrit.Sts2.Core.Extensions;
 
 // 命名空间说明见 AutoAnthonyFacade.cs：外部类型一律通过文件级 using + 非限定名引用。
 
@@ -38,7 +40,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             return spec.Variant switch
             {
                 "a_proxyatomic_buffer" or "a_proxyatomic_parry" or "a_proxyatomic_royalties"
-                    or "a_proxyatomic_calcify" or "a_proxyatomic_swordsage"
+                    or "a_proxyatomic_calcify" or "a_proxyatomic_swordsage" or "a_proxyatomic_forbiddengrimoire" or "first_cards_free_each_turn"
                     or "kings_sword_hits_all"
                     // A:rule 族（ApplyBoundPower 一行式）
                     or "poison_extra_triggers" or "derivative_bonus_damage"
@@ -51,7 +53,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             "d_channelfrost" or "d_channeldark" or "d_channellightning"
                 or "d_channelglass" or "d_channelplasma" or "d_channelrandom" => null,
             "d_gainfocus" => null,
-            "d_gaintemporaryfocus" => "临时聚焦的 AutoAnthony Power 生命周期尚未适配",
+            "d_gaintemporaryfocus" => null,
             "d_gainorbslots" => null,
             "n_createshiv" => null,
             "r_forge" => null,
@@ -102,7 +104,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             // 更多球激发/简单变体
             "d_evokeleftmostorb" => null,
             "d_evokealltwice" => null,
-            "n_createinkshiv" => "墨色小刀衍生槽不能用原生 Shiv 替代",
+            "n_createinkshiv" => null,
             "n_blockequalallpoison" => null,
             "d_exhaustallstatuses" => null,
             "d_shuffleallunexhaustedintodraw" => null,
@@ -150,14 +152,22 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
     {
         var mirror = context.Mirror;
         var owner = context.Card.Owner;
-        var amount = context.Card.OperationAmount(context.Shape.OperationIndex);
+        var amount = context.ExecutableAmount;
         // 源码门控：ExecutableOrbRepeatCount(amount) = Math.Max(0, amount)，== 0 时跳过
         var count = Math.Max(0, amount);
+        var producer = context.Card.Generated.Operations[context.Shape.OperationIndex];
+        if (ChaosOperationExecutor.SimpleHandDerivativeProducerTemplates.Contains(producer.Template))
+        {
+            ChaosDerivativeMirror.Add(mirror.Simulator, context.Card, context.Shape.OperationIndex, PileType.Hand,
+                ChaosOperationExecutor.ExecutableOperationCount(producer, context.ExecutableAmount));
+            return;
+        }
 
         // combat_rule 的代理 Power 模板（A:ProxyAtomic 族）
         if (context.Shape.Spec.Opcode == "combat_rule")
         {
-            var proxyAmount = Math.Max(1, amount);    // 源码 ApplyGeneratedProxyPower：max(1, amount)
+            var proxyAmount = context.Shape.Spec.Variant.StartsWith("a_proxyatomic_", StringComparison.Ordinal)
+                ? Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex)) : amount;
             switch (context.Shape.Spec.Variant)
             {
                 case "a_proxyatomic_buffer":
@@ -177,6 +187,11 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                     return;
                 case "a_proxyatomic_forbiddengrimoire":
                     ApplySelf(context, typeof(ForbiddenGrimoirePower), proxyAmount);
+                    return;
+                case "first_cards_free_each_turn":
+                    global::CombatSolver.TurnStartPowerSupport.PrepareVoidFormApplication(mirror.Simulator,
+                        (global::CombatSolver.SimulatedCombatState)mirror.CombatState, owner.Creature);
+                    ApplySelf(context, typeof(VoidFormPower), Math.Max(1, context.Card.OperationAmount(context.Shape.OperationIndex)));
                     return;
                 // 简单 combat_rule 规则
                 case "retain_hand_at_turn_end":
@@ -256,6 +271,10 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 effects.ApplyPowerFromSource(typeof(FocusPower), owner.Creature, amount, owner.Creature, context.Card);
                 return;
             }
+            case "d_gaintemporaryfocus":
+                ((global::CombatSolver.SimulatedCombatState)mirror.CombatState)
+                    .ApplyTemporaryFocus<ChaosTemporaryFocusPower>(owner.Creature, amount, owner.Creature);
+                return;
             case "d_gainorbslots":
                 if (count == 0) return;
                 mirror.Simulator.AddOrbSlots(owner, count);
@@ -303,7 +322,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 {
                     mirror.Simulator.OrbEvokeNext(owner, 1, dequeue: i == evokeCount - 1);
                     if (mirror.Simulator.HasPendingChoice)
-                        throw new InvalidOperationException("球激发出现选择，尚未接入整卡续接。");
+                        return;
                 }
                 return;
             }
@@ -452,10 +471,10 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 ApplySelf(context, typeof(StrengthPower), -count);
                 return;
             case "ncr_nextvoidcostszero":
-                ApplySelf(context, typeof(VeilpiercerPower), 1);
+                ApplySelf(context, typeof(VeilpiercerPower), DependencyResolver.Multiplier(context));
                 return;
             case "d_nextpowercostszero":
-                ApplySelf(context, typeof(FreePowerPower), 1);
+                ApplySelf(context, typeof(FreePowerPower), DependencyResolver.Multiplier(context));
                 return;
             // ===== N: 族简单 Power 模板 =====
             case "n_thorns":
@@ -509,7 +528,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                     if (orbQueue.Orbs.Count == 0) break;
                     mirror.Simulator.OrbEvoke(owner, orbQueue.Orbs[^1], dequeue: i == evokeCount - 1);
                     if (mirror.Simulator.HasPendingChoice)
-                        throw new InvalidOperationException("球激发出现选择，尚未接入整卡续接。");
+                        return;
                 }
                 return;
             }
@@ -524,12 +543,11 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                     {
                         mirror.Simulator.OrbEvokeNext(owner, 1, dequeue: repeat == count - 1);
                         if (mirror.Simulator.HasPendingChoice)
-                            throw new InvalidOperationException("全体球激发出现选择，尚未接入整卡续接。");
+                            return;
                     }
                 return;
             }
             case "n_createinkshiv":
-            case "d_gaintemporaryfocus":
                 throw new UnsupportedRuntimeSpecException(context.Shape.Spec.Opcode, context.Shape.Spec.Variant);
             case "n_blockequalallpoison":
             {
@@ -652,8 +670,13 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             }
             case "ncr_allenemiesloseeventhp":
             {
-                // 源码 L1860：全体敌人失去 state.EventAmount HP（触发式执行的事件量）
-                // 简化：无 EventAmount 时 no-op（直接打出时 EventAmount=0）
+                if (context.EventAmount > 0)
+                    foreach (var enemy in mirror.CombatState.HittableEnemies.ToArray())
+                    {
+                        mirror.Simulator.Damage([enemy], context.EventAmount, MegaCrit.Sts2.Core.ValueProps.ValueProp.Unblockable
+                            | MegaCrit.Sts2.Core.ValueProps.ValueProp.Unpowered, owner.Creature, mirror.Card, mirror.CardPlay);
+                        if (mirror.Simulator.HasPendingChoice) return;
+                    }
                 return;
             }
             case "ncr_killenemiesatdoomthreshold":
@@ -706,13 +729,7 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             }
             case "ncr_ostyalldamage":
             {
-                // 源码：Osty 对全体敌人造成伤害（经 DamageAndHits——Osty 为攻击者）
-                var osty = mirror.Simulator.State.GetOsty(owner);
-                if (osty is null) return;    // Osty 不存在 = no-op
-                var (ostyDamage, ostyHits) = DamageModifierResolver.Resolve(context, count, 1);
-                if (ostyHits > 0)
-                    mirror.Simulator.Damage(mirror.CombatState.HittableEnemies.ToArray(), ostyDamage,
-                        context.DamageProps, osty, context.Mirror.Card, context.Mirror.CardPlay);
+                OstyDamageResolver.Execute(context, null);
                 return;
             }
             case "ncr_healosty":
@@ -720,9 +737,8 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
                 // 源码：治疗 Osty（模拟器 SimCreatureState 支持 HP 修改）
                 var osty = mirror.Simulator.State.GetOsty(owner);
                 if (osty is null) return;
-                var ostyState = mirror.Simulator.State.GetCreature(osty);
                 if (count > 0)
-                    ostyState.Heal(count);
+                    mirror.Simulator.Heal(osty, count);
                 return;
             }
             case "ncr_killosty":
@@ -782,45 +798,45 @@ public sealed class TemplateSelfActionHandler : IOperationHandler
             }
             case "ncr_upgraderandomdiscardcards":
             {
-                // 源码 L1797：升级弃牌堆中的随机卡（简化：升级第一张可升级卡）
                 var discard = mirror.Simulator.State.GetPlayerCombatState(owner).DiscardPile.Cards;
-                var upgradable = discard.FirstOrDefault(c => c.Preview.IsUpgradable);
-                if (upgradable is not null)
-                    global::CombatSolver.Engine.Common.PredictionUtils.UpgradeCard(upgradable.MutablePreview);
+                var selected = discard.Where(card => card.Preview.IsUpgradable).TakeRandom(Math.Max(0, amount), mirror.Rng.CombatCardSelection).ToList();
+                foreach (var card in selected) mirror.Simulator.Upgrade(card);
                 return;
             }
             case "cl_gainblockequaldamage":
             {
                 // 源码 L1276-1279：格挡 = 本次伤害量（state.LastDamageDealt）
-                // 简化：格挡 = OperationAmount（直接打出时近似）
-                if (count > 0)
-                    mirror.Simulator.GainBlock(owner.Creature, count,
-                        context.BlockProps, context.Mirror.Card, context.Mirror.CardPlay);
+                mirror.Simulator.GainBlock(owner.Creature, context.Resolution?.LastDamageDealt ?? 0,
+                    context.BlockProps, context.Mirror.Card, context.IsTriggered ? null : context.Mirror.CardPlay);
                 return;
             }
             case "cl_damageotherenemiesequal":
             {
                 // 源码 L1339-1343：对其他敌人造成等量伤害
-                var target = context.Mirror.CardPlay.Target;
-                if (target is null) return;
+                var target = context.Target;
                 var others = mirror.CombatState.HittableEnemies
                     .Where(e => !ReferenceEquals(e, target)).ToArray();
-                if (others.Length > 0 && count > 0)
-                    mirror.Simulator.Damage(others, count,
-                        context.DamageProps, owner.Creature, context.Mirror.Card, context.Mirror.CardPlay);
+                if (others.Length > 0 && context.Resolution?.LastDamageDealt > 0)
+                    mirror.Simulator.Damage(others, context.Resolution.LastDamageDealt,
+                        MegaCrit.Sts2.Core.ValueProps.ValueProp.Unpowered | MegaCrit.Sts2.Core.ValueProps.ValueProp.Move,
+                        owner.Creature, context.Mirror.Card, context.Mirror.CardPlay);
                 return;
             }
             case "d_triggerdarkpassives":
             {
                 // 源码 L2237-2240：触发所有暗球的被动
                 var orbQueue = mirror.Simulator.State.GetPlayerCombatState(owner).OrbQueue;
-                foreach (var orb in orbQueue.Orbs.OfType<DarkOrb>().ToList())
-                    mirror.Simulator.OrbPassive(orb);
+                for (var repeat = 0; repeat < ChaosOperationExecutor.UpgradedOperationRepeatCount(context.Card, context.Shape.OperationIndex); repeat++)
+                    foreach (var orb in orbQueue.Orbs.Where(orb => ChaosOrbResolver.MatchesSource(orb, context.Operation)).ToList())
+                    {
+                        mirror.Simulator.OrbPassive(orb);
+                        if (mirror.Simulator.HasPendingChoice) return;
+                    }
                 return;
             }
             case "cl_playtopdrawcard":
             {
-                // 源码 L1328-1331：自动打出抽牌堆顶 1 张（no-op——嵌套出牌边界）
+                new AutoPlayHandler().Execute(context);
                 return;
             }
             default:

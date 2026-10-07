@@ -40,7 +40,7 @@ public sealed class BlockHandler : IOperationHandler
         // ApplyBlockModifiers：base + ExtraBlock + Σ(strength_scaled 加成)
         var block = context.ExecutableAmount + context.Card.ExtraBlock + StrengthScaledBonus(context);
         context.Mirror.Simulator.GainBlock(
-            context.Card.Owner.Creature, block, context.BlockProps, context.Mirror.Card, context.Mirror.CardPlay);
+            context.Card.Owner.Creature, block, context.BlockProps, context.Mirror.Card, context.IsTriggered ? null : context.Mirror.CardPlay);
     }
 
     /// <summary>
@@ -70,7 +70,10 @@ public sealed class BlockHandler : IOperationHandler
             var interval = ChaosOperationExecutor.RuntimeSpecValue(card, index, "strength_interval", 1);
             var perInterval = ChaosOperationExecutor.RuntimeSpecValue(card, index, "block_per_interval", 0);
             // 源码：strength / Math.Max(1, interval) * bonus * dependencyRepeats（整数除法后乘）
-            bonus += strength / Math.Max(1, interval) * perInterval;
+            if (operation.Parameters.TryGetValue("triggerIndex", out var gate) && gate >= 0 && gate < operations.Count
+                && operations[gate].RuntimeSpec?.Condition is not null
+                && !ConditionEvaluator.Evaluate(card, operations[gate], context.Mirror, context.Resolution ?? new OperationResolutionState())) continue;
+            bonus += strength / Math.Max(1, interval) * perInterval * DependencyResolver.ModifierMultiplier(context, index);
         }
         return bonus;
     }
