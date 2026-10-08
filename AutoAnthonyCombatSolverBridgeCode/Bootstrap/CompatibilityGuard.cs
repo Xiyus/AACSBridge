@@ -17,7 +17,7 @@ public sealed record BridgeModFacts(
     IReadOnlyList<string> MissingTypes,
     IReadOnlyList<string> MissingMembers);
 
-/// <summary>启动自检结果。Fail closed：全部检查通过 IsCompatible 才为 true。</summary>
+/// <summary>必要接口检查结果；版本/行为漂移只触发强制保守模式。</summary>
 public sealed record CompatibilityReport(
     bool IsCompatible,
     BridgeModFacts AutoAnthony,
@@ -25,6 +25,7 @@ public sealed record CompatibilityReport(
     IReadOnlyList<string> Failures,
     IReadOnlyList<string> Notes)
 {
+    public bool ForceConservativePlayability { get; init; }
     public const string MinimumAutoAnthonyVersion = "0.3.137";
     public const string TestedAutoAnthonyVersion = "0.3.139";
     public const string MinimumCombatSolverVersion = "0.50.1";
@@ -38,7 +39,7 @@ public sealed record CompatibilityReport(
 ///
 /// 纪律（来自 CombatSolver 第三方适配文档与 AutoAnthony 的 COMPONENT_API）：
 ///  - 保存已审计参考版本，并在运行期核对接口/schema/行为契约；
-///  - 自检不通过时一个镜像都不注册——部分适配比完全不适配更危险；
+///  - 必要接口不兼容时不注册；版本/行为漂移继续加载并排除未适配卡；
 ///  - 记录程序集 MVID + SHA256，让玩家和开发者能核对桥实际运行的二进制。
 /// </summary>
 public static class CompatibilityGuard
@@ -148,26 +149,42 @@ public static class CompatibilityGuard
         VerifyGameContract(failures, notes);
         AuditChaosCardOnPlayPatches(aaAssembly, notes);
         VerifyCompositeSeams(aa, cs, csAssembly, failures);
-
-        return new CompatibilityReport(failures.Count == 0, aa, cs, failures, notes);
+        var drift = new List<string>();
+        DetectBehaviorDrift(aa, cs, csAssembly, drift);
+        foreach (var warning in drift) notes.Add($"兼容性提示：{warning}");
+        var conservative = RequiresConservativeMode(aa.ManifestVersion, cs.ManifestVersion, drift.Count);
+        if (conservative) notes.Add("依赖版本或行为基线不匹配：桥继续加载，强制保守排除未适配卡；AA_BRIDGE_STRICT 不覆盖此模式。行为等价仍需复测。");
+        return new CompatibilityReport(failures.Count == 0, aa, cs, failures, notes)
+        { ForceConservativePlayability = conservative };
     }
+
+    internal static bool RequiresConservativeMode(Version? anthony, Version? solver, int behaviorDrifts)
+        => anthony != Version.Parse(CompatibilityReport.TestedAutoAnthonyVersion)
+            || solver != Version.Parse(CompatibilityReport.TestedCombatSolverVersion) || behaviorDrifts > 0;
 
     private static void VerifyCompositeSeams(BridgeModFacts aa, BridgeModFacts cs, Assembly? solver, List<string> failures)
     {
-        // Known binaries take the fast path. Other builds must retain the executable
-        // contracts of the adapted types; unrelated assembly changes are allowed.
+        if (solver is null) return;
+        VerifySeamSignatures(solver, failures);
+    }
+
+    private static void DetectBehaviorDrift(BridgeModFacts aa, BridgeModFacts cs, Assembly? solver, List<string> warnings)
+    {
+        // Drift is diagnostic, not an initialization failure. Card support remains
+        // guarded by the per-card RuntimeSpec matrix in forced conservative mode.
         if (!string.Equals(aa.Sha256, "333172b28e5095b400b806a583b7b6e635f5660e92938bccff433868bfefcb58", StringComparison.OrdinalIgnoreCase))
         {
             var anthony = FindLoadedAssembly("AutoAnthony");
-            if (anthony is null) failures.Add("AutoAnthony 程序集未加载。");
-            else VerifyBehavior(anthony, failures);
+            if (anthony is not null) VerifyBehavior(anthony, warnings);
         }
         if (!string.Equals(cs.Sha256, "832060172aa5eae8d79546f120a10e4571c324b7c0d6ab2c6abc2bcad24323cd", StringComparison.OrdinalIgnoreCase))
         {
-            if (solver is null) failures.Add("CombatSolver 程序集未加载。");
-            else VerifyBehavior(solver, failures);
+            if (solver is not null) VerifyBehavior(solver, warnings);
         }
-        if (solver is null) return;
+    }
+
+    private static void VerifySeamSignatures(Assembly solver, List<string> failures)
+    {
         var seams = new[]
         {
             ("CombatSolver.PersistentPowerSupport", "TriggerAfterSideTurnStart", "System.Boolean", 5),

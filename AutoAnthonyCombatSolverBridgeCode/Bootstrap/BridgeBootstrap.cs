@@ -15,10 +15,12 @@ namespace AutoAnthonyCombatSolverBridge.Bootstrap;
 public static class BridgeBootstrap
 {
     public static bool IsReady { get; private set; }
+    public static bool ForceConservativePlayability { get; private set; }
     internal static void MarkReady() => IsReady = true;
 
     public static void Initialize(CompatibilityReport report)
     {
+        ForceConservativePlayability = report.ForceConservativePlayability;
         var aa = report.AutoAnthony;
         var cs = report.CombatSolver;
 

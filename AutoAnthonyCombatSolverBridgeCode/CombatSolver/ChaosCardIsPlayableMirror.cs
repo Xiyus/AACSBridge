@@ -9,7 +9,7 @@ namespace AutoAnthonyCombatSolverBridge.CombatSolver;
 /// ChaosCardModel.IsPlayable 的镜像。两层语义：
 ///  1. 保守可打性（默认开启，AA_BRIDGE_STRICT=1 关闭）：超出支持矩阵的卡在模拟中返回
 ///     false——搜索只探索可精确预测的路线，矩阵外的卡不被求解器主动打出（真实游戏不受
-///     影响）。这是"宁可次优、不可错误预测"的保守实现：部署的每个动作都被精确预测。
+///     影响）。版本漂移时也强制此策略；准入不等于所有战斗组合已经验证。
 ///  2. 真实合法性（复刻 ChaosCardModel 的重写 L462-464）：base.IsPlayable &amp;&amp;
 ///     （无"抽牌堆为空才可打"子句，或抽牌堆确实为空）。base 恒为 true（CardModel 基类
 ///     默认，CombatSolver 镜像注释确认），能量/目标/Unplayable 检查在游戏出牌管线里——

@@ -102,6 +102,21 @@ void Run()
         if (!condition) throw new Exception(label);
         checks++;
     }
+    var fallbackPolicy = typeof(CompatibilityGuard).GetMethod("RequiresConservativeMode", BindingFlags.NonPublic | BindingFlags.Static)!;
+    bool Fallback(Version? aaVersion, Version? solverVersion, int changes = 0)
+        => (bool)fallbackPolicy.Invoke(null, [aaVersion, solverVersion, changes])!;
+    var auditedAa = Version.Parse(CompatibilityReport.TestedAutoAnthonyVersion);
+    var auditedSolver = Version.Parse(CompatibilityReport.TestedCombatSolverVersion);
+    Check(!Fallback(auditedAa, auditedSolver), "audited versions retain normal configured policy");
+    Check(Fallback(new Version(0, 3, 999), auditedSolver), "new AA version enters conservative mode instead of disabling bridge");
+    Check(Fallback(auditedAa, new Version(0, 1, 0)), "older solver version enters conservative mode pending required interface checks");
+    Check(Fallback(null, auditedSolver), "unknown manifest version forces conservative mode");
+    Check(Fallback(auditedAa, auditedSolver, 1), "behavior drift forces conservative mode even at identical version numbers");
+    var cardSupportPolicy = assembly.GetType("AutoAnthonyCombatSolverBridge.CombatSolver.ChaosCardSupport")!
+        .GetMethod("UseConservativePlayability", BindingFlags.NonPublic | BindingFlags.Static)!;
+    Check((bool)cardSupportPolicy.Invoke(null, [true, "1"])!, "compatibility fallback cannot be bypassed by strict environment flag");
+    Check(!(bool)cardSupportPolicy.Invoke(null, [false, "1"])!, "matching versions preserve explicit strict mode");
+    Check((bool)cardSupportPolicy.Invoke(null, [false, null])!, "default card policy remains conservative");
     OperationRuntimeSpec Spec(string opcode, string variant, string target, RuntimeTriggerSpec? trigger = null,
         RuntimeValueSlot[]? values = null, string[]? flags = null) =>
         new(1, opcode, variant, target, "none", "none", "any", flags ?? [], values ?? [], Trigger: trigger);
@@ -369,6 +384,12 @@ void Run()
     var failures = new List<string>();
     seams.Invoke(null, [Facts(aa), Facts(solver), solver, failures]);
     Check(failures.Count == 0, "installed binary seams: " + string.Join("; ", failures));
+    var startupReport = CompatibilityGuard.Run();
+    Check(startupReport.IsCompatible, "full startup guard accepts installed dependencies even when test-output manifests are unavailable: "
+        + string.Join("; ", startupReport.Failures));
+    var missingSeams = new List<string>();
+    seams.Invoke(null, [Facts(aa), Facts(solver), assembly, missingSeams]);
+    Check(missingSeams.Count > 0, "missing essential solver interfaces remain hard failures rather than version fallbacks");
     seams.Invoke(null, [Facts(aa), Facts(solver) with { Sha256 = "wrong" }, solver, failures]);
     Check(failures.Count == 0, "changed solver package hash with unchanged behavior remains compatible: " + string.Join("; ", failures));
     seams.Invoke(null, [Facts(aa) with { Sha256 = "different" }, Facts(solver), solver, failures]);

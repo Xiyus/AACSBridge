@@ -19,7 +19,7 @@ dotnet run --project tests/BridgeChecks -p:SkipModDeploy=true -- `
 The trailing directories resolve runtime dependencies. Original binaries are loaded at runtime;
 publicization only changes compile-time visibility.
 
-The 2026-10-08 suite passes 159 checks covering supported/rejected RuntimeSpec shapes, installed
+The 2026-10-08 suite passes 169 checks covering supported/rejected RuntimeSpec shapes, installed
 catalog admission, compatibility drift, actual mirror/Harmony registrations, fork isolation,
 continuation fingerprints, post-play movement, temporary-power routing and random transformation routing.
 These checks do not certify every whole-card combination or strict predicted/live combat equivalence.

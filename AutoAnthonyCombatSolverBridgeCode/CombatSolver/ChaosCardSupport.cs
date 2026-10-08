@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using AutoAnthony;
+using AutoAnthonyCombatSolverBridge.Bootstrap;
 using MegaCrit.Sts2.Core.Models;
 
 // 命名空间说明见 AutoAnthonyFacade.cs：外部类型一律通过文件级 using + 非限定名引用。
@@ -24,7 +25,11 @@ namespace AutoAnthonyCombatSolverBridge.CombatSolver;
 internal static class ChaosCardSupport
 {
     public static bool ConservativePlayability =>
-        !string.Equals(Environment.GetEnvironmentVariable("AA_BRIDGE_STRICT"), "1", StringComparison.Ordinal);
+        UseConservativePlayability(BridgeBootstrap.ForceConservativePlayability,
+            Environment.GetEnvironmentVariable("AA_BRIDGE_STRICT"));
+
+    internal static bool UseConservativePlayability(bool compatibilityFallback, string? strict)
+        => compatibilityFallback || !string.Equals(strict, "1", StringComparison.Ordinal);
 
     private sealed class Verdict
     {
