@@ -499,6 +499,29 @@ void Run()
     // Exercise every action registration against the unmodified installed solver. This catches
     // override-signature and duplicated-registry errors which a successful compile cannot detect.
     var mirror = assembly.GetType("AutoAnthonyCombatSolverBridge.CombatSolver.ChaosCompositePowerMirror")!;
+    var sourceResolver = assembly.GetType("AutoAnthonyCombatSolverBridge.Translation.CombatSourceCardResolver")!
+        .GetMethod("SelectSource", BindingFlags.Static | BindingFlags.NonPublic)!;
+    TestChaosCard MutableSourceFixture()
+    {
+        var fixture = TestChaosCard.Create([]);
+        typeof(MegaCrit.Sts2.Core.Models.AbstractModel).GetProperty("IsMutable")!.SetValue(fixture, true);
+        foreach (var field in typeof(ChaosCardModel).GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
+                     .Where(field => field.FieldType == typeof(string))) field.SetValue(fixture, "");
+        return fixture;
+    }
+    var detachedSource = MutableSourceFixture();
+    var sameDefinitionSource = MutableSourceFixture();
+    var matchingDeckSource = MutableSourceFixture();
+    var originalDeckIdentity = MutableSourceFixture();
+    detachedSource.DeckVersion = originalDeckIdentity;
+    matchingDeckSource.DeckVersion = originalDeckIdentity;
+    Check(ReferenceEquals(sourceResolver.Invoke(null, [detachedSource, new ChaosCardModel[] { sameDefinitionSource, matchingDeckSource }]), matchingDeckSource),
+        "delayed host-cost mutation prefers exact deck identity over first same-slot combat card");
+    detachedSource.DeckVersion = null;
+    Check(ReferenceEquals(sourceResolver.Invoke(null, [detachedSource, new ChaosCardModel[] { sameDefinitionSource, matchingDeckSource }]), sameDefinitionSource),
+        "host-cost source lookup retains AA first matching definition fallback order");
+    Check(ReferenceEquals(sourceResolver.Invoke(null, [detachedSource, Array.Empty<ChaosCardModel>()]), detachedSource),
+        "removed combat source falls back to temporary receiver without inventing a new card");
     var derivativeMirror = assembly.GetType("AutoAnthonyCombatSolverBridge.CombatSolver.ChaosDerivativeMirror")!;
     var randomReplacement = derivativeMirror.GetMethod("TransformReplacement", BindingFlags.Static | BindingFlags.NonPublic)!;
     var randomTransformFactory = solver.GetType("CombatSolver.Engine.InCombat.Extensions.CombatCardGenerationExtensions")!

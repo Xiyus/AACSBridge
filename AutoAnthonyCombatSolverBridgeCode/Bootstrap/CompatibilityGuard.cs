@@ -26,7 +26,7 @@ public sealed record CompatibilityReport(
     IReadOnlyList<string> Notes)
 {
     public const string MinimumAutoAnthonyVersion = "0.3.137";
-    public const string TestedAutoAnthonyVersion = "0.3.138";
+    public const string TestedAutoAnthonyVersion = "0.3.139";
     public const string MinimumCombatSolverVersion = "0.50.1";
     public const string TestedCombatSolverVersion = "0.50.1";
 }
@@ -156,7 +156,7 @@ public static class CompatibilityGuard
     {
         // Known binaries take the fast path. Other builds must retain the executable
         // contracts of the adapted types; unrelated assembly changes are allowed.
-        if (!string.Equals(aa.Sha256, "689b9c5056227c0b47e406159853938c407d56f5726604b1eac3c1b72c10fa50", StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(aa.Sha256, "333172b28e5095b400b806a583b7b6e635f5660e92938bccff433868bfefcb58", StringComparison.OrdinalIgnoreCase))
         {
             var anthony = FindLoadedAssembly("AutoAnthony");
             if (anthony is null) failures.Add("AutoAnthony 程序集未加载。");

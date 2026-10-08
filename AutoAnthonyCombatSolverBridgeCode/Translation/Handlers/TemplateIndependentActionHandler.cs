@@ -253,7 +253,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             case "d_increasethiscardcost":
             {
                 // 源码：本卡费用 +amount
-                context.Card.EnergyCost.AddThisCombat(amount);
+                CombatSourceCardResolver.Resolve(context).EnergyCost.AddThisCombat(Math.Max(1, amount));
                 return;
             }
             case "i_proxyatomic_foregoneconclusion":
@@ -412,7 +412,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             case "i_reducethiscardcostcombat":
             {
                 // 源码 L3150：本卡费用 -amount（本战斗）
-                context.Card.EnergyCost.AddThisCombat(-amount);
+                CombatSourceCardResolver.Resolve(context).EnergyCost.AddThisCombat(-amount);
                 return;
             }
             case "i_drawuntilnonattack":
@@ -445,7 +445,7 @@ public sealed class TemplateIndependentActionHandler : IOperationHandler
             case "d_setthiscardcostzero":
             {
                 // 源码 L2264：card.EnergyCost.SetThisCombat(0)
-                context.Card.EnergyCost.SetThisCombat(0);
+                CombatSourceCardResolver.Resolve(context).EnergyCost.SetThisCombat(0);
                 return;
             }
             case "d_increaseallclaws":
