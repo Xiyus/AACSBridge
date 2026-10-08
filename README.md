@@ -4,8 +4,10 @@ Slay the Spire 2 的纯代码 Bridge Mod（id：`AutoAnthonyCombatSolverBridge`�
 [CombatSolver](https://github.com/Torch1230/CombatSolver) 能够预测
 [AutoAnthony](https://github.com/mewcodex/AutoAnthony) 生成的随机卡牌。
 
-项目仓库：[Xiyus/AACSBridge](https://github.com/Xiyus/AACSBridge)。
-仓库名为 AACSBridge，游戏内 Mod id 和文件名仍为 AutoAnthonyCombatSolverBridge。
+## 重要
+
+本 Mod 人类含量为 0%，出现问题就是蓝色大肥鱼的锅。噢，还有白色龙娘。
+以后也未必更新，想适配新版本直接拿本仓库扔给AI。
 
 ## 当前状态
 
@@ -20,7 +22,7 @@ Slay the Spire 2 的纯代码 Bridge Mod（id：`AutoAnthonyCombatSolverBridge`�
 AutoAnthony 生成牌 → 读取结构化 OperationRuntimeSpec → 翻译成 CombatSolver 的预测行为 → CombatSolver 正常搜索
 ```
 
-绝不解析卡牌中文/英文描述——AutoAnthony 官方契约（`COMPONENT_API.md`）明确
+不解析卡牌中文/英文描述——AutoAnthony 官方契约（`COMPONENT_API.md`）明确
 `OperationRuntimeSpec`（Opcode / Variant / Target / Zones / Flags / ValueSlots /
 Condition / Trigger）才是执行来源，本地化文本只是输出投影。
 
@@ -34,7 +36,7 @@ Condition / Trigger）才是执行来源，本地化文本只是输出投影。
 
 两个 Mod 同时启用时桥自动生效，无需配置。
 
-## 保守排除策略（重要）
+## 保守排除策略
 
 超出支持矩阵的卡牌在模拟中按**不可打出**处理，减少使用未适配效果的风险。
 已准入的效果仍可能存在实现偏差，保守排除不能保证全部预测正确。设置环境变量 `AA_BRIDGE_STRICT=1` 可关闭该模式
@@ -111,34 +113,3 @@ AutoAnthonyCombatSolverBridge/
 ├── tests/BridgeChecks/                # 离线一致性检查（dotnet run）
 └── docs/                              # 目录准入审计、行为契约基线
 ```
-
-## 离线检查
-
-从仓库根目录执行，最后几个目录参数用于加载已安装的原版依赖：
-
-```powershell
-dotnet run --project tests/BridgeChecks -p:SkipModDeploy=true -- `
-  '<游戏>/data_sts2_windows_x86_64' `
-  '<AutoAnthony DLL 目录>' `
-  '<CombatSolver DLL 目录>' `
-  '<RitsuLib>/compat/0.111.0' `
-  '<RitsuLib>/shared' `
-  '<RitsuLib>'
-```
-
-覆盖翻译表完整性、守卫契约、触发器/修饰符/条件矩阵与各 handler 的准入/拒绝行为。
-离线检查不执行完整真实战斗。详细用法见 [tests/BridgeChecks/README.md](tests/BridgeChecks/README.md)。
-
-## 报告问题
-
-请在仓库 Issues 中说明游戏与依赖版本、角色、卡牌、失败回合，以及搜索失败、重算或选牌暂停的现象。
-提交日志前请移除个人路径、账号标识、凭据和其他无关信息。
-本仓库不包含开发者的原始游戏日志、私有配置、研究副本或构建缓存。
-
-## 致谢
-
-- [AutoAnthony](https://github.com/mewcodex/AutoAnthony)（mewcodex）——生成随机卡牌的本体；
-- [CombatSolver](https://github.com/Torch1230/CombatSolver)（Torch1230）——战斗求解器；
-- [Alchyr/ModTemplate-StS2](https://github.com/Alchyr/ModTemplate-StS2)——Empty Mod 模板。
-
-本 Mod 人类含量为 0%。
